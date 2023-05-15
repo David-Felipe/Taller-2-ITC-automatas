@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AFNLambda {
+
     private Set<Character> alphabet;
     private Set<String> states;
     private String initialState;
