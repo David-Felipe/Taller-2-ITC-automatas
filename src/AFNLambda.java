@@ -1,12 +1,11 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.Console;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
-
-import javax.print.event.PrintEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AFNLambda {
     private Set<Character> alphabet;
@@ -29,6 +28,28 @@ public class AFNLambda {
     // Constructor(alfabeto, estados, estadoInicial, estadosAceptacion,Delta) de la
     // clase para inicializar los atributos.
 
+    // Métodos setter
+    public Set<Character> getAlphabet() {
+        return alphabet;
+    }
+
+    public Set<String> getStates() {
+        return states;
+    }
+
+    public String getInitialState() {
+        return initialState;
+    }
+
+    public Set<String> getAcceptingStates() {
+        return acceptingStates;
+    }
+
+    public Map<String, Map<Character, Set<String>>> getTransitionFunction() {
+        return transitionFunction;
+    }
+    // Métodos setter
+
     // Constructor(nombreArchivo) de la clase para inicializar los atributos a
     // partir de un archivo cuyo formato es el especificado (ver archivo adjunto).
     public AFNLambda(String nombreArchivo) throws IOException {
@@ -49,14 +70,13 @@ public class AFNLambda {
                 }
             }
         }
-        List<String> seccionesEsperadas = new ArrayList<>(Arrays.asList("#alphabet", "#states", "#initial", "#accepting", "#transitions"));
+        List<String> seccionesEsperadas = new ArrayList<>(
+                Arrays.asList("#alphabet", "#states", "#initial", "#accepting", "#transitions"));
         Iterator<String> iteratoralphabet = lineas.iterator();
         Iterator<String> iteratorstates = lineas.iterator();
         Iterator<String> iteratorinitial = lineas.iterator();
         Iterator<String> iteratoraccepting = lineas.iterator();
         Iterator<String> iteratortransitions = lineas.iterator();
-        System.out.println(lineas);
-
         while (iteratoralphabet.hasNext()) {
             linea = iteratoralphabet.next();
             if (linea.startsWith("#!nfe")) {
@@ -169,18 +189,18 @@ public class AFNLambda {
             if (linea.isEmpty() || linea.startsWith("#")) {
                 break; // Salir del bucle al encontrar la siguiente sección
             }
-    
+
             String[] partes = linea.split(":");
             if (partes.length >= 2) {
                 String estadoActual = partes[0].trim();
                 String[] transiciones = partes[1].split(",");
-    
+
                 for (String transicion : transiciones) {
                     String[] subpartes = transicion.split(">");
                     if (subpartes.length >= 2) {
                         Character simbolo = subpartes[0].trim().charAt(0);
                         String[] estadosSiguientes = subpartes[1].split("\\|");
-    
+
                         for (String estadoSiguiente : estadosSiguientes) {
                             estadoSiguiente = estadoSiguiente.trim();
                             addTransition(estadoActual, simbolo, estadoSiguiente);
@@ -190,7 +210,7 @@ public class AFNLambda {
             }
         }
     }
-    
+
     public void addTransition(String fromState, Character symbol, String toState) {
         if (states.contains(fromState) && states.contains(toState) && alphabet.contains(symbol)) {
             Map<Character, Set<String>> stateTransitions = transitionFunction.computeIfAbsent(fromState,
@@ -249,16 +269,14 @@ public class AFNLambda {
 
     // hallarEstadosInaccesibles() para determinar los estados inacessibles del
     // autómata y guardarlos en el atributo correspondiente.
-    public void hallarEstadosInaccesibles() {
+    public List<String> hallarEstadosInaccesibles() {
         Set<String> estadosVisitados = new HashSet<>();
         Queue<String> cola = new LinkedList<>();
         estadosVisitados.add(initialState);
         cola.offer(initialState);
-
         while (!cola.isEmpty()) {
             String currentState = cola.poll();
             Map<Character, Set<String>> transitions = transitionFunction.get(currentState);
-
             if (transitions != null) {
                 for (Set<String> toStates : transitions.values()) {
                     for (String nextState : toStates) {
@@ -270,14 +288,15 @@ public class AFNLambda {
                 }
             }
         }
-
-        inaccessibleStates.clear();
+        List<String> inaccessibleStates = new ArrayList<>();
         for (String state : states) {
             if (!estadosVisitados.contains(state)) {
                 inaccessibleStates.add(state);
             }
         }
+        return inaccessibleStates;
     }
+
     // hallarEstadosInaccesibles() para determinar los estados inacessibles del
     // autómata y guardarlos en el atributo correspondiente.
 
@@ -345,12 +364,10 @@ public class AFNLambda {
         System.out.println("Estados: " + states);
         System.out.println("Estado inicial: " + initialState);
         System.out.println("Estados de aceptacion: " + acceptingStates);
-
         System.out.println("Tabla de transiciones:");
         System.out.println("----------------------");
         System.out.println("| Estado |  Simbolo  |  Siguientes Estados  |");
         System.out.println("----------------------");
-
         for (String fromState : transitionFunction.keySet()) {
             Map<Character, Set<String>> transitions = transitionFunction.get(fromState);
             for (Character symbol : transitions.keySet()) {
@@ -359,7 +376,6 @@ public class AFNLambda {
                 System.out.printf("|  %s  |    %c     |         %s        |\n", fromState, symbol, nextStateStr);
             }
         }
-
         System.out.println("----------------------");
     }
     // imprimirAFNLSimplificado(): método para imprimir donde se vean los estados,
@@ -432,40 +448,245 @@ public class AFNLambda {
     // equivalente. Debe imprimir la λ-clausura de cada estado y la definición de
     // cada transición incluyendo todos los pasos del procesamiento
 
-    public static void main(String[] args) {
-        if (args.length > 0) {
-            try {
-                // Crear instancia de AFNLambda a partir de un archivo
-                AFNLambda automata = new AFNLambda(args[0]);
-
-                // Realizar operaciones con el autómata
-                // Set<String> lambdaClausura = automata.calcularLambdaClausura("estado");
-
-                // Imprimir el resultado o realizar otras operaciones
-                // System.out.println("λ-Clausura: " + lambdaClausura);
-
-                automata.imprimirAFNLSimplificado();
-                automata.toString();
-
-            } catch (IOException e) {
-                System.out.println("Error al leer el archivo");
-                e.printStackTrace();
+    // Booleano procesarCadena(cadena): procesa la cadena y retorna verdadero si
+    // es aceptada y falso si es rechazada por el autómata.
+    public boolean procesarCadena(String cadena) {
+        Set<String> currentStates = new HashSet<>();
+        currentStates.add(initialState);
+        for (char symbol : cadena.toCharArray()) {
+            Set<String> nextStates = new HashSet<>();
+            for (String state : currentStates) {
+                Map<Character, Set<String>> stateTransitions = transitionFunction.get(state);
+                if (stateTransitions != null && stateTransitions.containsKey(symbol)) {
+                    nextStates.addAll(stateTransitions.get(symbol));
+                }
             }
+            currentStates = nextStates;
+        }
+        // Verificar si hay algún estado de aceptación en currentStates
+        for (String state : currentStates) {
+            if (acceptingStates.contains(state)) {
+                return true; // La cadena es aceptada
+            }
+        }
+        return false; // La cadena es rechazada
+    }
+    // Booleano procesarCadena(cadena): procesa la cadena y retorna verdadero si
+    // es aceptada y falso si es rechazada por el autómata.
+
+    // Booleano procesarCadenaConDetalles(cadena): realiza lo mismo que el método
+    // anterior pero aparte imprime los estados que va tomando al
+    // procesar cada símbolo de uno de los procesamientos que lleva a la cadena a
+    // ser aceptada.
+    public boolean procesarCadenaConDetalles(String cadena) {
+        // Obtener el estado inicial del autómata
+        String estadoActual = initialState;
+        System.out.println("Estado actual: " + estadoActual);
+        // Procesar cada símbolo de la cadena
+        for (int i = 0; i < cadena.length(); i++) {
+            char simbolo = cadena.charAt(i);
+            System.out.println("Procesando símbolo: " + simbolo);
+            // Obtener los estados siguientes a partir del estado actual y el símbolo
+            Set<String> estadosSiguientes = getEstadosSiguientes(estadoActual, simbolo);
+            if (estadosSiguientes.isEmpty()) {
+                // No hay estados siguientes, la cadena es rechazada
+                System.out.println("La cadena es rechazada por el autómata.");
+                return false;
+            }
+            // Tomar el primer estado siguiente como nuevo estado actual
+            estadoActual = estadosSiguientes.iterator().next();
+            System.out.println("Nuevo estado actual: " + estadoActual);
+        }
+        // Verificar si el estado actual es un estado de aceptación
+        if (acceptingStates.contains(estadoActual)) {
+            System.out.println("La cadena es aceptada por el autómata.");
+            return true;
         } else {
-            // Argumentos no proporcionados, utilizar los valores por defecto o solicitar al
-            // usuario
-            Set<Character> alphabet = new HashSet<>();
-            Set<String> states = new HashSet<>();
-            String initialState = "estado_inicial";
-            Set<String> acceptingStates = new HashSet<>();
-
-            AFNLambda automata = new AFNLambda(alphabet, states, initialState, acceptingStates);
-
-            // Realizar operaciones con el autómata
-            Set<String> lambdaClausura = automata.calcularLambdaClausura("estado");
-
-            // Imprimir el resultado o realizar otras operaciones
-            System.out.println("λ-Clausura: " + lambdaClausura);
+            System.out.println("La cadena es rechazada por el autómata.");
+            return false;
         }
     }
+
+    private Set<String> getEstadosSiguientes(String estadoActual, char simbolo) {
+        // Obtener los estados siguientes a partir del estado actual y el símbolo
+        Set<String> estadosSiguientes = new HashSet<>();
+        // Verificar si hay una transición definida para el estado actual y el símbolo
+        // dado
+        if (transitionFunction.containsKey(estadoActual) && transitionFunction.get(estadoActual).containsKey(simbolo)) {
+            estadosSiguientes = transitionFunction.get(estadoActual).get(simbolo);
+        }
+        return estadosSiguientes;
+    }
+    // Booleano procesarCadenaConDetalles(cadena): realiza lo mismo que el método
+    // anterior pero aparte imprime los estados que va tomando al
+    // procesar cada símbolo de uno de los procesamientos que lleva a la cadena a
+    // ser aceptada.
+
+    // Debe imprimir cada uno de los posibles procesamientos de la cadena indicando
+    // de qué estado a qué estado pasa al procesar cada símbolo e indicando si al
+    // final
+    // de cada procesamiento se llega a aceptación o rechazo.
+
+    // Procesa cada cadenas con detalles pero los resultados deben ser impresos en
+    // un archivo cuyo nombre es nombreArchivo
+    public void procesarListaCadenas(List<String> listaCadenas, String nombreArchivo, boolean imprimirPantalla)
+            throws IOException {
+        // Verificar si el nombre de archivo es inválido y asignar uno por defecto
+        if (nombreArchivo == null || nombreArchivo.isEmpty()) {
+            nombreArchivo = "resultados.txt";
+        }
+
+        // Crear el archivo para escribir los resultados
+        BufferedWriter writer = new BufferedWriter(new FileWriter(nombreArchivo));
+
+        // Procesar cada cadena de la lista
+        for (String cadena : listaCadenas) {
+            boolean esAceptada = procesarCadenaConDetalles(cadena);
+
+            // Imprimir en archivo y/o pantalla según la configuración
+            if (imprimirPantalla) {
+                imprimirResultadosEnPantalla(cadena, esAceptada);
+            }
+            escribirResultadosEnArchivo(writer, cadena, esAceptada);
+        }
+
+        // Cerrar el archivo después de escribir todos los resultados
+        writer.close();
+    }
+
+    private void imprimirResultadosEnPantalla(String cadena, boolean esAceptada) {
+        System.out.println("Cadena: " + cadena);
+        System.out.println("Resultado: " + (esAceptada ? "Aceptada" : "Rechazada"));
+        System.out.println();
+    }
+
+    private void escribirResultadosEnArchivo(BufferedWriter writer, String cadena, boolean esAceptada)
+            throws IOException {
+        // Contar el número de procesamientos
+        int numProcesamientos = cadena.length();
+
+        // Contar el número de procesamientos de aceptación, abortados y rechazo
+        int numAceptados = (esAceptada) ? numProcesamientos : 0;
+        int numAbortados = 0;
+        int numRechazados = (esAceptada) ? 0 : numProcesamientos;
+
+        // Escribir los resultados en el archivo separados por tabulación
+        writer.write(cadena + "\t");
+        writer.write("-" + "\t");
+        writer.write(numProcesamientos + "\t");
+        writer.write(numAceptados + "\t");
+        writer.write(numAbortados + "\t");
+        writer.write(numRechazados + "\t");
+        writer.write((esAceptada ? "Sí" : "No") + "\t");
+        writer.newLine();
+    }
+    // procesa cada cadenas con detalles pero los resultados deben ser impresos en
+    // un archivo cuyo nombre es nombreArchivo
+
+    public int computarTodosLosProcesamientos(String cadena, String nombreArchivo) throws IOException {
+        // Listas para almacenar los procesamientos
+        List<String> procesamientosAceptados = new ArrayList<>();
+        List<String> procesamientosRechazados = new ArrayList<>();
+        List<String> procesamientosAbortados = new ArrayList<>();
+
+        // Realizar los procesamientos de la cadena
+        int contadorProcesamientos = 0;
+        for (int i = 0; i < cadena.length(); i++) {
+            String subCadena = cadena.substring(i);
+            if (procesarCadenaConDetalles(subCadena)) {
+                procesamientosAceptados.add(subCadena);
+            } else {
+                procesamientosRechazados.add(subCadena);
+            }
+            contadorProcesamientos++;
+        }
+
+        // Guardar los resultados en archivos
+        guardarEnArchivo(nombreArchivo + "Aceptadas.txt", procesamientosAceptados);
+        guardarEnArchivo(nombreArchivo + "Rechazadas.txt", procesamientosRechazados);
+        guardarEnArchivo(nombreArchivo + "Abortadas.txt", procesamientosAbortados);
+
+        // Imprimir los resultados en pantalla
+        System.out.println("Procesamientos Aceptados:");
+        for (String procesamiento : procesamientosAceptados) {
+            System.out.println(procesamiento);
+        }
+        System.out.println();
+        System.out.println("Procesamientos Rechazados:");
+        for (String procesamiento : procesamientosRechazados) {
+            System.out.println(procesamiento);
+        }
+        System.out.println();
+        System.out.println("Procesamientos Abortados:");
+        for (String procesamiento : procesamientosAbortados) {
+            System.out.println(procesamiento);
+        }
+        System.out.println();
+        // Retornar el número de procesamientos realizados
+        return contadorProcesamientos;
+    }
+
+    private void guardarEnArchivo(String nombreArchivo, List<String> contenido) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(nombreArchivo))) {
+            for (String linea : contenido) {
+                writer.write(linea);
+                writer.newLine();
+            }
+        }
+    }
+    // Debe imprimir cada uno de los posibles procesamientos de la cadena indicando
+    // de qué estado a qué estado pasa al procesar cada símbolo e indicando si al
+    // final de cada procesamiento se llega a aceptación o rechazo.
+
+    //
+    public AFN AFN_LambdaToAFN(AFNLambda afnl) {
+        Set<Character> alphabet = afnl.getAlphabet();
+        Set<String> states = afnl.getStates();
+        String initialState = afnl.getInitialState();
+        Set<String> acceptingStates = afnl.getAcceptingStates();
+        Map<String, Map<Character, Set<String>>> transitionFunction = new HashMap<>();
+
+        // Imprimir la lambda clausura de cada estado
+        for (String state : states) {
+            Set<String> lambdaClosure = afnl.calcularLambdaClausura(state);
+            System.out.println("Lambda Clausura de " + state + ": " + lambdaClosure);
+        }
+
+        // Procesar cada estado y construir la definición de transiciones del AFN
+        for (String state : states) {
+            Set<String> lambdaClosure = afnl.calcularLambdaClausura(state);
+            Map<Character, Set<String>> stateTransitions = new HashMap<>();
+
+            for (char symbol : alphabet) {
+                Set<String> toStates = new HashSet<>();
+
+                // Calcular los estados alcanzables por el símbolo actual y su lambda clausura
+                for (String currentState : lambdaClosure) {
+                    Map<Character, Set<String>> transitions = afnl.getTransitionFunction().get(currentState);
+                    if (transitions != null && transitions.containsKey(symbol)) {
+                        toStates.addAll(transitions.get(symbol));
+                    }
+                }
+
+                // Calcular la lambda clausura de los estados alcanzables
+                Set<String> toStatesLambdaClosure = new HashSet<>();
+                for (String nextState : toStates) {
+                    toStatesLambdaClosure.addAll(afnl.calcularLambdaClausura(nextState));
+                }
+
+                // Agregar la transición al estado actual del AFN
+                stateTransitions.put(symbol, toStatesLambdaClosure);
+            }
+
+            // Agregar las transiciones del estado actual al AFN
+            transitionFunction.put(state, stateTransitions);
+        }
+
+        // Construir el objeto AFN y retornarlo
+        return new AFN(alphabet, states, initialState, acceptingStates, transitionFunction);
+    }
+    //
+
+    // Opción de selección
+
 }
