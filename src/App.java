@@ -1,93 +1,167 @@
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.Console;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
-import java.util.Scanner;
-import javax.print.event.PrintEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class App {
     public static void main(String[] args) throws IOException {
-        try {
-            AFNLambda automata = new AFNLambda(args[0]);
+        System.setProperty("console.encoding", "UTF-8");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-
-            boolean salir = false;
-
-            while (!salir) {
-                System.out.println("Seleccione una opción:");
-                System.out.println("1. Calcular λ-Clausura");
-                System.out.println("2. Determinar estados inaccesibles");
-                System.out.println("3. Imprimir autómata");
-                System.out.println("4. Exportar autómata");
-                System.out.println("5. Procesar cadena");
-                System.out.println("6. Procesar cadena con detalles");
-                System.out.println("7. Computar todos los procesamientos");
-                System.out.println("8. Procesar lista de cadenas con detalles");
-                System.out.println("9. Convertir AFN_Lambda a AFN");
-                System.out.println("Escriba 'exit' para salir");
-
-                try {
-                    String opcion = reader.readLine();
-                    switch (opcion) {
-                        case "1":
-                            calcularYMostrarLambdaClausura(automata);
-                            break;
-                        case "2":
-                            determinarYMostrarEstadosInaccesibles(automata);
-                            break;
-                        case "3":
-                            imprimirAFNLSimplificado(automata);
-                            break;
-                        case "4":
-                            exportarAutomata(automata);
-                            break;
-                        case "5":
-                            procesarCadena(automata);
-                            break;
-                        case "6":
-                            procesarCadenaConDetalles(automata);
-                            break;
-                        case "7":
-                            computarTodosLosProcesamientos(automata);
-                            break;
-                        case "8":
-                            procesarListaCadenasConDetalles(automata);
-                            break;
-                        case "9":
-                            System.out.println("Ingrese el nombre del archivo de entrada (AFN-λ):");
-                            String nombreArchivoEntrada = reader.readLine();
-                            // Crear instancia de AFNLambda a partir del archivo de entrada
-                            AFNLambda afnLambda = new AFNLambda(nombreArchivoEntrada);
-                            // Convertir el AFN-λ a AFN utilizando el método AFN_LambdaToAFN()
-                            AFN afn = afnLambda.AFN_LambdaToAFN(afnLambda);
-                            System.out.println("Ingrese el nombre del archivo de salida (AFN):");
-                            String nombreArchivoSalida = reader.readLine();
-                            // Exportar el autómata AFN a un archivo
-                            afn.exportar(nombreArchivoSalida);
-                            System.out.println("El autómata se ha exportado correctamente.");
-                            break;
-                        case "exit":
-                            salir = true;
-                            break;
-                        default:
-                            System.out.println("Opción inválida. Intente nuevamente.");
-                            break;
+        boolean salir = false;
+        while (!salir) {
+            System.out.println("Seleccione una opción:");
+            System.out.println("1. AFD");
+            System.out.println("2. AFN");
+            System.out.println("3. AFN-Lambda");
+            System.out.println("Escriba 'exit' para salir");
+            String opcionPrincipal = reader.readLine();
+            switch (opcionPrincipal) {
+                case "1":
+                    // Lógica para AFD
+                    boolean salirAFD = false;
+                    while (!salirAFD) {
+                        System.out.println("Opciones de AFD:");
+                        System.out.println("1. Calcular y mostrar λ-Clausura");
+                        System.out.println("2. Determinar y mostrar estados inaccesibles");
+                        System.out.println("3. Imprimir autómata");
+                        System.out.println("4. Exportar autómata");
+                        System.out.println("Escriba 'back' para volver al menú principal");
+                        String opcionAFD = reader.readLine();
+                        switch (opcionAFD) {
+                            case "1":
+                                // Lógica para calcular y mostrar λ-Clausura en AFD
+                                break;
+                            case "2":
+                                // Lógica para determinar y mostrar estados inaccesibles en AFD
+                                break;
+                            case "3":
+                                // Lógica para imprimir el autómata AFD
+                                break;
+                            case "4":
+                                // Lógica para exportar el autómata AFD
+                                break;
+                            case "back":
+                                salirAFD = true;
+                                break;
+                            default:
+                                System.out.println("Opción inválida. Intente nuevamente.");
+                                break;
+                        }
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                    break;
+                case "2":
+                    // Lógica para AFN
+                    boolean salirAFN = false;
+                    while (!salirAFN) {
+                        System.out.println("Opciones de AFN:");
+                        System.out.println("1. Calcular y mostrar λ-Clausura");
+                        System.out.println("2. Determinar y mostrar estados inaccesibles");
+                        System.out.println("3. Imprimir autómata");
+                        System.out.println("4. Exportar autómata");
+                        System.out.println("Escriba 'back' para volver al menú principal");
+                        String opcionAFN = reader.readLine();
+                        switch (opcionAFN) {
+                            case "1":
+                                // Lógica para calcular y mostrar λ-Clausura en AFN
+                                break;
+                            case "2":
+                                // Lógica para determinar y mostrar estados inaccesibles en AFN
+                                break;
+                            case "3":
+                                // Lógica para imprimir el autómata AFN
+                                break;
+                            case "4":
+                                // Lógica para exportar el autómata AFN
+                                break;
+                            case "back":
+                                salirAFN = true;
+                                break;
+                            default:
+                                System.out.println("Opción inválida. Intente nuevamente.");
+                                break;
+                        }
+                    }
+                    break;
+                case "3":
+                    // Lógica para AFN-Lambda
+                    Scanner scanner = new Scanner(System.in);
+                    System.out.println("Ingrese el nombre del archivo de entrada:");
+                    String nombreArchivoEntrada = scanner.nextLine();
+
+                    AFNLambda automata = new AFNLambda(nombreArchivoEntrada);
+                    boolean salirAFNLambda = false;
+                    while (!salirAFNLambda) {
+                        System.out.println("Opciones de AFN-Lambda:");
+                        System.out.println("1. Calcular y mostrar λ-Clausura");
+                        System.out.println("2. Determinar y mostrar estados inaccesibles");
+                        System.out.println("3. Imprimir autómata");
+                        System.out.println("4. Exportar autómata");
+                        System.out.println("5. Procesar cadena");
+                        System.out.println("6. Procesar cadena con detalles");
+                        System.out.println("7. Computar todos los procesamientos");
+                        System.out.println("8. Procesar lista de cadenas con detalles");
+                        System.out.println("9. Convertir AFN_Lambda a AFN");
+                        System.out.println("Escriba 'back' para volver al menú principal");
+
+                        String opcionAFNLambda = reader.readLine();
+
+                        switch (opcionAFNLambda) {
+                            case "1":
+                                calcularYMostrarLambdaClausura(automata);
+                                break;
+                            case "2":
+                                determinarYMostrarEstadosInaccesibles(automata);
+                                break;
+                            case "3":
+                                imprimirAFNLSimplificado(automata);
+                                break;
+                            case "4":
+                                exportarAutomata(automata);
+                                break;
+                            case "5":
+                                procesarCadena(automata);
+                                break;
+                            case "6":
+                                procesarCadenaConDetalles(automata);
+                                break;
+                            case "7":
+                                computarTodosLosProcesamientos(automata);
+                                break;
+                            case "8":
+                                procesarListaCadenasConDetalles(automata);
+                                break;
+                            case "9":
+                                // Convertir el AFN-λ a AFN utilizando el método AFN_LambdaToAFN()
+                                AFN afn = automata.AFN_LambdaToAFN(automata);
+                                System.out.println("Ingrese el nombre del archivo de salida (AFN):");
+                                String nombreArchivoSalida = reader.readLine();
+                                // Exportar el autómata AFN a un archivo
+                                afn.exportar(nombreArchivoSalida);
+                                System.out.println("El autómata se ha exportado correctamente.");
+                                break;
+                            case "back":
+                                salirAFNLambda = true;
+                                break;
+                            default:
+                                System.out.println("Opción inválida. Intente nuevamente.");
+                                break;
+                        }
+                        break;
+                    }
+                    break;
+                default:
+                    System.out.println("Opción inválida. Intente nuevamente.");
+                    break;
+                case "exit":
+                    salir = true;
+
             }
-        } catch (IOException e) {
-            System.out.println("Error al leer el archivo");
-            e.printStackTrace();
         }
+
     }
 
     private static void calcularYMostrarLambdaClausura(AFNLambda automata) throws IOException {
@@ -169,3 +243,8 @@ public class App {
         return listaCadenas;
     }
 }
+// AFD métodos
+
+// AFNLambda métodos
+
+// AFNLambda funciones
