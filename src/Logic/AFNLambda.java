@@ -1,3 +1,5 @@
+package Logic;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
@@ -54,6 +56,7 @@ public class AFNLambda {
     // Constructor(nombreArchivo) de la clase para inicializar los atributos a
     // partir de un archivo cuyo formato es el especificado (ver archivo adjunto).
     public AFNLambda(String nombreArchivo) throws IOException {
+
         this.alphabet = new HashSet<>();
         this.states = new HashSet<>();
         this.acceptingStates = new HashSet<>();
@@ -71,6 +74,7 @@ public class AFNLambda {
                 }
             }
         }
+
         List<String> seccionesEsperadas = new ArrayList<>(
                 Arrays.asList("#alphabet", "#states", "#initial", "#accepting", "#transitions"));
         Iterator<String> iteratoralphabet = lineas.iterator();
@@ -78,6 +82,7 @@ public class AFNLambda {
         Iterator<String> iteratorinitial = lineas.iterator();
         Iterator<String> iteratoraccepting = lineas.iterator();
         Iterator<String> iteratortransitions = lineas.iterator();
+
         while (iteratoralphabet.hasNext()) {
             linea = iteratoralphabet.next();
             if (linea.startsWith("#!nfe")) {

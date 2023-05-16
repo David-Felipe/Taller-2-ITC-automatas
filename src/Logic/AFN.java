@@ -1,3 +1,5 @@
+package Logic;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -9,13 +11,16 @@ public class AFN {
     private String initialState;
     private Set<String> acceptingStates;
     private Map<String, Map<Character, Set<String>>> transitionFunction;
-    public AFN(Set<Character> alphabet, Set<String> states, String initialState, Set<String> acceptingStates, Map<String, Map<Character, Set<String>>> transitionFunction) {
+
+    public AFN(Set<Character> alphabet, Set<String> states, String initialState, Set<String> acceptingStates,
+            Map<String, Map<Character, Set<String>>> transitionFunction) {
         this.alphabet = alphabet;
         this.states = states;
         this.initialState = initialState;
         this.acceptingStates = acceptingStates;
         this.transitionFunction = transitionFunction;
     }
+
     public void exportar(String archivo) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(archivo));
         writer.write("#!nfe");

@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import Logic.AFN;
+import Logic.AFNLambda;
+
 public class App {
     public static void main(String[] args) throws IOException {
         System.setProperty("console.encoding", "UTF-8");

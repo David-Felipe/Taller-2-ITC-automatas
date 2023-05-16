@@ -1,15 +1,29 @@
+package Logic;
+
 import java.util.*;
 
 public class Alfabeto {
 
     // Atributos de la clase alfabeto
-    public NavigableSet<Character> simbolos;
+    private NavigableSet<Character> simbolos;
+
+    // Constructor de la clase alfabeto para conjuntos
+    public Alfabeto(Set<Character> simbolos) {
+
+        // Convertimos simbolos a un conjunto
+        this.simbolos = new TreeSet<Character>(simbolos);
+        // Verificamos que lambda no esté en el alfabeto
+        isLambdaHere();
+
+    }
 
     // Constructor de la clase alfabeto para arreglos de caracteres
     public Alfabeto(Character[] simbolos) {
 
         // Convertimos simbolos a un conjunto
         this.simbolos = new TreeSet<Character>(Arrays.asList(simbolos));
+        // Verificamos que lambda no esté en el alfabeto
+        isLambdaHere();
 
     }
 
@@ -20,6 +34,8 @@ public class Alfabeto {
         Character[] simbolosArray = simbolos.chars().mapToObj(c -> (char) c).toArray(Character[]::new);
         Collection<Character> simbolosCollection = Arrays.asList(simbolosArray);
         this.simbolos = new TreeSet<Character>(simbolosCollection);
+        // Verificamos que lambda no esté en el alfabeto
+        isLambdaHere();
 
     }
 
@@ -56,6 +72,19 @@ public class Alfabeto {
 
         // Regresamos la cadena generada
         return cadena.toString();
+
+    }
+
+    // Método para verificar que el caracter '$' no esté en el alfabeto
+    private void isLambdaHere() {
+
+        // Verificamos que el caracter '$' no esté en el alfabeto
+        if (simbolos.contains('$')) {
+
+            // Si está, lanzamos una excepción
+            throw new IllegalArgumentException("El caracter '$' no puede estar en el alfabeto");
+
+        }
 
     }
 
