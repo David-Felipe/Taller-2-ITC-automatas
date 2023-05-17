@@ -15,6 +15,9 @@ public class AFD {
     private TreeMap<String, TreeMap<Character, String>> delta;
     private TreeSet<String> estadosLimbo;
     private TreeSet<String> estadosInasequibles;
+    private AFD AFDMinimizado;
+    private ArrayList<ArrayList<String>> tablaEstadosEquivalentes;
+    private TreeMap<tuplaEstados, TreeMap<Character, tuplaEstados>> tablaChequeoEquivalencia;
 
     // Constructores de la clase AFD
     // Constructor de la clase AFD para conjuntos
@@ -29,12 +32,14 @@ public class AFD {
         this.estadosLimbo = new TreeSet<>();
         this.estadosInasequibles = new TreeSet<>();
 
-        // TODO Verificar que el AFD sea válido y esté completo
-        if (!this.verificarCorregirCompletitudAFD()) {
+        // Verificar que el AFD esté completo y agregar estado limbo donde no
+        this.verificarCorregirCompletitudAFD();
 
-            System.out.println("El AFD no es válido");
+        // Hallar estados limbo y guardarlos
+        this.hallarEstadosLimbo();
 
-        }
+        // Hallar estados inasequibles y guardarlos
+        this.hallarEstadosInasequibles();
 
     }
 
@@ -63,6 +68,52 @@ public class AFD {
 
         // Depurar transiciones
         TreeMap<String, TreeMap<Character, String>> delta = depurarTransiciones(secciones.get("#transitions"));
+
+    }
+
+    // Clase tupla de estados
+    private class tuplaEstados implements Comparable<tuplaEstados> {
+
+        private String estado1;
+        private String estado2;
+
+        public tuplaEstados(String estado1, String estado2) {
+
+            this.estado1 = estado1;
+            this.estado2 = estado2;
+
+        }
+
+        @Override
+        public int compareTo(tuplaEstados tuplaComparada) {
+
+            if (this.estado1.equals(tuplaComparada.getEstado1())) {
+
+                return this.estado2.compareTo(tuplaComparada.getEstado2());
+
+            } else {
+
+                return this.estado1.compareTo(tuplaComparada.getEstado1());
+
+            }
+
+        }
+
+        public String getEstado1() {
+            return estado1;
+        }
+
+        public String getEstado2() {
+            return estado2;
+        }
+
+        public void setEstado1(String estado1) {
+            this.estado1 = estado1;
+        }
+
+        public void setEstado2(String estado2) {
+            this.estado2 = estado2;
+        }
 
     }
 
@@ -256,14 +307,306 @@ public class AFD {
 
     }
 
-    // Verificar que el AFD sea válido y esté completo y corregirlo si es necesario
+    // Verificar que el AFD este completo y si no corregirlo para que lo este
     private boolean verificarCorregirCompletitudAFD() {
 
-        // TODO Verificar que el AFD sea válido y esté completo
+        // Verificar que todos los estados tengan sus salidas completas
+        // Por cada estado del AFD
+        for (String estado : this.Q) {
 
-        // TODO Corregir el AFD si es necesario
+            // Si no tiene todas sus salidas
+            if (this.delta.get(estado).size() != this.sigma.getAlfabeto().size()) {
+
+                // Agregar las salidas faltantes
+                for (Character caracter : this.sigma.getAlfabeto()) {
+
+                    // Si no tiene la salida
+                    if (!this.delta.get(estado).containsKey(caracter)) {
+
+                        // Agregar la salida al estado limbo
+                        this.delta.get(estado).put(caracter, "limbo");
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        // Verificar que el estado limbo tenga todas sus salidas
+        // Si no tiene todas sus salidas
+        if (this.delta.get("limbo").size() != this.sigma.getAlfabeto().size()) {
+
+            // Agregar las salidas faltantes
+            for (Character caracter : this.sigma.getAlfabeto()) {
+
+                // Si no tiene la salida
+                if (!this.delta.get("limbo").containsKey(caracter)) {
+
+                    // Agregar la salida al estado limbo
+                    this.delta.get("limbo").put(caracter, "limbo");
+
+                }
+
+            }
+
+        }
 
         return true;
+
+    }
+
+    // Hallar los estados limbo del automata y guardarlos en "this.estadosLimbo"
+    private void hallarEstadosLimbo() {
+
+        // Crear la lista de estados limbo
+        TreeSet<String> estadosLimbo = new TreeSet<String>();
+
+        // Por cada estado del AFD
+        for (String estado : this.Q) {
+
+            // Si el estado no tiene transiciones hacia otros estados
+            if (this.delta.get(estado).values().stream().allMatch(e -> e.equals(estado))) {
+
+                // Agregar el estado a la lista de estados limbo
+                estadosLimbo.add(estado);
+
+            }
+            // Si el estado solo tiene transiciones hacia el estado limbo
+            if (this.delta.get(estado).values().stream().allMatch(e -> e.equals("limbo"))) {
+
+                // Agregar el estado a la lista de estados limbo
+                estadosLimbo.add(estado);
+
+            }
+
+        }
+
+        // Guardar los estados limbo en "this.estadosLimbo"
+        this.estadosLimbo = estadosLimbo;
+
+    }
+
+    // Hallar los estados inasequibles del automata y guardarlos en
+    // "this.estadosInasequibles"
+    private void hallarEstadosInasequibles() {
+
+        // Crear la lista de estados inasequibles
+        TreeSet<String> estadosInasequibles = new TreeSet<String>();
+        TreeSet<String> estadosAlcanzables = this.hallarEstadosAlcanzables();
+
+        // Por cada estado del AFD
+        for (String estado : this.Q) {
+
+            // Si el estado no es alcanzable desde el estado inicial
+            if (!estadosAlcanzables.contains(estado)) {
+
+                // Agregar el estado a la lista de estados inasequibles
+                estadosInasequibles.add(estado);
+
+            }
+
+        }
+
+        // Guardar los estados inasequibles en "this.estadosInasequibles"
+        this.estadosInasequibles = estadosInasequibles;
+
+    }
+
+    // Hallar los estados alcanzables del automata
+    private TreeSet<String> hallarEstadosAlcanzables() {
+
+        // Crear la lista de estados alcanzables
+        TreeSet<String> estadosAlcanzables = new TreeSet<String>();
+
+        // Crear la cola de estados por visitar
+        LinkedList<String> estadosPorVisitar = new LinkedList<String>();
+
+        // Agregar el estado inicial a la cola de estados por visitar
+        estadosPorVisitar.add(this.q0);
+
+        // Mientras la cola de estados por visitar no este vacia
+        while (!estadosPorVisitar.isEmpty()) {
+
+            // Obtener el estado actual
+            String estadoActual = estadosPorVisitar.removeFirst();
+
+            // Agregar el estado actual a la lista de estados alcanzables
+            estadosAlcanzables.add(estadoActual);
+
+            // Por cada estado al que se puede llegar desde el estado actual
+            Collection<String> estadosDestino = this.delta.get(estadoActual).values();
+            for (String estadoDestino : estadosDestino) {
+
+                // Si el estado destino no ha sido visitado
+                if (!estadosAlcanzables.contains(estadoDestino)) {
+
+                    // Agregar el estado destino a la cola de estados por visitar
+                    estadosPorVisitar.add(estadoDestino);
+
+                }
+
+            }
+
+        }
+
+        return estadosAlcanzables;
+
+    }
+
+    // Entregar una String con la informacion del AFD
+    // Entrega el alfabeto sobre el que está definido (sigma), estados (Q), el
+    // estado inicial (q0), estados de aceptacion (F), estados limbo (estadosLimbo),
+    // estadosInasequibles (estadosInasequibles) y tabla de transiciones (delta)
+    @Override
+    public String toString() {
+
+        StringBuilder automata = new StringBuilder();
+
+        // Formato dfa
+        automata.append("\n#!dfa\n\n");
+
+        // Insertar sigma
+        automata.append("#alphabet\n");
+        for (Character caracter : this.sigma.getAlfabeto()) {
+            automata.append(caracter + " \n");
+        }
+
+        // Insertar Q
+        automata.append("\n#states\n");
+        for (String estado : this.Q) {
+            automata.append(estado + " \n");
+        }
+
+        // Insertar q0
+        automata.append("\n#initial\n");
+        automata.append(this.q0 + "\n");
+
+        // Insertar F
+        automata.append("\n#accepting\n");
+        for (String estado : this.F) {
+            automata.append(estado + " \n");
+        }
+
+        // Insertar transiciones
+        automata.append("\n#transitions\n");
+        NavigableSet<Character> caracteres = this.sigma.getAlfabeto();
+        for (String estado : this.Q) {
+
+            TreeMap<Character, String> transicionesAct = this.delta.get(estado);
+
+            for (Character caracter : caracteres) {
+                automata.append(estado + " : " + caracter + " > " + transicionesAct.get(caracter) + "\n");
+            }
+
+        }
+
+        // Insertar estados limbo
+        automata.append("\n#limbo\n");
+        for (String estado : this.estadosLimbo) {
+            automata.append(estado + " \n");
+        }
+
+        // Insertar estados inasequibles
+        automata.append("\n#unreachable\n");
+        for (String estado : this.estadosInasequibles) {
+            automata.append(estado + " \n");
+        }
+
+        return automata.toString();
+
+    }
+
+    // Simplificar el automata a su minima expresion
+    public void simplificarAFD() {
+
+        hallarEstadosEquivalentes();
+        // TODO terminar la simplificacion, con lo hallado crear el AFD simplificado y
+        // guardarlo, quitar estados inasequibles y de ser necesario dejar un único
+        // estado limbo
+
+    }
+
+    private void hallarEstadosEquivalentes() {
+
+        // Crear tablas usadas para el procedimiento
+        this.tablaEstadosEquivalentes = new ArrayList<ArrayList<String>>();
+        this.tablaChequeoEquivalencia = new TreeMap<tuplaEstados, TreeMap<Character, tuplaEstados>>();
+
+        // * Poblar la tabla de equivalencias con una fila y una columna por cada estado
+        // a
+        // * la vez que comparamos estado de aceptacion en la celda
+        Integer fila = 0;
+
+        // Por cada estado (fila)
+        for (String estado : this.Q) {
+
+            // Hay una linea de columnas
+            ArrayList<String> filaActual = new ArrayList<String>();
+            Iterator<String> iteradorQ = this.Q.iterator();
+
+            // Con (fila + 1) columnas, pues es una matriz triangular con base abajo
+            for (int columna = 0; columna <= fila; columna++) {
+
+                // Comparar estados celda actual
+                filaActual.add(this.sonEstadosEquivalentes(estado, iteradorQ.next()));
+
+            }
+
+            // Agregar la fila a la tabla de estados equivalentes
+            this.tablaEstadosEquivalentes.add(filaActual);
+            // Suma uno a la fila
+            fila++;
+
+        }
+
+        // TODO Para cada "estado equivalente" en la tabla hallada anterior, verificar
+        // con la tabla si sí lleva a estados equivalentes y hacer las correcciones
+        // pertinentes
+
+    }
+
+    private String sonEstadosEquivalentes(String estado1, String estado2) {
+
+        // iteracion por triangulo, verificar si tienen el mismo estado de aceptacion
+        if (this.F.contains(estado1) != this.F.contains(estado2)) {
+
+            return "1";
+
+        }
+
+        // iteracion por tabla de transiciones
+        tuplaEstados origen = new tuplaEstados(estado1, estado2);
+        NavigableSet<Character> alfabeto = this.sigma.getAlfabeto();
+        TreeMap<Character, tuplaEstados> transiciones = new TreeMap<Character, tuplaEstados>();
+
+        // Por cada caracter del alfabeto para esta tupla de origen
+        for (Character caracter : alfabeto) {
+
+            // Hay una tupla de destino
+            String estadoDestino1 = this.delta.get(estado1).get(caracter);
+            String estadoDestino2 = this.delta.get(estado2).get(caracter);
+            tuplaEstados destino = new tuplaEstados(estadoDestino1, estadoDestino2);
+
+            // Agregarla al mapa de caracter a tupla destino para este origen
+            transiciones.put(caracter, destino);
+
+            // Caso en el que llevan a estados no equivalentes pero tenian mismo estado de
+            // aceptacion
+            if (this.F.contains(estadoDestino1) != this.F.contains(estadoDestino2)) {
+
+                this.tablaChequeoEquivalencia.put(origen, transiciones);
+                return "2";
+
+            }
+
+        }
+
+        // Agregar la tupla de origen y el mapa de transiciones a la tabla de
+        // chequeo de equivalencia
+        this.tablaChequeoEquivalencia.put(origen, transiciones);
+        return "E";
 
     }
 

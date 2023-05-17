@@ -39,6 +39,34 @@ public class Alfabeto {
 
     }
 
+    // Metodo para verificar si un simbolos está en el alfabeto
+    public boolean contiene(Character simbolo) {
+
+        // Regresamos si el simbolo está en el alfabeto
+        return simbolos.contains(simbolo);
+
+    }
+
+    // Método para verificar si una cadena está en el alfabeto
+    public boolean contiene(String cadena) {
+
+        // Convertimos la cadena a un arreglo de caracteres
+        Character[] cadenaArray = cadena.chars().mapToObj(c -> (char) c).toArray(Character[]::new);
+        Collection<Character> cadenaCollection = Arrays.asList(cadenaArray);
+
+        // Regresamos si la cadena está en el alfabeto
+        return simbolos.containsAll(cadenaCollection);
+
+    }
+
+    // Getter del alfabeto
+    public NavigableSet<Character> getAlfabeto() {
+
+        // Regresamos el alfabeto
+        return simbolos;
+
+    }
+
     // Método para generar cadenas aleatorias a partir del contenido de simbolos
     public String generarCadena(int longitud) {
 
