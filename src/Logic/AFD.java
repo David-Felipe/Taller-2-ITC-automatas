@@ -57,19 +57,19 @@ public class AFD {
 
         // Depurar cada componente desde su lista de lineas
         // Depurar alfabeto
-        Alfabeto sigma = depurarAlfabeto(secciones.get("#alphabet"));
+        this.sigma = depurarAlfabeto(secciones.get("#alphabet"));
 
         // Depurar estados
-        TreeSet<String> Q = new TreeSet<>(secciones.get("#states"));
+        this.Q = new TreeSet<>(secciones.get("#states"));
 
         // Depurar estado inicial
-        String q0 = secciones.get("#initial").get(0);
+        this.q0 = secciones.get("#initial").get(0);
 
         // Depurar estados de aceptación
-        TreeSet<String> F = new TreeSet<>(secciones.get("#accepting"));
+        this.F = new TreeSet<>(secciones.get("#accepting"));
 
         // Depurar transiciones
-        TreeMap<String, TreeMap<Character, String>> delta = depurarTransiciones(secciones.get("#transitions"));
+        this.delta = depurarTransiciones(secciones.get("#transitions"));
 
     }
 
@@ -771,7 +771,7 @@ public class AFD {
     }
 
     // Imprimir el AFD minimizado
-    public void imprimirAFDMinimizado() {
+    public void imprimirAFDSimplificado() {
 
         System.out.println(this.AFDMinimizado.toString());
 
