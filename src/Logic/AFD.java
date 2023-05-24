@@ -4,6 +4,7 @@ import java.util.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import org.jgrapht.alg.util.*;;
 
 public class AFD {
 
@@ -18,6 +19,7 @@ public class AFD {
     private AFD AFDMinimizado;
     private ArrayList<ArrayList<String>> tablaEstadosEquivalentes;
     private TreeMap<tuplaEstados, TreeMap<Character, tuplaEstados>> tablaChequeoEquivalencia;
+    private UnionFind<String> clasesEquivalencia;
 
     // Constructores de la clase AFD
     // Constructor de la clase AFD para conjuntos
@@ -530,10 +532,9 @@ public class AFD {
     // Simplificar el automata a su minima expresion
     public void simplificarAFD() {
 
-        hallarEstadosEquivalentes();
-        // TODO terminar la simplificacion, con lo hallado crear el AFD simplificado y
-        // guardarlo, quitar estados inasequibles y de ser necesario dejar un único
-        // estado limbo
+        this.hallarEstadosEquivalentes();
+        this.hallarClasesEquivalencia();
+        this.crearAFDMinimizado();
 
     }
 
@@ -671,6 +672,115 @@ public class AFD {
             }
 
         }
+
+    }
+
+    private void hallarClasesEquivalencia() {
+
+        // Para traversar la tabla de equivalencias hallando las clases
+        Integer numFila = 0;
+        this.clasesEquivalencia = new UnionFind<String>(this.Q);
+
+        // Iterar sobre la tabla de equivalencias uniendo los estados equivalentes
+        // Por cada estado (fila)
+        for (String estado : this.Q) {
+
+            // Hay una linea de columnas
+            ArrayList<String> filaActual = this.tablaEstadosEquivalentes.get(numFila);
+            Iterator<String> iteradorQ = this.Q.iterator();
+
+            // Con (fila + 1) columnas, pues es una matriz triangular con base abajo
+            for (int numColumna = 0; numColumna <= numFila; numColumna++) {
+
+                // Si la celda es equivalente
+                if (filaActual.get(numColumna).equals("E")) {
+
+                    // Unir los estados de la celda
+                    clasesEquivalencia.union(estado, iteradorQ.next());
+
+                } else {
+
+                    // Avanzar el iterador
+                    iteradorQ.next();
+
+                }
+
+            }
+
+            // Suma uno a la fila
+            numFila++;
+
+        }
+
+    }
+
+    private void crearAFDMinimizado() {
+
+        // Crear los elementos del nuevo Q minimizado
+        TreeSet<String> minQ = new TreeSet<String>();
+        String minQ0 = this.clasesEquivalencia.find(this.q0);
+        TreeSet<String> minF = new TreeSet<String>();
+        TreeMap<String, TreeMap<Character, String>> minDelta = new TreeMap<String, TreeMap<Character, String>>();
+
+        // Agregar al nuevo Q los representantes de las clases de equivalencia
+        for (String estado : this.Q) {
+
+            String repreActual = this.clasesEquivalencia.find(estado);
+
+            // Agregamos el representante de la clase de equivalencia del estado a minQ
+            minQ.add(repreActual);
+
+            // Si el estado es de aceptacion, agregar su representante al nuevo F
+            if (this.F.contains(repreActual)) {
+
+                minF.add(repreActual);
+
+            }
+
+            // Agregamos sus transiciones al nuevo delta si no estan ya agregadas
+            if (!minDelta.containsKey(repreActual)) {
+
+                // Obtener elementos necesarios para formar minDelta para el representante
+                TreeMap<Character, String> transicionesRepreActualMin = new TreeMap<Character, String>();
+                TreeMap<Character, String> transicionesRepreActual = this.delta.get(repreActual);
+                NavigableSet<Character> alfabeto = this.sigma.getAlfabeto();
+
+                // Para cada caracter del alfabeto
+                for (Character caracter : alfabeto) {
+
+                    // Obtener el representante de la clase de equivalencia del estado destino
+                    String destino = transicionesRepreActual.get(caracter);
+                    String repreDestino = this.clasesEquivalencia.find(destino);
+
+                    // Agregarlo a las transiciones minimizadas del representante actual (origen)
+                    transicionesRepreActualMin.put(caracter, repreDestino);
+
+                }
+
+                // Agregar las transiciones minimizadas del representante actual (origen) a
+                // minDelta
+                minDelta.put(repreActual, transicionesRepreActualMin);
+
+            }
+
+        }
+
+        // Crear el nuevo AFD minimizado y guardarlo
+        this.AFDMinimizado = new AFD(this.sigma, minQ, minQ0, minF, minDelta);
+
+    }
+
+    // Imprimir el AFD minimizado
+    public void imprimirAFDMinimizado() {
+
+        System.out.println(this.AFDMinimizado.toString());
+
+    }
+
+    // Exportar AFD a un archivo .afd
+    public void exportar(String nombreArchivo) {
+
+        // TODO exportar AFD a un archivo .afd, num 8
 
     }
 
