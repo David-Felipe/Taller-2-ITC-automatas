@@ -76,6 +76,7 @@ public class AFD {
 
         private String estado1;
         private String estado2;
+        private String equivalencia;
 
         public tuplaEstados(String estado1, String estado2) {
 
@@ -105,6 +106,14 @@ public class AFD {
 
         public String getEstado2() {
             return estado2;
+        }
+
+        public String getEquivalencia() {
+            return equivalencia;
+        }
+
+        public void setEquivalencia(String equivalencia) {
+            this.equivalencia = equivalencia;
         }
 
         public void setEstado1(String estado1) {
@@ -561,9 +570,8 @@ public class AFD {
 
         }
 
-        // TODO Para cada "estado equivalente" en la tabla hallada anterior, verificar
-        // con la tabla si sí lleva a estados equivalentes y hacer las correcciones
-        // pertinentes
+        // Chequear equivalencia de estados con la tabla de chequeo de equivalencia
+        this.chequearEquivalencia();
 
     }
 
@@ -596,6 +604,7 @@ public class AFD {
             // aceptacion
             if (this.F.contains(estadoDestino1) != this.F.contains(estadoDestino2)) {
 
+                origen.setEquivalencia("2");
                 this.tablaChequeoEquivalencia.put(origen, transiciones);
                 return "2";
 
@@ -605,8 +614,63 @@ public class AFD {
 
         // Agregar la tupla de origen y el mapa de transiciones a la tabla de
         // chequeo de equivalencia
+        origen.setEquivalencia("E");
         this.tablaChequeoEquivalencia.put(origen, transiciones);
         return "E";
+
+    }
+
+    private void chequearEquivalencia() {
+
+        // Obtener un iterable sobre las entradas de la tabla de chequeo de equivalencia
+        Set<Map.Entry<tuplaEstados, TreeMap<Character, tuplaEstados>>> entradas = this.tablaChequeoEquivalencia
+                .entrySet();
+
+        // Por cada entrada de la tabla de chequeo de equivalencia
+        for (Map.Entry<tuplaEstados, TreeMap<Character, tuplaEstados>> entrada : entradas) {
+
+            tuplaEstados origen = entrada.getKey();
+
+            // Verificar si las tuplas realmente son equivalentes con la tabla de
+            // equivalencias
+            if (origen.getEquivalencia().equals("E")) {
+
+                // Para cada salida verificar si son equivalentes
+                TreeMap<Character, tuplaEstados> transiciones = entrada.getValue();
+                NavigableSet<Character> alfabeto = this.sigma.getAlfabeto();
+
+                // Para cada salida verificar si en la tabla de equivalencias son equivalentes
+                for (Character caracter : alfabeto) {
+
+                    // Obtener tupla de destino
+                    tuplaEstados destino = transiciones.get(caracter);
+                    String destino1 = destino.getEstado1();
+                    String destino2 = destino.getEstado2();
+
+                    // Obtener fila y columna del destino en la tabla de equivalencias
+                    Integer fila = this.Q.headSet(destino1).size();
+                    Integer columna = this.Q.headSet(destino2).size();
+
+                    // Obtener equivalencia del destino en la tabla de equivalencias
+                    String equivalencia = this.tablaEstadosEquivalentes.get(fila).get(columna);
+
+                    // Si no son equivalentes, cambiar la equivalencia de la tupla de origen y
+                    // actualizar la tabla de equivalencias para la tupla de origen
+                    if (!equivalencia.equals("E")) {
+
+                        origen.setEquivalencia("3");
+                        Integer filaOrigen = this.Q.headSet(origen.getEstado1()).size();
+                        Integer columnaOrigen = this.Q.headSet(origen.getEstado2()).size();
+                        this.tablaEstadosEquivalentes.get(filaOrigen).set(columnaOrigen, "3");
+                        break;
+
+                    }
+
+                }
+
+            }
+
+        }
 
     }
 
