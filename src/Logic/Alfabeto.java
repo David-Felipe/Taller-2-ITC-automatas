@@ -116,4 +116,8 @@ public class Alfabeto {
 
     }
 
+    public Boolean contains(char simbolo) {
+        return this.simbolos.contains(simbolo);
+    }
+
 }
