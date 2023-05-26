@@ -2,7 +2,8 @@ package Logic;
 
 import java.util.*;
 import java.io.*;
-import org.jgrapht.alg.util.*;;
+import org.jgrapht.alg.util.*;
+import Logic.ProcesamientoCadenaAFD;
 
 public class AFD {
 
@@ -24,6 +25,7 @@ public class AFD {
     private UnionFind<String> clasesEquivalencia;
 
     // Atributos para procesar cadenas
+    private ProcesamientoCadenaAFD ultimoProcesamiento;
     private StringBuilder logUltimoProcesamiento;
 
     // Constructores de la clase AFD
@@ -900,6 +902,7 @@ public class AFD {
 
         // Crear el log
         StringBuilder log = new StringBuilder();
+        ProcesamientoCadenaAFD procesamiento = new ProcesamientoCadenaAFD(cadena, this);
 
         // Obtener el estado inicial
         String estadoActual = this.q0;
@@ -991,6 +994,7 @@ public class AFD {
 
             // Meter lo mismo al log
             log.append("[" + estadoActual + ", " + cadenaRestante + "] -> " + estadoDestino + "\n");
+            procesamiento.agregraPasoComputacional(estadoActual, caracter, estadoDestino);
 
             // Actualizar el estado actual
             estadoActual = estadoDestino;
@@ -999,6 +1003,7 @@ public class AFD {
 
         // Guardar procesamiento en logUltimoProcesamiento
         this.logUltimoProcesamiento = log;
+        this.ultimoProcesamiento = procesamiento;
 
         // Si el estado actual es de aceptacion
         if (this.F.contains(estadoActual)) {
@@ -1011,6 +1016,7 @@ public class AFD {
 
             // Meter lo mismo al log
             log.append("Si\n");
+            procesamiento.setEsAceptada(true);
 
             return true;
 
@@ -1024,6 +1030,7 @@ public class AFD {
 
             // Meter lo mismo al log
             log.append("No\n");
+            procesamiento.setEsAceptada(false);
 
             return false;
 
