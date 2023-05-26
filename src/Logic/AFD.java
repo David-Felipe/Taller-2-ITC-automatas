@@ -1,9 +1,7 @@
 package Logic;
 
 import java.util.*;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import org.jgrapht.alg.util.*;;
 
 public class AFD {
@@ -14,12 +12,19 @@ public class AFD {
     private String q0;
     private TreeSet<String> F;
     private TreeMap<String, TreeMap<Character, String>> delta;
+
+    // Atributos descriptivos
     private TreeSet<String> estadosLimbo;
     private TreeSet<String> estadosInasequibles;
+
+    // Atributos para simplificar el AFD
     private AFD AFDMinimizado;
     private ArrayList<ArrayList<String>> tablaEstadosEquivalentes;
-    private TreeMap<tuplaEstados, TreeMap<Character, tuplaEstados>> tablaChequeoEquivalencia;
+    private TreeMap<TuplaEstados, TreeMap<Character, TuplaEstados>> tablaChequeoEquivalencia;
     private UnionFind<String> clasesEquivalencia;
+
+    // Atributos para procesar cadenas
+    private StringBuilder logUltimoProcesamiento;
 
     // Constructores de la clase AFD
     // Constructor de la clase AFD para conjuntos
@@ -71,24 +76,85 @@ public class AFD {
         // Depurar transiciones
         this.delta = depurarTransiciones(secciones.get("#transitions"));
 
+        // Verificar que el AFD esté completo y agregar estado limbo donde no
+        this.verificarCorregirCompletitudAFD();
+
+        // Hallar estados limbo y guardarlos
+        this.hallarEstadosLimbo();
+
+        // Hallar estados inasequibles y guardarlos
+        this.hallarEstadosInasequibles();
+
+    }
+
+    // Getters y setters de la clase AFD
+    // Getter sigma
+    public Alfabeto getSigma() {
+        return this.sigma;
+    }
+
+    // Setter sigma
+    public void setSigma(Alfabeto sigma) {
+        this.sigma = sigma;
+    }
+
+    // Getter Q
+    public TreeSet<String> getQ() {
+        return this.Q;
+    }
+
+    // Setter Q
+    public void setQ(TreeSet<String> Q) {
+        this.Q = Q;
+    }
+
+    // Getter q0
+    public String getQ0() {
+        return this.q0;
+    }
+
+    // Setter q0
+    public void setQ0(String q0) {
+        this.q0 = q0;
+    }
+
+    // Getter F
+    public TreeSet<String> getF() {
+        return this.F;
+    }
+
+    // Setter F
+    public void setF(TreeSet<String> F) {
+        this.F = F;
+    }
+
+    // Getter delta
+    public TreeMap<String, TreeMap<Character, String>> getDelta() {
+        return this.delta;
+    }
+
+    // Setter delta
+    public void setDelta(TreeMap<String, TreeMap<Character, String>> delta) {
+        this.delta = delta;
     }
 
     // Clase tupla de estados
-    private class tuplaEstados implements Comparable<tuplaEstados> {
+    private class TuplaEstados implements Comparable<TuplaEstados> {
 
         private String estado1;
         private String estado2;
         private String equivalencia;
 
-        public tuplaEstados(String estado1, String estado2) {
+        public TuplaEstados(String estado1, String estado2) {
 
             this.estado1 = estado1;
             this.estado2 = estado2;
+            this.equivalencia = "";
 
         }
 
         @Override
-        public int compareTo(tuplaEstados tuplaComparada) {
+        public int compareTo(TuplaEstados tuplaComparada) {
 
             if (this.estado1.equals(tuplaComparada.getEstado1())) {
 
@@ -155,9 +221,9 @@ public class AFD {
 
         // Leer todo el resto de lineas
         while (linea != null) {
+            linea = reader.readLine();
             linea.trim();
             lineasArchivo.add(linea);
-            linea = reader.readLine();
         }
 
         // Cerrar el buffer
@@ -192,12 +258,13 @@ public class AFD {
                 if (lineaArchivo.equals(seccion)) {
 
                     Integer inicioSeccion = indice; // Aqui inicia la seccion
-
+                    // Obtener la siguiente linea al titulo de la seccion
                     indice++;
                     String lineaActual = " ";
                     // Guardar el contenido de la sección hasta encontrar la siguiente sección o el
                     // fin del documento
-                    while (!seccionesEsperadas.contains(lineaActual) && indice < lineasArchivo.size()) {
+                    while (!lineaActual.contains("#") && indice < lineasArchivo.size()) {
+
                         lineaActual = lineasArchivo.get(indice);
                         lineaActual.trim();
 
@@ -206,6 +273,7 @@ public class AFD {
 
                         contenido.add(lineaActual);
                         indice++;
+
                     }
 
                     // Eliminar el contenido de la seccion encontrada en las lineas del archivo
@@ -228,27 +296,27 @@ public class AFD {
     private Alfabeto depurarAlfabeto(ArrayList<String> listaLineas) {
 
         // Crear la lista de caracteres que ira el alfabeto
-        LinkedList<Character> alfabeto = new LinkedList<Character>();
+        TreeSet<Character> alfabeto = new TreeSet<Character>();
 
         // Por cada linea del alfabeto
         for (String linea : listaLineas) {
 
             // Si la linea contiene un solo caracter
-            if (linea.length() == 1) {
+            if (linea.trim().length() == 1) {
 
-                alfabeto.addLast(linea.charAt(0));
+                alfabeto.add(linea.charAt(0));
 
             } else if (linea.contains("-")) {
 
                 // Si la linea contiene un rango de caracteres
                 String[] rango = linea.split("-");
-                Character inicio = rango[0].charAt(0);
-                Character fin = rango[1].charAt(0);
+                Character inicio = rango[0].trim().charAt(0);
+                Character fin = rango[1].trim().charAt(0);
                 Character caracter = inicio;
 
                 // Por cada caracter en el rango
                 while (caracter <= fin) {
-                    alfabeto.addLast(caracter);
+                    alfabeto.add(caracter);
                     caracter++;
                 }
 
@@ -256,11 +324,8 @@ public class AFD {
 
         }
 
-        // Pasar el iterador de la lista enlazada a un array de caracteres
-        Character[] alfabetoArray = new Character[alfabeto.size()];
-
         // Crear el alfabeto
-        return new Alfabeto(alfabetoArray);
+        return new Alfabeto(alfabeto);
 
     }
 
@@ -322,14 +387,16 @@ public class AFD {
     private boolean verificarCorregirCompletitudAFD() {
 
         // Verificar que todos los estados tengan sus salidas completas
+        NavigableSet<Character> alfabeto = this.sigma.getAlfabeto();
+
         // Por cada estado del AFD
         for (String estado : this.Q) {
 
             // Si no tiene todas sus salidas
-            if (this.delta.get(estado).size() != this.sigma.getAlfabeto().size()) {
+            if (this.delta.get(estado).size() != alfabeto.size()) {
 
                 // Agregar las salidas faltantes
-                for (Character caracter : this.sigma.getAlfabeto()) {
+                for (Character caracter : alfabeto) {
 
                     // Si no tiene la salida
                     if (!this.delta.get(estado).containsKey(caracter)) {
@@ -347,10 +414,10 @@ public class AFD {
 
         // Verificar que el estado limbo tenga todas sus salidas
         // Si no tiene todas sus salidas
-        if (this.delta.get("limbo").size() != this.sigma.getAlfabeto().size()) {
+        if (this.delta.get("limbo").size() != alfabeto.size()) {
 
             // Agregar las salidas faltantes
-            for (Character caracter : this.sigma.getAlfabeto()) {
+            for (Character caracter : alfabeto) {
 
                 // Si no tiene la salida
                 if (!this.delta.get("limbo").containsKey(caracter)) {
@@ -374,10 +441,10 @@ public class AFD {
         // Crear la lista de estados limbo
         TreeSet<String> estadosLimbo = new TreeSet<String>();
 
-        // Por cada estado del AFD
+        // Para cada estado del AFD
         for (String estado : this.Q) {
 
-            // Si el estado no tiene transiciones hacia otros estados
+            // Si el estado no tiene transiciones hacia otros estados, solo hacia si mismo
             if (this.delta.get(estado).values().stream().allMatch(e -> e.equals(estado))) {
 
                 // Agregar el estado a la lista de estados limbo
@@ -446,8 +513,10 @@ public class AFD {
             // Agregar el estado actual a la lista de estados alcanzables
             estadosAlcanzables.add(estadoActual);
 
-            // Por cada estado al que se puede llegar desde el estado actual
+            // Hallar los estados destino desde este origen
             Collection<String> estadosDestino = this.delta.get(estadoActual).values();
+
+            // Por cada estado al que se puede llegar desde el estado actual
             for (String estadoDestino : estadosDestino) {
 
                 // Si el estado destino no ha sido visitado
@@ -476,32 +545,33 @@ public class AFD {
         StringBuilder automata = new StringBuilder();
 
         // Formato dfa
-        automata.append("\n#!dfa\n\n");
+        automata.append("#!dfa\n");
 
         // Insertar sigma
         automata.append("#alphabet\n");
-        for (Character caracter : this.sigma.getAlfabeto()) {
+        NavigableSet<Character> alfabeto = this.sigma.getAlfabeto();
+        for (Character caracter : alfabeto) {
             automata.append(caracter + " \n");
         }
 
         // Insertar Q
-        automata.append("\n#states\n");
+        automata.append("#states\n");
         for (String estado : this.Q) {
             automata.append(estado + " \n");
         }
 
         // Insertar q0
-        automata.append("\n#initial\n");
+        automata.append("#initial\n");
         automata.append(this.q0 + "\n");
 
         // Insertar F
-        automata.append("\n#accepting\n");
+        automata.append("#accepting\n");
         for (String estado : this.F) {
             automata.append(estado + " \n");
         }
 
         // Insertar transiciones
-        automata.append("\n#transitions\n");
+        automata.append("#transitions\n");
         NavigableSet<Character> caracteres = this.sigma.getAlfabeto();
         for (String estado : this.Q) {
 
@@ -514,13 +584,13 @@ public class AFD {
         }
 
         // Insertar estados limbo
-        automata.append("\n#limbo\n");
+        automata.append("#limbo\n");
         for (String estado : this.estadosLimbo) {
             automata.append(estado + " \n");
         }
 
         // Insertar estados inasequibles
-        automata.append("\n#unreachable\n");
+        automata.append("#unreachable\n");
         for (String estado : this.estadosInasequibles) {
             automata.append(estado + " \n");
         }
@@ -542,7 +612,7 @@ public class AFD {
 
         // Crear tablas usadas para el procedimiento
         this.tablaEstadosEquivalentes = new ArrayList<ArrayList<String>>();
-        this.tablaChequeoEquivalencia = new TreeMap<tuplaEstados, TreeMap<Character, tuplaEstados>>();
+        this.tablaChequeoEquivalencia = new TreeMap<TuplaEstados, TreeMap<Character, TuplaEstados>>();
 
         // * Poblar la tabla de equivalencias con una fila y una columna por cada estado
         // a
@@ -586,9 +656,9 @@ public class AFD {
         }
 
         // iteracion por tabla de transiciones
-        tuplaEstados origen = new tuplaEstados(estado1, estado2);
+        TuplaEstados origen = new TuplaEstados(estado1, estado2);
         NavigableSet<Character> alfabeto = this.sigma.getAlfabeto();
-        TreeMap<Character, tuplaEstados> transiciones = new TreeMap<Character, tuplaEstados>();
+        TreeMap<Character, TuplaEstados> transiciones = new TreeMap<Character, TuplaEstados>();
 
         // Por cada caracter del alfabeto para esta tupla de origen
         for (Character caracter : alfabeto) {
@@ -596,7 +666,7 @@ public class AFD {
             // Hay una tupla de destino
             String estadoDestino1 = this.delta.get(estado1).get(caracter);
             String estadoDestino2 = this.delta.get(estado2).get(caracter);
-            tuplaEstados destino = new tuplaEstados(estadoDestino1, estadoDestino2);
+            TuplaEstados destino = new TuplaEstados(estadoDestino1, estadoDestino2);
 
             // Agregarla al mapa de caracter a tupla destino para este origen
             transiciones.put(caracter, destino);
@@ -624,27 +694,27 @@ public class AFD {
     private void chequearEquivalencia() {
 
         // Obtener un iterable sobre las entradas de la tabla de chequeo de equivalencia
-        Set<Map.Entry<tuplaEstados, TreeMap<Character, tuplaEstados>>> entradas = this.tablaChequeoEquivalencia
+        Set<Map.Entry<TuplaEstados, TreeMap<Character, TuplaEstados>>> entradas = this.tablaChequeoEquivalencia
                 .entrySet();
 
         // Por cada entrada de la tabla de chequeo de equivalencia
-        for (Map.Entry<tuplaEstados, TreeMap<Character, tuplaEstados>> entrada : entradas) {
+        for (Map.Entry<TuplaEstados, TreeMap<Character, TuplaEstados>> entrada : entradas) {
 
-            tuplaEstados origen = entrada.getKey();
+            TuplaEstados origen = entrada.getKey();
 
             // Verificar si las tuplas realmente son equivalentes con la tabla de
             // equivalencias
             if (origen.getEquivalencia().equals("E")) {
 
                 // Para cada salida verificar si son equivalentes
-                TreeMap<Character, tuplaEstados> transiciones = entrada.getValue();
+                TreeMap<Character, TuplaEstados> transiciones = entrada.getValue();
                 NavigableSet<Character> alfabeto = this.sigma.getAlfabeto();
 
                 // Para cada salida verificar si en la tabla de equivalencias son equivalentes
                 for (Character caracter : alfabeto) {
 
                     // Obtener tupla de destino
-                    tuplaEstados destino = transiciones.get(caracter);
+                    TuplaEstados destino = transiciones.get(caracter);
                     String destino1 = destino.getEstado1();
                     String destino2 = destino.getEstado2();
 
@@ -714,11 +784,12 @@ public class AFD {
 
     }
 
+    // ! Solo funciona si no se cambia el estado de UnionFind clasesDeEquivalencia
     private void crearAFDMinimizado() {
 
-        // Crear los elementos del nuevo Q minimizado
+        // Inicializar los elementos del nuevo Q minimizado
         TreeSet<String> minQ = new TreeSet<String>();
-        String minQ0 = this.clasesEquivalencia.find(this.q0);
+        String minQ0 = this.clasesEquivalencia.find(this.q0); // Clase de q0
         TreeSet<String> minF = new TreeSet<String>();
         TreeMap<String, TreeMap<Character, String>> minDelta = new TreeMap<String, TreeMap<Character, String>>();
 
@@ -773,6 +844,7 @@ public class AFD {
     // Imprimir el AFD minimizado
     public void imprimirAFDSimplificado() {
 
+        this.simplificarAFD();
         System.out.println(this.AFDMinimizado.toString());
 
     }
@@ -780,7 +852,420 @@ public class AFD {
     // Exportar AFD a un archivo .afd
     public void exportar(String nombreArchivo) {
 
-        // TODO exportar AFD a un archivo .afd, num 8
+        String[] nombreArchivoSplit = nombreArchivo.split("\\.");
+        String extension = nombreArchivoSplit[nombreArchivoSplit.length - 1].trim();
+        String nombreNuevoArchivo;
+
+        if (extension.equals("afd")) {
+
+            nombreNuevoArchivo = nombreArchivo;
+
+        } else {
+
+            nombreNuevoArchivo = nombreArchivoSplit[0] + ".afd";
+
+        }
+
+        // Crear el archivo y llenarlo con toString
+        try {
+
+            // Crear el archivo
+            File archivo = new File(nombreNuevoArchivo);
+            archivo.createNewFile();
+
+            // Escribir el AFD en el archivo
+            FileWriter escritor = new FileWriter(archivo);
+            escritor.write(this.toString());
+            escritor.close();
+
+            System.out.println("Archivo del automata sin minimizar creado exitosamente");
+
+        } catch (IOException e) {
+
+            System.out.println("Error al crear el archivo");
+
+        }
+
+    }
+
+    // Hacer metodos para procesar cadenas
+    // Procesar una cadena y devolver si es aceptada o no
+    public Boolean procesarCadena(String cadena, Boolean detalles) {
+
+        // Crear la lista enlazada a partir de los caracteres de la cadena
+        LinkedList<Character> listaCadena = new LinkedList<Character>();
+        for (Character caracter : cadena.toCharArray()) {
+            listaCadena.addLast(caracter);
+        }
+
+        // Crear el log
+        StringBuilder log = new StringBuilder();
+
+        // Obtener el estado inicial
+        String estadoActual = this.q0;
+
+        if (detalles) {
+
+            // Espacio para no saturar
+            System.out.println();
+            System.out.println(cadena);
+            System.out.println();
+
+        }
+
+        // Meter lo mismo al log
+        log.append("\n\n");
+        log.append(cadena);
+        log.append("\n");
+
+        // Por cada caracter de la cadena
+        while (!listaCadena.isEmpty()) {
+
+            // Obtener el caracter
+            Character caracter = listaCadena.pop();
+            // Obtener la cadena restante
+            StringBuilder cadenaRestante = new StringBuilder();
+
+            for (Character caracterRestante : listaCadena) {
+                cadenaRestante.append(caracterRestante);
+            }
+
+            // Obtener alfabeto
+            NavigableSet<Character> alfabeto = this.sigma.getAlfabeto();
+            // Si el caracter no pertenece al alfabeto
+            if (!alfabeto.contains(caracter)) {
+
+                // La cadena no es aceptada
+                if (detalles) {
+
+                    System.out.println("El caracter " + caracter + " no pertenece al alfabeto");
+                    System.out.println("(" + estadoActual + ", " + caracter + ") -> ?");
+                    System.out.println("La cadena no es aceptada");
+
+                }
+
+                // Meter lo mismo al log
+                log.append("[" + estadoActual + ", " + cadenaRestante + "] -> ?\n");
+                log.append("No\n");
+                log.append("La cadena no es aceptada\n");
+                log.append("El caracter " + caracter + " no pertenece al alfabeto\n");
+
+                // Guardar procesamiento en logUltimoProcesamiento
+                this.logUltimoProcesamiento = log;
+
+                return false;
+
+            }
+
+            // Obtener el estado destino
+            String estadoDestino = this.delta.get(estadoActual).get(caracter);
+
+            // Si el estado destino es el estado limbo
+            if (estadoDestino.equals("limbo")) {
+
+                // La cadena no es aceptada
+                if (detalles) {
+
+                    System.out.println("(" + estadoActual + ", " + caracter + ") -> (limbo)");
+                    System.out.println("La cadena no es aceptada");
+
+                }
+
+                // Meter lo mismo al log
+                log.append("[" + estadoActual + ", " + cadenaRestante + "] -> limbo\n");
+                log.append("No\n");
+
+                // Guardar procesamiento en logUltimoProcesamiento
+                this.logUltimoProcesamiento = log;
+
+                return false;
+
+            }
+
+            // Mostrar paso computacional
+            if (detalles) {
+
+                System.out.println("(" + estadoActual + ", " + caracter + ") -> (" + estadoDestino + ")");
+
+            }
+
+            // Meter lo mismo al log
+            log.append("[" + estadoActual + ", " + cadenaRestante + "] -> " + estadoDestino + "\n");
+
+            // Actualizar el estado actual
+            estadoActual = estadoDestino;
+
+        }
+
+        // Guardar procesamiento en logUltimoProcesamiento
+        this.logUltimoProcesamiento = log;
+
+        // Si el estado actual es de aceptacion
+        if (this.F.contains(estadoActual)) {
+
+            // La cadena es aceptada
+            if (detalles) {
+                System.out.println("La cadena es aceptada");
+                System.out.println();
+            }
+
+            // Meter lo mismo al log
+            log.append("Si\n");
+
+            return true;
+
+        } else {
+
+            // La cadena no es aceptada
+            if (detalles) {
+                System.out.println("La cadena no es aceptada");
+                System.out.println();
+            }
+
+            // Meter lo mismo al log
+            log.append("No\n");
+
+            return false;
+
+        }
+
+    }
+
+    public Boolean procesarCadena(String cadena) {
+
+        return this.procesarCadena(cadena, false);
+
+    }
+
+    public Boolean procesarCadenaConDetalles(String cadena) {
+
+        return this.procesarCadena(cadena, true);
+
+    }
+
+    // Procesar lista de cadenas
+    public void procesarListaCadenas(Iterable<String> listaCadenas, String nombreArchivo, Boolean imprimirPantalla) {
+
+        StringBuilder resultado = new StringBuilder();
+
+        for (String cadena : listaCadenas) {
+
+            this.procesarCadena(cadena, imprimirPantalla);
+
+            resultado.append(logUltimoProcesamiento);
+
+        }
+
+        // Escribir en un archivo nombreArchivo el resultado
+        String[] nombreArchivoSplit = nombreArchivo.split("\\.");
+        String extension = nombreArchivoSplit[nombreArchivoSplit.length - 1];
+        String nombreNuevoArchivo;
+
+        if (extension.equals("txt")) {
+
+            nombreNuevoArchivo = nombreArchivo;
+
+        } else {
+
+            nombreNuevoArchivo = nombreArchivo + ".txt";
+
+        }
+
+        // Crear el archivo y llenarlo con toString
+        try {
+
+            // Crear el archivo
+            File archivo = new File(nombreNuevoArchivo);
+            archivo.createNewFile();
+
+            // Escribir el AFD en el archivo
+            FileWriter escritor = new FileWriter(archivo);
+            escritor.write(this.AFDMinimizado.toString());
+            escritor.close();
+
+            System.out.println("Archivo creado exitosamente");
+
+        } catch (IOException e) {
+
+            System.out.println("Error al crear el archivo");
+
+        }
+
+    }
+
+    // Hallar complemento del automata
+    public AFD hallarComplemento() {
+
+        TreeSet<String> complementF = new TreeSet<String>();
+        for (String estado : this.Q) {
+
+            if (!this.F.contains(estado)) {
+
+                complementF.add(estado);
+
+            }
+
+        }
+
+        return new AFD(sigma, Q, q0, complementF, delta);
+
+    }
+
+    public AFD hallarComplemento(AFD afdInput) {
+
+        return afdInput.hallarComplemento();
+
+    }
+
+    // Hallar producto cartesiano de dos automatas
+    public AFD hallarProductoCartesianoCon(AFD afdInput, String operacion) {
+
+        // Obtener atributos basicos de afdInput
+        TreeSet<String> QInput = afdInput.getQ();
+        String q0Input = afdInput.getQ0();
+        TreeSet<String> FInput = afdInput.getF();
+        TreeMap<String, TreeMap<Character, String>> deltaInput = afdInput.getDelta();
+
+        // Inicializar los que van a ser los atributos del nuevo AFD
+        TreeSet<String> QNuevo = new TreeSet<String>();
+        TreeSet<TuplaEstados> tuplasQ = new TreeSet<TuplaEstados>();
+        String q0Nuevo = "(" + this.q0 + ", " + q0Input + ")";
+        TreeSet<String> FNuevo = new TreeSet<String>();
+        TreeMap<String, TreeMap<Character, String>> deltaNuevo = new TreeMap<String, TreeMap<Character, String>>();
+
+        // Obtener el QNuevo
+        for (String estado1 : this.Q) {
+
+            for (String estado2 : QInput) {
+
+                QNuevo.add("(" + estado1 + ", " + estado2 + ")");
+                tuplasQ.add(new TuplaEstados(estado1, estado2));
+
+            }
+
+        }
+
+        // Obtener el FNuevo
+        for (String estado1 : this.Q) {
+
+            for (String estado2 : QInput) {
+
+                switch (operacion) {
+
+                    case "union":
+
+                        if (this.F.contains(estado1) || FInput.contains(estado2)) {
+
+                            FNuevo.add("(" + estado1 + ", " + estado2 + ")");
+
+                        }
+
+                        break;
+
+                    case "interseccion":
+
+                        if (this.F.contains(estado1) && FInput.contains(estado2)) {
+
+                            FNuevo.add("(" + estado1 + ", " + estado2 + ")");
+
+                        }
+
+                        break;
+
+                    case "diferencia":
+
+                        if (this.F.contains(estado1) && !FInput.contains(estado2)) {
+
+                            FNuevo.add("(" + estado1 + ", " + estado2 + ")");
+
+                        }
+
+                        break;
+
+                    case "diferencia simetrica":
+
+                        if ((this.F.contains(estado1) && !FInput.contains(estado2))
+                                || (!this.F.contains(estado1) && FInput.contains(estado2))) {
+
+                            FNuevo.add("(" + estado1 + ", " + estado2 + ")");
+
+                        }
+
+                        break;
+
+                    default:
+
+                        System.out.println("Operacion no valida");
+
+                        break;
+                }
+
+            }
+
+        }
+
+        // Obtener el deltaNuevo
+        for (TuplaEstados pareja : tuplasQ) {
+
+            // Obtener origen y alfabeto
+            String origen1 = pareja.getEstado1();
+            String origen2 = pareja.getEstado2();
+            NavigableSet<Character> alfabeto = this.sigma.getAlfabeto();
+
+            // Iniciar transiciones para esta tupla
+            TreeMap<Character, String> transiciones = new TreeMap<Character, String>();
+
+            // Por cada caracter del alfabeto
+            for (Character caracter : alfabeto) {
+
+                // Obtener destino
+                String destino1 = this.delta.get(origen1).get(caracter);
+                String destino2 = deltaInput.get(origen2).get(caracter);
+
+                // Obtener tupla de destino
+                String destino = "(" + destino1 + ", " + destino2 + ")";
+
+                // Agregar la transicion
+                transiciones.put(caracter, destino);
+
+            }
+
+            // Agregar las transiciones para esta tupla
+            deltaNuevo.put("(" + origen1 + ", " + origen2 + ")", transiciones);
+
+        }
+
+        return new AFD(this.sigma, QNuevo, q0Nuevo, FNuevo, deltaNuevo);
+
+    }
+
+    public AFD hallarProductoCartesiano(AFD afdInput1, AFD afdInput2, String operacion) {
+
+        return afdInput1.hallarProductoCartesianoCon(afdInput2, operacion);
+
+    }
+
+    public AFD hallarProductoCartesianoY(AFD afdInput1, AFD afdInput2) {
+
+        return this.hallarProductoCartesiano(afdInput1, afdInput2, "interseccion");
+
+    }
+
+    public AFD hallarProductoCartesianoO(AFD afdInput1, AFD afdInput2) {
+
+        return this.hallarProductoCartesiano(afdInput1, afdInput2, "union");
+
+    }
+
+    public AFD hallarProductoCartesianoDiferencia(AFD afdInput1, AFD afdInput2) {
+
+        return this.hallarProductoCartesiano(afdInput1, afdInput2, "diferencia");
+
+    }
+
+    public AFD hallarProductoCartesianoDiferenciaSimetrica(AFD afdInput1, AFD afdInput2) {
+
+        return this.hallarProductoCartesiano(afdInput1, afdInput2, "diferencia simetrica");
 
     }
 
