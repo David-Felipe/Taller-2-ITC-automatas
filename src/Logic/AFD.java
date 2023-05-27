@@ -5,7 +5,10 @@ import java.io.*;
 import org.jgrapht.alg.util.*;
 import Logic.ProcesamientoCadenaAFD;
 
-public class AFD {
+public class AFD implements Comparable<AFD> {
+
+    // Nombre AFD
+    private String nombreAFD;
 
     // Atributos clase AFD
     private Alfabeto sigma;
@@ -28,7 +31,7 @@ public class AFD {
     private ProcesamientoCadenaAFD ultimoProcesamiento;
     private StringBuilder logUltimoProcesamiento;
 
-    // Constructores de la clase AFD
+    // * Constructores de la clase AFD
     // Constructor de la clase AFD para conjuntos
     public AFD(Alfabeto sigma, TreeSet<String> Q, String q0, TreeSet<String> F,
             TreeMap<String, TreeMap<Character, String>> delta) {
@@ -89,7 +92,21 @@ public class AFD {
 
     }
 
-    // Getters y setters de la clase AFD
+    // * Getters y setters de la clase AFD
+    // Setter nombre
+    public void setNombreAFD(String nombre) {
+
+        this.nombreAFD = nombre;
+
+    }
+
+    // Getter nombre
+    public String getNombreAFD() {
+
+        return this.nombreAFD;
+
+    }
+
     // Getter sigma
     public Alfabeto getSigma() {
         return this.sigma;
@@ -140,7 +157,7 @@ public class AFD {
         this.delta = delta;
     }
 
-    // Clase tupla de estados
+    // * Clase tupla de estados
     private class TuplaEstados implements Comparable<TuplaEstados> {
 
         private String estado1;
@@ -196,6 +213,17 @@ public class AFD {
 
     }
 
+    // * Para que AFD sea comparable
+    @Override
+    public int compareTo(AFD otroAFD) {
+
+        String nombreOtro = otroAFD.getNombreAFD();
+
+        return this.nombreAFD.compareTo(nombreOtro);
+
+    }
+
+    // * Leer AFD desde un archivo
     // Leer lineas del archivo y devolverlas como un ArrayList<String>
     private ArrayList<String> leerArchivo(String rutaArchivo) throws Exception {
 
@@ -385,6 +413,7 @@ public class AFD {
 
     }
 
+    // * Verificaciones AFD
     // Verificar que el AFD este completo y si no corregirlo para que lo este
     private boolean verificarCorregirCompletitudAFD() {
 
@@ -537,7 +566,7 @@ public class AFD {
 
     }
 
-    // Entregar una String con la informacion del AFD
+    // * Entregar una String con la informacion del AFD
     // Entrega el alfabeto sobre el que está definido (sigma), estados (Q), el
     // estado inicial (q0), estados de aceptacion (F), estados limbo (estadosLimbo),
     // estadosInasequibles (estadosInasequibles) y tabla de transiciones (delta)
@@ -601,12 +630,14 @@ public class AFD {
 
     }
 
-    // Simplificar el automata a su minima expresion
-    public void simplificarAFD() {
+    // * Simplificar el automata a su minima expresion
+    public AFD simplificarAFD() {
 
         this.hallarEstadosEquivalentes();
         this.hallarClasesEquivalencia();
         this.crearAFDMinimizado();
+
+        return this.AFDMinimizado;
 
     }
 
@@ -851,7 +882,7 @@ public class AFD {
 
     }
 
-    // Exportar AFD a un archivo .afd
+    // * Exportar AFD a un archivo .afd
     public void exportar(String nombreArchivo) {
 
         String[] nombreArchivoSplit = nombreArchivo.split("\\.");
@@ -890,7 +921,7 @@ public class AFD {
 
     }
 
-    // Hacer metodos para procesar cadenas
+    // * Metodos para procesar cadenas
     // Procesar una cadena y devolver si es aceptada o no
     public Boolean procesarCadena(String cadena, Boolean detalles) {
 
@@ -1100,7 +1131,7 @@ public class AFD {
 
     }
 
-    // Hallar complemento del automata
+    // * Hallar complemento del automata
     public AFD hallarComplemento() {
 
         TreeSet<String> complementF = new TreeSet<String>();
@@ -1124,7 +1155,7 @@ public class AFD {
 
     }
 
-    // Hallar producto cartesiano de dos automatas
+    // * Hallar producto cartesiano de dos automatas
     public AFD hallarProductoCartesianoCon(AFD afdInput, String operacion) {
 
         // Obtener atributos basicos de afdInput
