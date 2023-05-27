@@ -21,11 +21,24 @@ public class ClasePrueba {
         Boolean probando = true;
         Scanner input = new Scanner(System.in, "utf-8");
 
+        // Limpiar consola para que se vea mas fancy
+        System.out.print("\033c");
         // Espacio al inicio para no saturar
         System.out.println();
         System.out.println();
         // Mensaje de bienvenida
         System.out.println("Bienvenido al programa de prueba de automatas");
+        // Esperar a que lea el mensaje
+        try {
+
+            // Espera que lea el mensaje
+            TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+        } catch (InterruptedException e) {
+
+            e.printStackTrace();
+
+        }
 
         // Seleccion en menu inicial que se repite hasta salir
         while (probando) {
@@ -463,6 +476,11 @@ public class ClasePrueba {
         // Pedir informacion necesaria para crear el AFD
         // Pedir ruta al archivo
         System.out.println("Por favor ingrese la ruta al archivo que contiene el AFD");
+        while (!input.hasNext()) {
+
+            // Esperar a que haya un input y luego sí avanzas
+
+        }
         String rutaArchivo = input.nextLine();
         System.out.println();
 
@@ -473,7 +491,7 @@ public class ClasePrueba {
 
             System.out.println(
                     "Por favor ingrese un nombre de menos de maxCharLenName caracteres sin espacios para el AFD");
-            nombreAFD = input.next();
+            nombreAFD = input.nextLine().trim();
             System.out.println();
 
             // Verificar condición
@@ -506,7 +524,9 @@ public class ClasePrueba {
 
             }
 
-            System.out.println("Ocurrio un error al buscar el archivo");
+            System.out.println();
+            System.out.println("Ocurrió un error al buscar el archivo");
+            System.out.println();
 
             try {
 
