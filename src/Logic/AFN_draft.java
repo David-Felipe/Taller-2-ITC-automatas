@@ -28,7 +28,7 @@ public class AFN_draft {
         this.delta = delta;
 
         // Hallar estados inasequibles y guardarlos
-        //this.hallarEstadosInasequibles();
+        this.hallarEstadosInaccesibles();
     }
     
     // Constructor de la clase AFN para archivo .nfa inicial
@@ -121,9 +121,7 @@ public class AFN_draft {
         if(!seccionesEsperadas.isEmpty()){
             throw new IllegalArgumentException("Faltan secciones en el archivo.");
         }
-        System.out.println(this.q0);
-        System.out.println(this.Q);
-        System.out.println(this.delta);
+        this.hallarEstadosInaccesibles();
     }
 
     private Set<Character> leerAlfabeto(Iterator<String> iterator) {
@@ -213,6 +211,38 @@ public class AFN_draft {
         }
     }
     
+    private void hallarEstadosInaccesibles() {
+        HashSet<String> estados = new HashSet<String>();
+        estados.add(this.q0);
+        int oldSizeEstados = 0;
+
+        NavigableSet<Character> alfabeto = this.sigma.getAlfabeto();
+        while (oldSizeEstados != estados.size()){
+            oldSizeEstados = estados.size();
+            Iterator<String> iterator = estados.iterator();
+            HashSet<String> copyEstados = new HashSet<String>();
+            copyEstados.addAll(estados);
+            while (iterator.hasNext()) {
+                String estado = iterator.next();
+                for (Character simbolo : alfabeto){
+                    HashSet<String> imagen = this.delta(estado, simbolo);
+                    if (imagen != null) {
+                        copyEstados.addAll(imagen);
+                    }
+                }
+            }
+            estados = copyEstados;
+        }
+
+        Iterator<String> iterator = this.Q.iterator();
+        while (iterator.hasNext()) {
+            String estado = iterator.next();
+            if (!estados.contains(estado)) {
+                this.estadosInaccesibles.add(estado);
+            }
+        }
+    }
+
     public void exportar(String archivo) throws IOException {
         ;
     }
