@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
+import java.io.*;
 
 public class AFN_draft {
 
@@ -243,10 +244,6 @@ public class AFN_draft {
         }
     }
 
-    public void exportar(String archivo) throws IOException {
-        ;
-    }
-
     // Implementacion de la funcion de trancision
     public HashSet<String> delta(String estado, Character simbolo) {
         if (this.Q.contains(estado) && this.sigma.contains(simbolo) && this.delta.get(estado)!=null) {
@@ -331,6 +328,113 @@ public class AFN_draft {
         }
         System.out.println("Aceptacion");
         return true;
+    }
+
+    private String preToString(Boolean mostrarInaccesibles, Boolean addSeccionEstadosInaccesibles) {
+        StringBuilder sb = new StringBuilder();
+
+        // formato nfa
+        sb.append("#!nfa\n");
+
+        // Insertar sigma
+        sb.append("#alphabet\n");
+        for (Character simbolo : this.sigma.getAlfabeto()) {
+            sb.append(simbolo + " \n");
+        }
+
+        // Insertar Q
+        sb.append("#states\n");
+        for (String estado : this.Q) {
+            if (!mostrarInaccesibles && this.estadosInaccesibles.contains(estado)){
+                continue;
+            }
+            sb.append(estado + " \n");
+        }
+
+        // Insertar q0
+        sb.append("#initial\n");
+        sb.append(this.q0 + "\n");
+
+        // Insertar F
+        sb.append("#accepting\n");
+        for (String estado : this.F) {
+            if (!mostrarInaccesibles && this.estadosInaccesibles.contains(estado)){
+                continue;
+            }
+            sb.append(estado + " \n");
+        }
+
+        // Insertar estados inaccesibles si mostrarInaccesibles
+        if (addSeccionEstadosInaccesibles){
+            sb.append("#inaccessible\n");
+            for (String estado : this.estadosInaccesibles) {
+                sb.append(estado + " \n");
+            }
+        }
+
+        // Insertar transiciones
+        sb.append("#transitions\n");
+        for (String preEstado : this.delta.keySet()) {
+            for (Character simbolo : this.delta.get(preEstado).keySet()){
+                Boolean masDeUnPostEstado = false;
+                sb.append(preEstado + ":" + simbolo + ">");
+                for (String postEstado: this.delta.get(preEstado).get(simbolo)){
+                    if (masDeUnPostEstado){
+                        sb.append(";" + postEstado);
+                    } else {
+                        sb.append(postEstado);
+                        masDeUnPostEstado = true;
+                    }
+                }
+                sb.append("\n");
+            }
+        }
+        return sb.toString();
+    }
+
+    @Override
+    public String toString() {
+        return this.preToString(true, true);
+    }
+
+    public void imprimirAFNLSimplificado() {
+        System.out.println(this.preToString(false, false));
+    }
+
+    public void exportar(String archivo) throws IOException {
+        String[] nombreArchivoSplit = archivo.split("\\.");
+        String extension = nombreArchivoSplit[nombreArchivoSplit.length - 1].trim();
+        String nombreNuevoArchivo;
+
+        if (extension.equals("nfa")) {
+
+            nombreNuevoArchivo = archivo;
+
+        } else {
+
+            nombreNuevoArchivo = nombreArchivoSplit[0] + ".nfa";
+
+        }
+
+        // Crear el archivo y llenarlo con toString
+        try {
+
+            // Crear el archivo
+            File archivoAFN = new File(nombreNuevoArchivo);
+            archivoAFN.createNewFile();
+
+            // Escribir el AFD en el archivo
+            FileWriter escritor = new FileWriter(archivoAFN);
+            escritor.write(this.preToString(true, false));
+            escritor.close();
+
+            System.out.println("Archivo del AFN creado exitosamente");
+
+        } catch (IOException e) {
+
+            System.out.println("Error al crear el archivo");
+
+        }
     }
 
     // Hallar los estados inasequibles del automata y guardarlos en
