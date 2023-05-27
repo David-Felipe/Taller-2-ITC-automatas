@@ -53,7 +53,7 @@ public class ClasePrueba {
 
             // Mostrar las opciones iniciales
             System.out.println("Presionando el entero seguido de la tecla enter, por favor");
-            System.out.println("Seleccione una opción:");
+            System.out.println("seleccione una opción:");
             System.out.println();
             System.out.println("1. Probar automatas");
             System.out.println("2. Probar conversiones");
@@ -127,7 +127,7 @@ public class ClasePrueba {
 
             // Mostrar las opciones de selección de automata
             System.out.println("Presionando el entero seguido de la tecla enter, por favor");
-            System.out.println("Seleccione una opción:");
+            System.out.println("seleccione una opción:");
             System.out.println();
             System.out.println("1. Probar AFD");
             System.out.println("2. Probar AFN");
@@ -228,7 +228,7 @@ public class ClasePrueba {
 
             // Mostrar las opciones para probar AFD
             System.out.println("Presionando el entero seguido de la tecla enter, por favor");
-            System.out.println("Seleccione una opción:");
+            System.out.println("seleccione una opción:");
             System.out.println();
             System.out.println("1. Editar AFD's ");
             System.out.println("2. Procesar cadenas");
@@ -248,7 +248,7 @@ public class ClasePrueba {
                     break;
 
                 case 2:
-                    procesarCadenas(automatasActuales, input);
+                    procesarCadenasAFD(automatasActuales, input);
                     break;
 
                 case 3:
@@ -286,6 +286,7 @@ public class ClasePrueba {
 
     }
 
+    // * Editar AFD
     private static void editarAFD(TreeSet<AFD> automatasActuales, Scanner input) {
 
         // Setup menu editar AFD
@@ -324,7 +325,7 @@ public class ClasePrueba {
 
             // Mostrar las opciones para editar AFD
             System.out.println("Presionando el entero seguido de la tecla enter, por favor");
-            System.out.println("Seleccione una opción:");
+            System.out.println("seleccione una opción:");
             System.out.println();
             System.out.println("1. Crear AFD ");
             System.out.println("2. Eliminar AFD");
@@ -410,7 +411,7 @@ public class ClasePrueba {
 
             // Mostrar las opciones para crear AFD
             System.out.println("Presionando el entero seguido de la tecla enter, por favor");
-            System.out.println("Seleccione una opción:");
+            System.out.println("seleccione una opción:");
             System.out.println();
             System.out.println("1. Crear AFD desde archivo ");
             System.out.println("2. Crear AFD por complemento de existente");
@@ -617,6 +618,7 @@ public class ClasePrueba {
             } else {
 
                 ingresandoAFD = false;
+                numAFD--;
 
             }
 
@@ -730,6 +732,7 @@ public class ClasePrueba {
             } else {
 
                 ingresandoAFD = false;
+                numAFD--;
 
             }
 
@@ -842,6 +845,7 @@ public class ClasePrueba {
             } else {
 
                 ingresandoAFD = false;
+                numAFD--;
 
             }
 
@@ -854,32 +858,665 @@ public class ClasePrueba {
 
     }
 
-    private static void procesarCadenas(TreeSet<AFD> automatasActuales, Scanner input) {
+    // * Procesar cadenas
+    private static void procesarCadenasAFD(TreeSet<AFD> automatasActuales, Scanner input) {
 
-        // TODO
+        // Verificar que sí existan
+        if (automatasActuales.size() == 0) {
+
+            System.out.println();
+            System.out.println("No hay ningún automata creado,por favor");
+            System.out.println("primero cree uno antes de usar esta opción");
+            System.out.println();
+
+            try {
+
+                // Espera que lea el mensaje
+                TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+            } catch (InterruptedException e) {
+
+                e.printStackTrace();
+
+            }
+
+            return;
+
+        }
+
+        // Setup menu seleccion de tipo de procesamiento
+        Boolean procesandoCadenas = true;
+
+        // Seleccion de procesamiento que se repite hasta volver
+        while (procesandoCadenas) {
+
+            // Limpiar consola para que se vea mas fancy
+            System.out.print("\033c");
+
+            // Espacio al inicio para no saturar e indicar menu
+            System.out.println();
+            System.out.println("Selección tipo de procesamiento");
+            System.out.println();
+
+            if (automatasActuales.size() != 0) {
+
+                Integer numActual = 1;
+
+                System.out.println("Sus AFD actuales son:");
+                System.out.println();
+
+                // Imprimir los AFD contenidos en automatasActuales
+                for (AFD actual : automatasActuales) {
+
+                    System.out.println(Integer.toString(numActual) + ". " + actual.getNombreAFD() + "\n");
+
+                }
+
+                System.out.println();
+
+                numActual++;
+
+            }
+
+            // Mostrar las opciones de selección de automata
+            System.out.println("Presionando el entero seguido de la tecla enter, por favor");
+            System.out.println("seleccione una opción:");
+            System.out.println();
+            System.out.println("1. Procesar cadena");
+            System.out.println("2. Procesar lista de cadenas desde archivo");
+            System.out.println("0. Volver");
+            System.out.println();
+            System.out.print("Ingrese su opción: ");
+            Integer opcion = input.nextInt();
+            System.out.println();
+
+            // Redirigir a la opcion deseada
+            switch (opcion) {
+
+                case 1:
+                    procesarCadenaAFD(automatasActuales, input);
+                    break;
+
+                case 2:
+                    procesarListaCadenasAFD(automatasActuales, input);
+                    break;
+
+                case 0:
+                    procesandoCadenas = false;
+                    break;
+
+                default:
+
+                    System.out.println("Opción inválida");
+
+                    try {
+
+                        // Espera que lea el mensaje
+                        TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+                    } catch (InterruptedException e) {
+
+                        e.printStackTrace();
+
+                    }
+
+                    break;
+
+            }
+
+        }
 
     }
 
+    private static void procesarCadenaAFD(TreeSet<AFD> automatasActuales, Scanner input) {
+
+        // Limpiar consola para que se vea mas fancy
+        System.out.print("\033c");
+
+        // Espacio al inicio para no saturar e indicar menu
+        System.out.println();
+        System.out.println("Procesamiento de cadena");
+        System.out.println();
+
+        // Mostrar automatas existentes
+        if (automatasActuales.size() != 0) {
+
+            Integer numActual = 1;
+
+            System.out.println("Sus AFD actuales son:");
+            System.out.println();
+
+            // Imprimir los AFD contenidos en automatasActuales
+            for (AFD actual : automatasActuales) {
+
+                System.out.println(Integer.toString(numActual) + ". " + actual.getNombreAFD() + "\n");
+
+            }
+
+            System.out.println();
+
+            numActual++;
+
+        }
+
+        // Ingresar el AFD a usar
+        Boolean ingresandoAFD = true;
+        Integer numAFD = 0;
+
+        while (ingresandoAFD) {
+
+            // Pedir info necesaria
+            System.out.println("Indique el número del AFD a partir del cual quiere procesar");
+            System.out.println("la cadena");
+            numAFD = input.nextInt();
+            System.out.println();
+
+            if (numAFD <= 0 || numAFD > automatasActuales.size()) {
+
+                System.out.println("El número ingresado no es valido");
+                System.out.println("Por favor intentelo de nuevo");
+                System.out.println();
+
+            } else {
+
+                ingresandoAFD = false;
+                numAFD--;
+
+            }
+
+        }
+
+        // Ingresar la cadena a procesar
+        // Pedir info necesaria
+        System.out.println("Por favor ingrese la cadena a procesar");
+        String cadenaEntrada = input.next();
+        System.out.println();
+
+        // Preguntar si desea detalles
+        System.out.println("Desea imprimir los detalles del procesamiento?");
+        System.out.println("por favor digite 1 para sí y 0 para no:");
+        Integer detalles = input.nextInt();
+        System.out.println();
+
+        // Procesar la cadena
+        ArrayList<AFD> listaAutomatas = new ArrayList<>(automatasActuales);
+        AFD afdBase = listaAutomatas.get(numAFD);
+        Boolean resultado = afdBase.procesarCadena(cadenaEntrada, detalles == 1);
+        System.out.println();
+
+        // Mostrar el resultado
+        if (resultado) {
+
+            System.out.println("La cadena fue aceptada por el AFD");
+            System.out.println();
+
+        } else {
+
+            System.out.println("La cadena no fue aceptada por el AFD");
+            System.out.println();
+
+        }
+
+    }
+
+    private static void procesarListaCadenasAFD(TreeSet<AFD> automatasActuales, Scanner input) {
+
+        // Limpiar consola para que se vea mas fancy
+        System.out.print("\033c");
+
+        // Espacio al inicio para no saturar e indicar menu
+        System.out.println();
+        System.out.println("Procesamiento de lista de cadenas desde archivo");
+        System.out.println();
+
+        // Mostrar automatas existentes
+        if (automatasActuales.size() != 0) {
+
+            Integer numActual = 1;
+
+            System.out.println("Sus AFD actuales son:");
+            System.out.println();
+
+            // Imprimir los AFD contenidos en automatasActuales
+            for (AFD actual : automatasActuales) {
+
+                System.out.println(Integer.toString(numActual) + ". " + actual.getNombreAFD() + "\n");
+
+            }
+
+            System.out.println();
+
+            numActual++;
+
+        }
+
+        // Ingresar el AFD a usar
+        Boolean ingresandoAFD = true;
+        Integer numAFD = 0;
+
+        while (ingresandoAFD) {
+
+            // Pedir info necesaria
+            System.out.println("Indique el número del AFD a partir del cual quiere procesar");
+            System.out.println("la lista de cadenas");
+            numAFD = input.nextInt();
+            System.out.println();
+
+            if (numAFD <= 0 || numAFD > automatasActuales.size()) {
+
+                System.out.println("El número ingresado no es valido");
+                System.out.println("Por favor intentelo de nuevo");
+                System.out.println();
+
+            } else {
+
+                ingresandoAFD = false;
+                numAFD--;
+
+            }
+
+        }
+
+        // Ingresar la ruta al archivo
+        // Pedir info necesaria
+        System.out.println("Por favor ingrese la ruta al archivo que contiene la lista de cadenas");
+        while (!input.hasNext()) {
+
+            // Esperar a que haya un input y luego sí avanzas
+
+        }
+        String rutaArchivo = input.nextLine();
+        System.out.println();
+
+        // Obtener cadenas desde el archivo
+        ArrayList<String> listaCadenas = new ArrayList<>();
+        try {
+
+            // Abrir el archivo
+            File archivo = new File(rutaArchivo);
+            Scanner lector = new Scanner(archivo);
+
+            // Leer todas las lineas y agregarlas
+            while (lector.hasNextLine()) {
+
+                String lineaActual = lector.nextLine().trim();
+                listaCadenas.add(lineaActual);
+
+            }
+
+            // Cerrar el lector
+            lector.close();
+
+        } catch (FileNotFoundException e) {
+
+            if (devMode) {
+
+                e.printStackTrace();
+
+            }
+
+            System.out.println();
+            System.out.println("Ocurrió un error al buscar el archivo");
+            System.out.println();
+
+            try {
+
+                // Espera que lea el mensaje
+                TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+            } catch (InterruptedException intrrptd) {
+
+                intrrptd.printStackTrace();
+
+            }
+
+            return;
+
+        }
+
+        // Ingresar nombre del archivo de salida
+        // Pedir info necesaria
+        System.out.println("Por favor ingrese el nombre del archivo de salida");
+        String nombreArchivoSalida = input.nextLine();
+        System.out.println();
+
+        // Preguntar si desea detalles
+        System.out.println("Desea imprimir los detalles del procesamiento?");
+        System.out.println("por favor digite 1 para sí y 0 para no:");
+        Integer detalles = input.nextInt();
+        System.out.println();
+
+        // Procesar la cadena
+        ArrayList<AFD> listaAutomatas = new ArrayList<>(automatasActuales);
+        AFD afdBase = listaAutomatas.get(numAFD);
+        afdBase.procesarListaCadenas(listaCadenas, nombreArchivoSalida, detalles == 1);
+        System.out.println();
+
+    }
+
+    // * Producto cartesiano
     private static void productoCartesiano(TreeSet<AFD> automatasActuales, Scanner input) {
 
-        // TODO
+        // Verificar que sí existan
+        if (automatasActuales.size() == 0) {
+
+            System.out.println();
+            System.out.println("No hay ningún automata creado,por favor");
+            System.out.println("primero cree uno antes de usar esta opción");
+            System.out.println();
+
+            try {
+
+                // Espera que lea el mensaje
+                TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+            } catch (InterruptedException e) {
+
+                e.printStackTrace();
+
+            }
+
+            return;
+
+        }
+
+        // Setup menu seleccion de operacion
+        Boolean seleccionandoOperacion = true;
+
+        // Seleccion de operacion que se repite hasta volver
+        while (seleccionandoOperacion) {
+
+            // Limpiar consola para que se vea mas fancy
+            System.out.print("\033c");
+
+            // Espacio al inicio para no saturar e indicar menu
+            System.out.println();
+            System.out.println("Selección de operación Producto Cartesiano");
+            System.out.println();
+
+            if (automatasActuales.size() != 0) {
+
+                Integer numActual = 1;
+
+                System.out.println("Sus AFD actuales son:");
+                System.out.println();
+
+                // Imprimir los AFD contenidos en automatasActuales
+                for (AFD actual : automatasActuales) {
+
+                    System.out.println(Integer.toString(numActual) + ". " + actual.getNombreAFD() + "\n");
+
+                }
+
+                System.out.println();
+
+                numActual++;
+
+            }
+
+            // Mostrar las opciones de seleccion de operacion
+            System.out.println("Presionando el entero seguido de la tecla enter, por favor");
+            System.out.println("seleccione una opción:");
+            System.out.println();
+            System.out.println("1. Union");
+            System.out.println("2. Interseccion");
+            System.out.println("3. Diferencia");
+            System.out.println("4. Diferencia simetrica");
+            System.out.println("0. Volver");
+            System.out.println();
+            System.out.print("Ingrese su opción: ");
+            Integer opcion = input.nextInt();
+            System.out.println();
+
+            // Redirigir a la opcion deseada
+            switch (opcion) {
+
+                case 1:
+                    hallarProductoCartesianoAFD(automatasActuales, input, "union");
+                    break;
+
+                case 2:
+                    hallarProductoCartesianoAFD(automatasActuales, input, "interseccion");
+                    break;
+
+                case 3:
+                    hallarProductoCartesianoAFD(automatasActuales, input, "diferencia");
+                    break;
+
+                case 4:
+                    hallarProductoCartesianoAFD(automatasActuales, input, "diferencia simetrica");
+                    break;
+
+                case 0:
+                    seleccionandoOperacion = false;
+                    break;
+
+                default:
+
+                    System.out.println("Opción inválida");
+
+                    try {
+
+                        // Espera que lea el mensaje
+                        TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+                    } catch (InterruptedException e) {
+
+                        e.printStackTrace();
+
+                    }
+
+                    break;
+
+            }
+
+        }
 
     }
 
+    private static void hallarProductoCartesianoAFD(TreeSet<AFD> automatasActuales, Scanner input, String operacion) {
+
+        // Limpiar consola para que se vea mas fancy
+        System.out.print("\033c");
+
+        // Espacio al inicio para no saturar e indicar menu
+        System.out.println();
+        System.out.println("Selección de operación Producto Cartesiano");
+        System.out.println();
+
+        // Mostrar automatas existentes
+        if (automatasActuales.size() != 0) {
+
+            Integer numActual = 1;
+
+            System.out.println("Sus AFD actuales son:");
+            System.out.println();
+
+            // Imprimir los AFD contenidos en automatasActuales
+            for (AFD actual : automatasActuales) {
+
+                System.out.println(Integer.toString(numActual) + ". " + actual.getNombreAFD() + "\n");
+
+            }
+
+            System.out.println();
+
+            numActual++;
+
+        }
+
+        // Ingresar el AFD a usar
+        Boolean ingresandoAFD = true;
+        Integer numAFD1 = 0;
+
+        while (ingresandoAFD) {
+
+            // Pedir info necesaria
+            System.out.println("Indique el número del primer AFD a partir del cual quiere hacer");
+            System.out.println("el producto cartesiano");
+            numAFD1 = input.nextInt();
+            System.out.println();
+
+            if (numAFD1 <= 0 || numAFD1 > automatasActuales.size()) {
+
+                System.out.println("El número ingresado no es valido");
+                System.out.println("Por favor intentelo de nuevo");
+                System.out.println();
+
+            } else {
+
+                ingresandoAFD = false;
+                numAFD1--;
+
+            }
+
+        }
+
+        // Ingresar el AFD a usar
+        ingresandoAFD = true;
+        Integer numAFD2 = 0;
+
+        while (ingresandoAFD) {
+
+            // Pedir info necesaria
+            System.out.println("Indique el número del segundo AFD a partir del cual quiere hacer");
+            System.out.println("el producto cartesiano");
+            numAFD2 = input.nextInt();
+            System.out.println();
+
+            if (numAFD2 <= 0 || numAFD2 > automatasActuales.size() || numAFD2 == numAFD1 + 1) {
+
+                System.out.println("El número ingresado no es valido");
+                System.out.println("Por favor intentelo de nuevo");
+                System.out.println();
+
+            } else {
+
+                ingresandoAFD = false;
+                numAFD2--;
+
+            }
+
+        }
+
+        // Ingresar nombre del AFD resultante
+        // Pedir info necesaria
+        System.out.println("Por favor ingrese el nombre del AFD resultante");
+        String nombreAFD = input.next();
+        System.out.println();
+
+        // Crear el AFD
+        ArrayList<AFD> listaAutomatas = new ArrayList<>(automatasActuales);
+        AFD afd1 = listaAutomatas.get(numAFD1);
+        AFD afd2 = listaAutomatas.get(numAFD2);
+        AFD resultado = afd1.hallarProductoCartesianoCon(afd2, operacion);
+        resultado.setNombreAFD(nombreAFD);
+        automatasActuales.add(resultado);
+
+    }
+
+    // * Exportar AFD
     private static void exportarAFD(TreeSet<AFD> automatasActuales, Scanner input) {
 
-        // TODO
+        // Limpiar consola para que se vea mas fancy
+        System.out.print("\033c");
+
+        // Verificar que sí existan
+        if (automatasActuales.size() == 0) {
+
+            System.out.println();
+            System.out.println("No hay ningún automata creado,por favor");
+            System.out.println("primero cree uno antes de usar esta opción");
+            System.out.println();
+
+            try {
+
+                // Espera que lea el mensaje
+                TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+            } catch (InterruptedException e) {
+
+                e.printStackTrace();
+
+            }
+
+            return;
+
+        }
+
+        // Espacio al inicio para no saturar e indicar menu
+        System.out.println();
+        System.out.println("Exportar AFD");
+        System.out.println();
+
+        // Mostrar automatas existentes
+        if (automatasActuales.size() != 0) {
+
+            Integer numActual = 1;
+
+            System.out.println("Sus AFD actuales son:");
+            System.out.println();
+
+            // Imprimir los AFD contenidos en automatasActuales
+            for (AFD actual : automatasActuales) {
+
+                System.out.println(Integer.toString(numActual) + ". " + actual.getNombreAFD() + "\n");
+
+            }
+
+            System.out.println();
+
+            numActual++;
+
+        }
+
+        // Ingresar el AFD a exportar
+        Boolean ingresandoAFD = true;
+        Integer numAFD = 0;
+
+        while (ingresandoAFD) {
+
+            // Pedir info necesaria
+            System.out.println("Indique el número del AFD a exportar");
+            numAFD = input.nextInt();
+            System.out.println();
+
+            if (numAFD <= 0 || numAFD > automatasActuales.size()) {
+
+                System.out.println("El número ingresado no es valido");
+                System.out.println("Por favor intentelo de nuevo");
+                System.out.println();
+
+            } else {
+
+                ingresandoAFD = false;
+                numAFD--;
+
+            }
+
+        }
+
+        // Ingresar nombre del archivo de salida
+        // Pedir info necesaria
+        System.out.println("Por favor ingrese el nombre del archivo de salida");
+        String nombreArchivoSalida = input.next();
+        System.out.println();
+
+        // Exportar el AFD
+        ArrayList<AFD> listaAutomatas = new ArrayList<>(automatasActuales);
+        AFD afdExportado = listaAutomatas.get(numAFD);
+        afdExportado.exportar(nombreArchivoSalida);
 
     }
 
-    // * Probar AFN
+    // ** Probar AFN
     private static void probarAFN(Scanner input) {
 
         // TODO
 
     }
 
-    // * Probar AFN Lambda
+    // ** Probar AFN Lambda
     private static void probarAFNLambda(Scanner input) {
 
         // TODO
