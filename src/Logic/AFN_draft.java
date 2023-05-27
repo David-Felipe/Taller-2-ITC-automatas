@@ -15,12 +15,12 @@ public class AFN_draft {
     private String q0;
     private HashSet<String> F;
     private HashSet<String> estadosInaccesibles;
-    private Map<String, Map<Character, Set<String>>> delta;
+    private HashMap<String, HashMap<Character, HashSet<String>>> delta;
 
     // Constructores de la clase AFN
     // Constructor de la clase AFN para conjuntos
     public AFN_draft(Alfabeto sigma, HashSet<String> Q, String q0, HashSet<String> F,
-            Map<String, Map<Character, Set<String>>> delta) {
+            HashMap<String, HashMap<Character, HashSet<String>>> delta) {
         this.sigma = sigma;
         this.Q = Q;
         this.q0 = q0;
@@ -30,6 +30,7 @@ public class AFN_draft {
         // Hallar estados inasequibles y guardarlos
         //this.hallarEstadosInasequibles();
     }
+    
     // Constructor de la clase AFN para archivo .nfa inicial
     public AFN_draft(String rutaArchivo) throws Exception {
         
@@ -205,15 +206,101 @@ public class AFN_draft {
 
     public void addTransition(String fromState, Character symbol, String toState) {
         if (this.Q.contains(fromState) && this.Q.contains(toState) && this.sigma.contains(symbol)) {
-            Map<Character, Set<String>> stateTransitions = this.delta.computeIfAbsent(fromState,
+            HashMap<Character, HashSet<String>> stateTransitions = this.delta.computeIfAbsent(fromState,
                     k -> new HashMap<>());
-            Set<String> toStates = stateTransitions.computeIfAbsent(symbol, k -> new HashSet<>());
+            HashSet<String> toStates = stateTransitions.computeIfAbsent(symbol, k -> new HashSet<>());
             toStates.add(toState);
         }
     }
-  
+    
     public void exportar(String archivo) throws IOException {
         ;
+    }
+
+    // Implementacion de la funcion de trancision
+    public HashSet<String> delta(String estado, Character simbolo) {
+        if (this.Q.contains(estado) && this.sigma.contains(simbolo) && this.delta.get(estado)!=null) {
+            return this.delta.get(estado).get(simbolo);
+        } else {
+            return null;
+        }
+    }
+
+    public Boolean procesarCadena(String cadena) {
+        HashSet<String> estados = new HashSet<String>();
+        estados.add(this.q0);
+        for (int i = 0; i < cadena.length(); i++) {
+            HashSet<String> postEstados = new HashSet<String>();
+
+            Iterator<String> iterator = estados.iterator();
+            while (iterator.hasNext()) {
+                HashSet<String> imagen = this.delta(iterator.next(), cadena.charAt(i));
+                if (imagen != null) {
+                    postEstados.addAll(imagen);
+                }
+            }
+            if (postEstados.isEmpty()) {
+                return false;
+            }
+            estados = postEstados;
+        }
+        estados.retainAll(this.F);
+        if (estados.isEmpty()) {
+            return false;
+        }
+        return true;
+    }
+
+    public Boolean procesarCadenaConDetalles(String cadena) {
+        ArrayList<HashSet<String>> sets = new ArrayList<HashSet<String>>();
+
+        HashSet<String> estados = new HashSet<String>();
+        estados.add(this.q0);
+        sets.add(estados);
+
+        for (int i = 0; i < cadena.length(); i++) {
+            HashSet<String> postEstados = new HashSet<String>();
+
+            Iterator<String> iterator = estados.iterator();
+            while (iterator.hasNext()) {
+                HashSet<String> imagen = this.delta(iterator.next(), cadena.charAt(i));
+                if (imagen != null) {
+                    postEstados.addAll(imagen);
+                }
+            }
+            if (postEstados.isEmpty()) {
+                return false;
+            }
+            sets.add(postEstados);
+            estados = postEstados;
+        }
+        estados.retainAll(this.F);
+        if (estados.isEmpty()) {
+            return false;
+        }
+
+
+        ArrayList<String> estadosProcesamiento = new ArrayList<String>();
+        String estadoFinal = " ";
+        for (String estado : sets.get(cadena.length())) {
+            estadoFinal = estado;
+            break;
+        }
+        estadosProcesamiento.add(estadoFinal);
+        for (int i=cadena.length()-1 ; i>=0 ; i--) {
+            for (String estado : sets.get(i)) {
+                if (this.delta(estado, cadena.charAt(i))!= null && this.delta(estado, cadena.charAt(i)).contains(estadoFinal)){
+                    estadosProcesamiento.add(estado);
+                    estadoFinal = estado;
+                    break;
+                }
+            }
+        }
+        for (int i=cadena.length() ; i>0 ; i--) {
+            System.out.printf("["+estadosProcesamiento.get(i)+","+cadena.substring(cadena.length()-i)+"]->");
+        }
+        System.out.println("Aceptacion");
+        return true;
     }
 
     // Hallar los estados inasequibles del automata y guardarlos en
