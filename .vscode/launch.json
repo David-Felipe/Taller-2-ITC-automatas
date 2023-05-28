@@ -6,6 +6,13 @@
             "name": "App",
             "request": "launch",
             "mainClass": "App",
+            "projectName": "Taller-2-ITC-automatas_3f5ce630"
+        },
+        {
+            "type": "java",
+            "name": "App",
+            "request": "launch",
+            "mainClass": "App",
             "projectName": "Taller-2-ITC-automatas_4f734889"
         },
         {

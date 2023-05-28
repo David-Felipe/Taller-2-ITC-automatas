@@ -647,25 +647,26 @@ public class AFNLambda {
     //
     public AFN AFN_LambdaToAFN(AFNLambda afnl) {
         Set<Character> alphabet = afnl.getAlphabet();
+        Alfabeto alfabeto = new Alfabeto(alphabet);
         Set<String> states = afnl.getStates();
         String initialState = afnl.getInitialState();
         Set<String> acceptingStates = afnl.getAcceptingStates();
-        Map<String, Map<Character, Set<String>>> transitionFunction = new HashMap<>();
-
+        HashMap<String, HashMap<Character, HashSet<String>>> transitionFunction = new HashMap<>();
+    
         // Imprimir la lambda clausura de cada estado
         for (String state : states) {
             Set<String> lambdaClosure = afnl.calcularLambdaClausura(state);
             System.out.println("Lambda Clausura de " + state + ": " + lambdaClosure);
         }
-
+    
         // Procesar cada estado y construir la definición de transiciones del AFN
         for (String state : states) {
             Set<String> lambdaClosure = afnl.calcularLambdaClausura(state);
-            Map<Character, Set<String>> stateTransitions = new HashMap<>();
-
+            HashMap<Character, HashSet<String>> stateTransitions = new HashMap<>();
+    
             for (char symbol : alphabet) {
-                Set<String> toStates = new HashSet<>();
-
+                HashSet<String> toStates = new HashSet<>();
+    
                 // Calcular los estados alcanzables por el símbolo actual y su lambda clausura
                 for (String currentState : lambdaClosure) {
                     Map<Character, Set<String>> transitions = afnl.getTransitionFunction().get(currentState);
@@ -673,26 +674,24 @@ public class AFNLambda {
                         toStates.addAll(transitions.get(symbol));
                     }
                 }
-
+    
                 // Calcular la lambda clausura de los estados alcanzables
-                Set<String> toStatesLambdaClosure = new HashSet<>();
+                HashSet<String> toStatesLambdaClosure = new HashSet<>();
                 for (String nextState : toStates) {
                     toStatesLambdaClosure.addAll(afnl.calcularLambdaClausura(nextState));
                 }
-
+    
                 // Agregar la transición al estado actual del AFN
                 stateTransitions.put(symbol, toStatesLambdaClosure);
             }
-
+    
             // Agregar las transiciones del estado actual al AFN
             transitionFunction.put(state, stateTransitions);
         }
-
+    
         // Construir el objeto AFN y retornarlo
-        return new AFN(alphabet, states, initialState, acceptingStates, transitionFunction);
+        return new AFN(alfabeto, new HashSet<>(states), initialState, new HashSet<>(acceptingStates), new HashMap<>(transitionFunction));
     }
     //
-
     // Opción de selección
-
 }
