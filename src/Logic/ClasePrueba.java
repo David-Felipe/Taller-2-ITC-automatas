@@ -10,7 +10,7 @@ import Logic.AFD;
 
 public class ClasePrueba {
 
-    static Integer segundosEsperaLector = 5;
+    static Integer segundosEsperaLector = 3;
     static Boolean devMode = false;
     static Integer maxCharLenName = 15;
 
@@ -482,7 +482,7 @@ public class ClasePrueba {
             // Esperar a que haya un input y luego sí avanzas
 
         }
-        String rutaArchivo = input.nextLine();
+        String rutaArchivo = input.next();
         System.out.println();
 
         // Pedir nombre del AFD
@@ -492,7 +492,7 @@ public class ClasePrueba {
 
             System.out.println(
                     "Por favor ingrese un nombre de menos de maxCharLenName caracteres sin espacios para el AFD");
-            nombreAFD = input.nextLine().trim();
+            nombreAFD = input.next().trim();
             System.out.println();
 
             // Verificar condición
@@ -864,6 +864,9 @@ public class ClasePrueba {
         // Verificar que sí existan
         if (automatasActuales.size() == 0) {
 
+            // Limpiar consola para que se vea mas fancy
+            System.out.print("\033c");
+
             System.out.println();
             System.out.println("No hay ningún automata creado,por favor");
             System.out.println("primero cree uno antes de usar esta opción");
@@ -1125,7 +1128,7 @@ public class ClasePrueba {
             // Esperar a que haya un input y luego sí avanzas
 
         }
-        String rutaArchivo = input.nextLine();
+        String rutaArchivo = input.next();
         System.out.println();
 
         // Obtener cadenas desde el archivo
@@ -1199,6 +1202,9 @@ public class ClasePrueba {
 
         // Verificar que sí existan
         if (automatasActuales.size() == 0) {
+
+            // Limpiar consola para que se vea mas fancy
+            System.out.print("\033c");
 
             System.out.println();
             System.out.println("No hay ningún automata creado,por favor");
