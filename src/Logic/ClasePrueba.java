@@ -491,7 +491,8 @@ public class ClasePrueba {
         while (ingresandoNombre) {
 
             System.out.println(
-                    "Por favor ingrese un nombre de menos de maxCharLenName caracteres sin espacios para el AFD");
+                    "Por favor ingrese un nombre de menos de " + Integer.toString(maxCharLenName)
+                            + " caracteres sin espacios para el AFD");
             nombreAFD = input.next().trim();
             System.out.println();
 
@@ -630,7 +631,7 @@ public class ClasePrueba {
         while (ingresandoNombre) {
 
             System.out.println(
-                    "Por favor ingrese un nombre de menos de " + maxCharLenName
+                    "Por favor ingrese un nombre de menos de " + Integer.toString(maxCharLenName)
                             + " caracteres sin espacios para el AFD");
             nombreAFD = input.next();
             System.out.println();
@@ -745,7 +746,8 @@ public class ClasePrueba {
         while (ingresandoNombre) {
 
             System.out.println(
-                    "Por favor ingrese un nombre de menos de maxCharLenName caracteres sin espacios para el AFD");
+                    "Por favor ingrese un nombre de menos de" + Integer.toString(maxCharLenName)
+                            + "caracteres sin espacios para el AFD");
             nombreAFD = input.next();
             System.out.println();
 

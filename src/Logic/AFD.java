@@ -322,8 +322,7 @@ public class AFD implements Comparable<AFD> {
                     Integer inicioSeccion = indice; // Aqui inicia la seccion
 
                     indice++;
-                    String lineaActual = lineasArchivo.get(indice);
-                    lineaActual.trim();
+                    String lineaActual = lineasArchivo.get(indice).trim();
                     // Guardar el contenido de la sección hasta encontrar la siguiente sección o el
                     // fin del documento
                     while (!lineaActual.contains("#") && indice < lineasArchivo.size()) {
@@ -332,8 +331,7 @@ public class AFD implements Comparable<AFD> {
                             contenido.add(lineaActual);
 
                         indice++;
-                        lineaActual = lineasArchivo.get(indice);
-                        lineaActual.trim().trim();
+                        lineaActual = lineasArchivo.get(indice).trim();
 
                     }
 
@@ -464,7 +462,7 @@ public class AFD implements Comparable<AFD> {
                     // Si no tiene la salida
                     if (!this.delta.get(estado).containsKey(caracter)) {
 
-                        // Agregar la salida al estado limbo
+                        // Agregar la salida al estado limbo y crearlo
                         this.delta.get(estado).put(caracter, "limbo");
                         limboExist = true;
 
@@ -478,6 +476,10 @@ public class AFD implements Comparable<AFD> {
 
         // Verificar que sí existe el limbo
         if (limboExist) {
+
+            // Agregar el estado limbo
+            this.Q.add("limbo");
+            this.delta.put("limbo", new TreeMap<Character, String>());
 
             // Verificar que el estado limbo tenga todas sus salidas
             // Si no tiene todas sus salidas
@@ -509,9 +511,14 @@ public class AFD implements Comparable<AFD> {
 
         // Crear la lista de estados limbo
         TreeSet<String> estadosLimbo = new TreeSet<String>();
+        estadosLimbo.add("limbo");
 
         // Para cada estado del AFD
         for (String estado : this.Q) {
+
+            // Si es de aceptacion, saltatelo, ignoralo, no puede ser limbo
+            if (this.F.contains(estado))
+                continue;
 
             // Si el estado no tiene transiciones hacia otros estados, solo hacia si mismo
             if (this.delta.get(estado).values().stream().allMatch(e -> e.equals(estado))) {
