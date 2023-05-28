@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.*;
 import java.util.*;
 import java.io.*;
 
@@ -18,6 +19,9 @@ public class AFN {
     private HashSet<String> estadosInaccesibles;
     private HashMap<String, HashMap<Character, HashSet<String>>> delta;
 
+    // Atributos para procesar cadenas
+    private HashMap<String, String> logUltimoProcesamiento;
+
     // Constructores de la clase AFN
     // Constructor de la clase AFN para conjuntos
     public AFN(Alfabeto sigma, HashSet<String> Q, String q0, HashSet<String> F,
@@ -30,6 +34,8 @@ public class AFN {
 
         // Hallar estados inasequibles y guardarlos
         this.hallarEstadosInaccesibles();
+
+        this.inicializarLogUltimoProcesamiento();
     }
     
     // Constructor de la clase AFN para archivo .nfa inicial
@@ -122,7 +128,10 @@ public class AFN {
         if(!seccionesEsperadas.isEmpty()){
             throw new IllegalArgumentException("Faltan secciones en el archivo.");
         }
+        // Hallar estados inasequibles y guardarlos
         this.hallarEstadosInaccesibles();
+
+        this.inicializarLogUltimoProcesamiento();
     }
 
     private Set<Character> leerAlfabeto(Iterator<String> iterator) {
@@ -244,6 +253,16 @@ public class AFN {
                 this.estadosInaccesibles.add(estado);
             }
         }
+    }
+
+    private void inicializarLogUltimoProcesamiento() {
+        this.logUltimoProcesamiento = new HashMap<String, String>();
+        this.logUltimoProcesamiento.put("procesamientoMasCorto", "");
+        this.logUltimoProcesamiento.put("numProcesamientos", "0");
+        this.logUltimoProcesamiento.put("numProcesamientosAceptados", "0");
+        this.logUltimoProcesamiento.put("numProcesamientosRechazados", "0");
+        this.logUltimoProcesamiento.put("numProcesamientosAbortados", "0");
+        this.logUltimoProcesamiento.put("fueAceptada", "0");
     }
 
     // Implementacion de la funcion de trancision
@@ -723,5 +742,159 @@ public class AFN {
         }
 
         return procesamientosTerminados.size();
+    }
+
+    private void logProcesamientos(String cadena) {
+        String procesamientoRechazadoMasCorto = "";
+        String procesamientoRechazado = "";
+        int sizeProcesamientoRechazadoMasCorto = cadena.length();
+        Boolean todaviaNoEsAceptada = true;
+        Boolean todaviaNoEsRechazada = true;
+        int contadorAceptadas = 0;
+        int contadorRechazadas = 0;
+        int contadorAbortadas = 0;
+        ArrayDeque<ArrayDeque<String[]>> q = new ArrayDeque<ArrayDeque<String[]>>();
+        ArrayDeque<ArrayDeque<String[]>> procesamientosTerminados = new ArrayDeque<ArrayDeque<String[]>>();
+        ArrayDeque<String[]> procesamientoInicial = new ArrayDeque<String[]>();
+        String[] configuracionInicial = {this.q0, cadena};
+        procesamientoInicial.add(configuracionInicial);
+        q.add(procesamientoInicial);
+        while (!q.isEmpty()) {
+            ArrayDeque<String[]> procesamiento = q.remove();
+            HashSet<String[]> nextProcesamientos = this.darPasoComputacional(procesamiento.peekLast());
+            if (nextProcesamientos!=null) {
+                for (String[] nextProcesamiento : nextProcesamientos) {
+                    ArrayDeque<String[]> nuevoStack = procesamiento.clone();
+                    nuevoStack.add(nextProcesamiento);
+                    q.add(nuevoStack);
+                }
+            } else {
+                procesamientosTerminados.add(procesamiento);
+            }
+        }
+        for (ArrayDeque<String[]> procesamiento : procesamientosTerminados) {
+            StringBuilder sbUltimoProcesamiento = new StringBuilder();
+            Boolean masDeUnaconfiguracion = false;
+            int sizeProcesamiento = procesamiento.size() - 1; 
+            String tipoProcesamiento = "";
+            
+            if (procesamiento.peekLast()[1] == "") {
+                if (this.F.contains(procesamiento.peekLast()[0])) {
+                    tipoProcesamiento = "aceptado";
+                    contadorAceptadas++;
+                } else {
+                    tipoProcesamiento = "rechazado";
+                    contadorRechazadas++;
+                }
+            } else {
+                tipoProcesamiento = "abortado";
+                contadorAbortadas++;
+            }
+            while (!procesamiento.isEmpty()){
+                String[] configuracion = procesamiento.remove();
+                if (masDeUnaconfiguracion) {
+                    sbUltimoProcesamiento.append("->[" + configuracion[0] + "," + configuracion[1] + "]");
+                } else {
+                    sbUltimoProcesamiento.append("[" + configuracion[0] + "," + configuracion[1] + "]");
+                    masDeUnaconfiguracion = true;
+                }
+            }
+            switch (tipoProcesamiento) {
+                case "aceptado":
+                    if (todaviaNoEsAceptada) {
+                        this.logUltimoProcesamiento.put("fueAceptada", "1");
+                        this.logUltimoProcesamiento.put("procesamientoMasCorto", sbUltimoProcesamiento.toString());
+                        todaviaNoEsAceptada = false;
+                    }
+                    break;
+                case "abortado":
+                    if (sizeProcesamiento < sizeProcesamientoRechazadoMasCorto) {
+                        sizeProcesamientoRechazadoMasCorto = sizeProcesamiento;
+                        procesamientoRechazadoMasCorto = sbUltimoProcesamiento.toString();
+                    }
+                    break;
+                default:
+                    if (todaviaNoEsRechazada) {
+                        procesamientoRechazado = sbUltimoProcesamiento.toString(); 
+                        todaviaNoEsRechazada = false;
+                    }
+            }
+        }
+        this.logUltimoProcesamiento.put("numProcesamientosAceptados", Integer.toString(contadorAceptadas));
+        this.logUltimoProcesamiento.put("numProcesamientosRechazados", Integer.toString(contadorRechazadas));
+        this.logUltimoProcesamiento.put("numProcesamientosAbortados", Integer.toString(contadorAbortadas));
+        this.logUltimoProcesamiento.put("numProcesamientos", Integer.toString(contadorAceptadas + contadorRechazadas + contadorAbortadas));
+        if (todaviaNoEsAceptada){
+            this.logUltimoProcesamiento.put("fueAceptada", "0");
+            if (procesamientoRechazadoMasCorto == "") {
+                this.logUltimoProcesamiento.put("procesamientoMasCorto", procesamientoRechazado);
+            } else {
+                this.logUltimoProcesamiento.put("procesamientoMasCorto", procesamientoRechazadoMasCorto);
+            }
+        }
+    }
+
+    public void procesarListaCadenas(String[] listaCadenas, String nombreArchivo, Boolean imprimirPantalla) {
+
+        StringBuilder sb = new StringBuilder();
+
+        for (String cadena : listaCadenas) {
+            this.logProcesamientos(cadena);
+            String fueAceptada = "no";
+            if (this.logUltimoProcesamiento.get("fueAceptada") == "1") {
+                fueAceptada = "si";
+            }
+            sb.append(cadena + "\t" 
+                        + this.logUltimoProcesamiento.get("procesamientoMasCorto") + "\t"
+                        + this.logUltimoProcesamiento.get("numProcesamientos") + "\t" 
+                        + this.logUltimoProcesamiento.get("numProcesamientosAceptados") + "\t"
+                        + this.logUltimoProcesamiento.get("numProcesamientosAbortados") + "\t" 
+                        + this.logUltimoProcesamiento.get("numProcesamientosRechazados") + "\t" 
+                        + fueAceptada + "\n" );
+            
+        }
+
+        String listaProcesada = sb.toString();
+
+        // Imprimir si imprimirPantalla
+        if (imprimirPantalla) {
+            System.out.println(listaProcesada);
+        }
+        
+        // Comprobar que el nombre del archivo es valido
+        for (int i = 0; i < nombreArchivo.length(); i++) {
+            Character simbolo = nombreArchivo.charAt(i);
+            if (!Character.isDigit(simbolo) && !Character.isLetter(simbolo) && !(simbolo >= ',' && simbolo <= '.') && !(simbolo == '_')) {
+                nombreArchivo = "procesamiento-cadenas_" 
+                                + LocalDateTime.now().getYear() + "-"
+                                + LocalDateTime.now().getMonthValue() + "-"
+                                + LocalDateTime.now().getDayOfMonth() + "-"
+                                + LocalDateTime.now().getHour() + "-"
+                                + LocalDateTime.now().getMinute() + "-"
+                                + LocalDateTime.now().getSecond() + "_" 
+                                + Integer.toString(this.hashCode());
+                break;
+            }
+        }
+
+        // Crear el archivo y llenarlo con listaProcesada
+        nombreArchivo  += ".txt";
+        try {
+
+            // Crear el archivo de procesamientos de cadenas
+            File archivo = new File(nombreArchivo);
+            archivo.createNewFile();
+
+            // Escribir la lista en el archivo
+            FileWriter escritor = new FileWriter(archivo);
+            escritor.write(listaProcesada);
+            escritor.close();
+
+            System.out.println("Archivo de procesamientos de las cadenas listadas creado exitosamente.");
+
+        } catch (IOException e) {
+
+            System.out.println("Error al crear el archivo de procesamientos de las cadenas listadas.");
+        }
     }
 }
