@@ -1,0 +1,33 @@
+#!dfa
+#alphabet
+a 
+b 
+c 
+#states
+{q0} 
+{q10,q11,q12,q13,q8,q9} 
+{q14,q15,q16,q17,q18} 
+{q2,q3} 
+{q20,q4,q5,q6,q7}
+#initial
+{q0}
+#accepting
+{q14,q15,q16,q17,q18} 
+#transitions
+{q0} : a > {q2,q3}
+{q0} : b > limbo
+{q0} : c > limbo
+{q10,q11,q12,q13,q8,q9} : a > {q14,q15,q16,q17,q18}
+{q10,q11,q12,q13,q8,q9} : b > limbo
+{q10,q11,q12,q13,q8,q9} : c > limbo
+{q14,q15,q16,q17,q18} : a > limbo
+{q14,q15,q16,q17,q18} : b > limbo
+{q14,q15,q16,q17,q18} : c > limbo
+{q2,q3} : a > limbo
+{q2,q3} : b > {q20,q4,q5,q6,q7}
+{q2,q3} : c > limbo
+{q20,q4,q5,q6,q7} : a > limbo
+{q20,q4,q5,q6,q7} : b > limbo
+{q20,q4,q5,q6,q7} : c > {q10,q11,q12,q13,q8,q9}
+#comentario
+Testeo recomendado por Juan Jose

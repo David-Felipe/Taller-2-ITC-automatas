@@ -405,6 +405,15 @@ public class AFD implements Comparable<AFD> {
             String caracterTransicion = partesDestino[0].trim();
             String estadoDestino = partesDestino[1].trim().trim();
 
+            // Si el estado destino no está contenido en Q
+            if (!this.Q.contains(estadoDestino)) {
+
+                // Agregarlo a el y a su mapa de transiciones, alv
+                this.Q.add(estadoDestino);
+                transiciones.put(estadoDestino, new TreeMap<Character, String>());
+
+            }
+
             // Si el estado de origen ya existe
             if (transiciones.containsKey(estadoOrigen)) {
 
@@ -427,7 +436,7 @@ public class AFD implements Comparable<AFD> {
                 }
 
             } else {
-                // Si el estado de origen no existe
+                // Si el mapa de transiciones del estado de origen no existe
                 // Crear el mapa de transiciones del estado de origen
                 TreeMap<Character, String> transicionesEstado = new TreeMap<>();
                 // Agregar el caracter de transicion con su estado de destino correspondiente
@@ -463,8 +472,8 @@ public class AFD implements Comparable<AFD> {
                     if (!this.delta.get(estado).containsKey(caracter)) {
 
                         // Agregar la salida al estado limbo y crearlo
-                        this.delta.get(estado).put(caracter, "limbo");
                         limboExist = true;
+                        this.delta.get(estado).put(caracter, "limbo");
 
                     }
 
@@ -754,6 +763,7 @@ public class AFD implements Comparable<AFD> {
             if (this.F.contains(estadoDestino1) != this.F.contains(estadoDestino2)) {
 
                 origen.setEquivalencia("2");
+                destino.setEquivalencia("1");
                 this.tablaChequeoEquivalencia.put(origen, transiciones);
                 return "2";
 
