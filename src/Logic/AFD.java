@@ -790,6 +790,14 @@ public class AFD implements Comparable<AFD> {
 
             TuplaEstados origen = entrada.getKey();
 
+            // Si estas en la diagonal principal
+            if (origen.getEstado1().equals(origen.getEstado2())) {
+
+                // No hay nada que hacer
+                continue;
+
+            }
+
             // Verificar si las tuplas realmente son equivalentes con la tabla de
             // equivalencias
             if (origen.getEquivalencia().equals("E")) {
@@ -809,6 +817,15 @@ public class AFD implements Comparable<AFD> {
                     // Obtener fila y columna del destino en la tabla de equivalencias
                     Integer fila = this.Q.headSet(destino1).size();
                     Integer columna = this.Q.headSet(destino2).size();
+
+                    // Verificar que no se vayan para la parte de arriba del triangulo
+                    if (fila < columna) {
+
+                        Integer temp = fila;
+                        fila = columna;
+                        columna = temp;
+
+                    }
 
                     // Obtener equivalencia del destino en la tabla de equivalencias
                     String equivalencia = this.tablaEstadosEquivalentes.get(fila).get(columna);

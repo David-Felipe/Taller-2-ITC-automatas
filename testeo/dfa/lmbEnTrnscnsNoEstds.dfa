@@ -30,4 +30,4 @@ c
 {q20,q4,q5,q6,q7} : b > limbo
 {q20,q4,q5,q6,q7} : c > {q10,q11,q12,q13,q8,q9}
 #comentario
-Testeo recomendado por Juan Jose
+Testeo recomendado por Juan Jose, lio con limbo en transiciones pero no agregado en estados
