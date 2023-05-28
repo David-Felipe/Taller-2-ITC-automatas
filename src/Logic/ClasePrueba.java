@@ -1176,7 +1176,12 @@ public class ClasePrueba {
         // Ingresar nombre del archivo de salida
         // Pedir info necesaria
         System.out.println("Por favor ingrese el nombre del archivo de salida");
-        String nombreArchivoSalida = input.nextLine();
+        while (!input.hasNext()) {
+
+            // Esperar a que haya un input y luego sí avanzas
+
+        }
+        String nombreArchivoSalida = input.next();
         System.out.println();
 
         // Preguntar si desea detalles
@@ -1185,7 +1190,7 @@ public class ClasePrueba {
         Integer detalles = input.nextInt();
         System.out.println();
 
-        // Procesar la cadena
+        // Procesar las cadenas
         ArrayList<AFD> listaAutomatas = new ArrayList<>(automatasActuales);
         AFD afdBase = listaAutomatas.get(numAFD);
         afdBase.procesarListaCadenas(listaCadenas, nombreArchivoSalida, detalles == 1);

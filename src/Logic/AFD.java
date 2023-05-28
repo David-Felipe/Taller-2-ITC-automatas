@@ -1027,14 +1027,14 @@ public class AFD implements Comparable<AFD> {
         // Por cada caracter de la cadena
         while (!listaCadena.isEmpty()) {
 
-            // Obtener el caracter
-            Character caracter = listaCadena.pop();
             // Obtener la cadena restante
             StringBuilder cadenaRestante = new StringBuilder();
 
             for (Character caracterRestante : listaCadena) {
                 cadenaRestante.append(caracterRestante);
             }
+            // Obtener el caracter
+            Character caracter = listaCadena.pop();
 
             // Obtener alfabeto
             NavigableSet<Character> alfabeto = this.sigma.getAlfabeto();
@@ -1181,7 +1181,7 @@ public class AFD implements Comparable<AFD> {
 
         }
 
-        // Crear el archivo y llenarlo con toString
+        // Crear el archivo y llenarlo con resultado
         try {
 
             // Crear el archivo
@@ -1190,7 +1190,7 @@ public class AFD implements Comparable<AFD> {
 
             // Escribir el AFD en el archivo
             FileWriter escritor = new FileWriter(archivo);
-            escritor.write(this.AFDMinimizado.toString());
+            escritor.write(resultado.toString());
             escritor.close();
 
             System.out.println("Archivo creado exitosamente");
