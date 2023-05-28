@@ -54,7 +54,7 @@ public class AFD implements Comparable<AFD> {
         this.hallarEstadosInasequibles();
 
     }
-    
+
     // Constructor de la clase AFD para conjuntos (Hash)
     public AFD(Alfabeto sigma, HashSet<String> Q, String q0, HashSet<String> F,
             HashMap<String, HashMap<Character, String>> delta) {
@@ -63,9 +63,9 @@ public class AFD implements Comparable<AFD> {
         this.Q = new TreeSet<String>(Q);
         this.q0 = q0;
         this.F = new TreeSet<String>(F);
-        
+
         TreeMap<String, TreeMap<Character, String>> treeDelta = new TreeMap<String, TreeMap<Character, String>>();
-        for (String estado : delta.keySet()){
+        for (String estado : delta.keySet()) {
             treeDelta.put(estado, new TreeMap<Character, String>());
             for (Character simbolo : delta.get(estado).keySet()) {
                 treeDelta.get(estado).put(simbolo, delta.get(estado).get(simbolo));
@@ -268,11 +268,7 @@ public class AFD implements Comparable<AFD> {
         linea.trim();
 
         // Verificar que sí corresponda a un AFD
-        if (linea.equals("#!dfa")) {
-
-            linea = reader.readLine();
-
-        } else {
+        if (!linea.equals("#!dfa")) {
 
             // Cerrar el buffer
             reader.close();
@@ -282,7 +278,12 @@ public class AFD implements Comparable<AFD> {
 
         // Leer todo el resto de lineas
         while (linea != null) {
+
             linea = reader.readLine();
+            // Verificar el final antes de agregar
+            if (linea == null)
+                break;
+
             linea.trim();
             lineasArchivo.add(linea);
         }
@@ -319,21 +320,20 @@ public class AFD implements Comparable<AFD> {
                 if (lineaArchivo.equals(seccion)) {
 
                     Integer inicioSeccion = indice; // Aqui inicia la seccion
-                    // Obtener la siguiente linea al titulo de la seccion
+
                     indice++;
-                    String lineaActual = " ";
+                    String lineaActual = lineasArchivo.get(indice);
+                    lineaActual.trim();
                     // Guardar el contenido de la sección hasta encontrar la siguiente sección o el
                     // fin del documento
                     while (!lineaActual.contains("#") && indice < lineasArchivo.size()) {
 
-                        lineaActual = lineasArchivo.get(indice);
-                        lineaActual.trim();
-
                         if (lineaActual != null || lineaActual != " " || lineaActual != "")
                             contenido.add(lineaActual);
 
-                        contenido.add(lineaActual);
                         indice++;
+                        lineaActual = lineasArchivo.get(indice);
+                        lineaActual.trim().trim();
 
                     }
 
@@ -405,7 +405,7 @@ public class AFD implements Comparable<AFD> {
             String estadoOrigen = partesTransicion[0].trim();
             String[] partesDestino = partesTransicion[1].split(">");
             String caracterTransicion = partesDestino[0].trim();
-            String estadoDestino = partesDestino[1].trim();
+            String estadoDestino = partesDestino[1].trim().trim();
 
             // Si el estado de origen ya existe
             if (transiciones.containsKey(estadoOrigen)) {
@@ -450,6 +450,7 @@ public class AFD implements Comparable<AFD> {
 
         // Verificar que todos los estados tengan sus salidas completas
         NavigableSet<Character> alfabeto = this.sigma.getAlfabeto();
+        Boolean limboExist = false;
 
         // Por cada estado del AFD
         for (String estado : this.Q) {
@@ -465,6 +466,7 @@ public class AFD implements Comparable<AFD> {
 
                         // Agregar la salida al estado limbo
                         this.delta.get(estado).put(caracter, "limbo");
+                        limboExist = true;
 
                     }
 
@@ -474,18 +476,23 @@ public class AFD implements Comparable<AFD> {
 
         }
 
-        // Verificar que el estado limbo tenga todas sus salidas
-        // Si no tiene todas sus salidas
-        if (this.delta.get("limbo").size() != alfabeto.size()) {
+        // Verificar que sí existe el limbo
+        if (limboExist) {
 
-            // Agregar las salidas faltantes
-            for (Character caracter : alfabeto) {
+            // Verificar que el estado limbo tenga todas sus salidas
+            // Si no tiene todas sus salidas
+            if (this.delta.get("limbo").size() != alfabeto.size()) {
 
-                // Si no tiene la salida
-                if (!this.delta.get("limbo").containsKey(caracter)) {
+                // Agregar las salidas faltantes
+                for (Character caracter : alfabeto) {
 
-                    // Agregar la salida al estado limbo
-                    this.delta.get("limbo").put(caracter, "limbo");
+                    // Si no tiene la salida
+                    if (!this.delta.get("limbo").containsKey(caracter)) {
+
+                        // Agregar la salida al estado limbo
+                        this.delta.get("limbo").put(caracter, "limbo");
+
+                    }
 
                 }
 
