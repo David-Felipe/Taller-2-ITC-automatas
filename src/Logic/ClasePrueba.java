@@ -217,12 +217,11 @@ public class ClasePrueba {
                 for (AFD actual : automatasActuales) {
 
                     System.out.println(Integer.toString(numActual) + ". " + actual.getNombreAFD() + "\n");
+                    numActual++;
 
                 }
 
                 System.out.println();
-
-                numActual++;
 
             }
 
@@ -314,12 +313,11 @@ public class ClasePrueba {
                 for (AFD actual : automatasActuales) {
 
                     System.out.println(Integer.toString(numActual) + ". " + actual.getNombreAFD() + "\n");
+                    numActual++;
 
                 }
 
                 System.out.println();
-
-                numActual++;
 
             }
 
@@ -400,12 +398,11 @@ public class ClasePrueba {
                 for (AFD actual : automatasActuales) {
 
                     System.out.println(Integer.toString(numActual) + ". " + actual.getNombreAFD() + "\n");
+                    numActual++;
 
                 }
 
                 System.out.println();
-
-                numActual++;
 
             }
 
@@ -590,12 +587,11 @@ public class ClasePrueba {
             for (AFD actual : automatasActuales) {
 
                 System.out.println(Integer.toString(numActual) + ". " + actual.getNombreAFD() + "\n");
+                numActual++;
 
             }
 
             System.out.println();
-
-            numActual++;
 
         }
 
@@ -656,7 +652,7 @@ public class ClasePrueba {
         AFD afdBase = listaAutomatas.get(numAFD);
         AFD afdBuscado = afdBase.hallarComplemento();
         afdBuscado.setNombreAFD(nombreAFD);
-        automatasActuales.add(afdBase);
+        automatasActuales.add(afdBuscado);
 
     }
 
@@ -705,12 +701,11 @@ public class ClasePrueba {
             for (AFD actual : automatasActuales) {
 
                 System.out.println(Integer.toString(numActual) + ". " + actual.getNombreAFD() + "\n");
+                numActual++;
 
             }
 
             System.out.println();
-
-            numActual++;
 
         }
 
@@ -771,7 +766,7 @@ public class ClasePrueba {
         AFD afdBase = listaAutomatas.get(numAFD);
         AFD afdBuscado = afdBase.simplificarAFD();
         afdBuscado.setNombreAFD(nombreAFD);
-        automatasActuales.add(afdBase);
+        automatasActuales.add(afdBuscado);
 
     }
 
@@ -820,12 +815,11 @@ public class ClasePrueba {
             for (AFD actual : automatasActuales) {
 
                 System.out.println(Integer.toString(numActual) + ". " + actual.getNombreAFD() + "\n");
+                numActual++;
 
             }
 
             System.out.println();
-
-            numActual++;
 
         }
 
@@ -915,12 +909,11 @@ public class ClasePrueba {
                 for (AFD actual : automatasActuales) {
 
                     System.out.println(Integer.toString(numActual) + ". " + actual.getNombreAFD() + "\n");
+                    numActual++;
 
                 }
 
                 System.out.println();
-
-                numActual++;
 
             }
 
@@ -996,12 +989,11 @@ public class ClasePrueba {
             for (AFD actual : automatasActuales) {
 
                 System.out.println(Integer.toString(numActual) + ". " + actual.getNombreAFD() + "\n");
+                numActual++;
 
             }
 
             System.out.println();
-
-            numActual++;
 
         }
 
@@ -1063,6 +1055,14 @@ public class ClasePrueba {
 
         }
 
+        // Esperar hasta que presione enter
+        System.out.println("Presione enter para continuar");
+        try {
+            System.in.read(); // Waits for user to press Enter
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private static void procesarListaCadenasAFD(TreeSet<AFD> automatasActuales, Scanner input) {
@@ -1087,12 +1087,11 @@ public class ClasePrueba {
             for (AFD actual : automatasActuales) {
 
                 System.out.println(Integer.toString(numActual) + ". " + actual.getNombreAFD() + "\n");
+                numActual++;
 
             }
 
             System.out.println();
-
-            numActual++;
 
         }
 
@@ -1198,6 +1197,19 @@ public class ClasePrueba {
         afdBase.procesarListaCadenas(listaCadenas, nombreArchivoSalida, detalles == 1);
         System.out.println();
 
+        // Si pidió detalles, esperar a que los lea
+        if (detalles == 1) {
+
+            // Esperar hasta que presione enter
+            System.out.println("Presione enter para continuar");
+            try {
+                System.in.read(); // Waits for user to press Enter
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+
     }
 
     // * Producto cartesiano
@@ -1254,12 +1266,11 @@ public class ClasePrueba {
                 for (AFD actual : automatasActuales) {
 
                     System.out.println(Integer.toString(numActual) + ". " + actual.getNombreAFD() + "\n");
+                    numActual++;
 
                 }
 
                 System.out.println();
-
-                numActual++;
 
             }
 
@@ -1345,12 +1356,11 @@ public class ClasePrueba {
             for (AFD actual : automatasActuales) {
 
                 System.out.println(Integer.toString(numActual) + ". " + actual.getNombreAFD() + "\n");
+                numActual++;
 
             }
 
             System.out.println();
-
-            numActual++;
 
         }
 
@@ -1470,12 +1480,11 @@ public class ClasePrueba {
             for (AFD actual : automatasActuales) {
 
                 System.out.println(Integer.toString(numActual) + ". " + actual.getNombreAFD() + "\n");
+                numActual++;
 
             }
 
             System.out.println();
-
-            numActual++;
 
         }
 
