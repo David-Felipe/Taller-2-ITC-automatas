@@ -527,15 +527,12 @@ public class ClasePrueba {
             System.out.println("Ocurrió un error al buscar el archivo");
             System.out.println();
 
+            // Esperar hasta que presione enter
+            System.out.println("Presione enter para continuar");
             try {
-
-                // Espera que lea el mensaje
-                TimeUnit.SECONDS.sleep(segundosEsperaLector);
-
-            } catch (InterruptedException intrrptd) {
-
-                intrrptd.printStackTrace();
-
+                System.in.read(); // Waits for user to press Enter
+            } catch (IOException er) {
+                er.printStackTrace();
             }
 
         }
@@ -1164,15 +1161,12 @@ public class ClasePrueba {
             System.out.println("Ocurrió un error al buscar el archivo");
             System.out.println();
 
+            // Esperar hasta que presione enter
+            System.out.println("Presione enter para continuar");
             try {
-
-                // Espera que lea el mensaje
-                TimeUnit.SECONDS.sleep(segundosEsperaLector);
-
-            } catch (InterruptedException intrrptd) {
-
-                intrrptd.printStackTrace();
-
+                System.in.read(); // Waits for user to press Enter
+            } catch (IOException err) {
+                err.printStackTrace();
             }
 
             return;
@@ -1555,25 +1549,6 @@ public class ClasePrueba {
     }
 
     private static void probarAFNLambdaToAFD() {
-
-        // TODO
-
-    }
-
-    // Probar operaciones sobre AFD
-    private static void probarComplemento() {
-
-        // TODO
-
-    }
-
-    private static void probarProductoCartesiano() {
-
-        // TODO
-
-    }
-
-    private static void probarSimplificacion() {
 
         // TODO
 
