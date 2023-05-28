@@ -54,6 +54,37 @@ public class AFD implements Comparable<AFD> {
         this.hallarEstadosInasequibles();
 
     }
+    
+    // Constructor de la clase AFD para conjuntos (Hash)
+    public AFD(Alfabeto sigma, HashSet<String> Q, String q0, HashSet<String> F,
+            HashMap<String, HashMap<Character, String>> delta) {
+
+        this.sigma = sigma;
+        this.Q = new TreeSet<String>(Q);
+        this.q0 = q0;
+        this.F = new TreeSet<String>(F);
+        
+        TreeMap<String, TreeMap<Character, String>> treeDelta = new TreeMap<String, TreeMap<Character, String>>();
+        for (String estado : delta.keySet()){
+            treeDelta.put(estado, new TreeMap<Character, String>());
+            for (Character simbolo : delta.get(estado).keySet()) {
+                treeDelta.get(estado).put(simbolo, delta.get(estado).get(simbolo));
+            }
+        }
+        this.delta = treeDelta;
+
+        this.estadosLimbo = new TreeSet<>();
+        this.estadosInasequibles = new TreeSet<>();
+
+        // Verificar que el AFD esté completo y agregar estado limbo donde no
+        this.verificarCorregirCompletitudAFD();
+
+        // Hallar estados limbo y guardarlos
+        this.hallarEstadosLimbo();
+
+        // Hallar estados inasequibles y guardarlos
+        this.hallarEstadosInasequibles();
+    }
 
     // Constructor de la clase AFD para archivo .afd inicial
     public AFD(String rutaArchivo) throws Exception {
