@@ -452,11 +452,9 @@ public class AFN {
         }
     }
 
-    public AFD AFNtoAFD(AFN afn) {
-        System.out.println("He aqui esha: ");
-        System.out.println(afn.delta);
-        System.out.println(afn.Q);
-        System.out.println(afn.q0);
+    public AFD AFNtoAFD(AFN afn) { 
+        int pad = afn.q0.length();
+        ArrayDeque<String> estadosAlcanzables = new ArrayDeque<String>();
 
         HashSet<String> q0 = new HashSet<String>();
         q0.add(afn.q0);
@@ -467,8 +465,13 @@ public class AFN {
         q.add(q0);
         HashMap<String, HashMap<Character, String>> delta = new HashMap<String, HashMap<Character, String>>();
         while (!q.isEmpty()) {
+
             HashSet<String> estadoNuevo = q.remove();
             String strEstadoNuevo = afn.statesSetToString(estadoNuevo);
+
+            estadosAlcanzables.add(strEstadoNuevo);
+
+            pad = Math.max(pad, strEstadoNuevo.length());
             for (String estado : estadoNuevo){
                 if (afn.F.contains(estado)) {
                     F.add(strEstadoNuevo);
@@ -506,6 +509,7 @@ public class AFN {
             }
         }
         if (limboEsNecesario) {
+            pad = Math.max(pad, 5);
             for (Character simbolo : afn.sigma.getAlfabeto()) {
                 if (delta.get("limbo") != null) {
                     delta.get("limbo").put(simbolo, "limbo");
@@ -516,6 +520,32 @@ public class AFN {
                 }
             }
         }
+        
+        pad += 3;
+        int sizeAlfabeto = afn.sigma.getAlfabeto().size();
+        StringBuilder sb = new StringBuilder();
+        sb.append("|" + String.format("%" + pad + "s", "delta |"));
+        for (Character simbolo : afn.sigma.getAlfabeto()) {
+            sb.append(String.format("%" + pad + "s", simbolo + " |"));
+        }
+        sb.append("\n");
+        sb.append(String.join("", Collections.nCopies(1+pad*(sizeAlfabeto+1), "-")) + "\n");
+        while (!estadosAlcanzables.isEmpty()) {
+            String estado = estadosAlcanzables.remove();
+            sb.append("|" + String.format("%" + pad + "s", estado + " |"));
+            for (Character simbolo : afn.sigma.getAlfabeto()) {
+                sb.append(String.format("%" + pad + "s", delta.get(estado).get(simbolo) + " |"));
+            }
+            sb.append("\n");
+        }
+        sb.append("|");
+        if (limboEsNecesario) {
+            for (int i = 0 ; i<=sizeAlfabeto ; i++) {
+                sb.append(String.format("%" + pad + "s", "limbo |"));
+            }
+            sb.append("\n");
+        }
+        System.out.println(sb.toString());
         return new AFD(afn.sigma, Q, this.statesSetToString(q0), F, delta);
     }
 
@@ -535,5 +565,163 @@ public class AFN {
         }
         sb.append("}");
         return sb.toString();
+    }
+
+    private HashSet<String[]> darPasoComputacional(String[] configuracion){
+        if (configuracion[1].length()>0){
+            HashSet<String> estadosImagen = this.delta(configuracion[0], configuracion[1].charAt(0));
+            if (estadosImagen!=null){
+                HashSet<String[]> postConfiguraciones = new HashSet<String[]>();
+                String subcadena = configuracion[1].substring(1);
+                for (String estado : estadosImagen) {
+                    String[] postConfiguracion = {estado,subcadena};
+                    postConfiguraciones.add(postConfiguracion);
+                }
+                return postConfiguraciones;
+            }
+        }
+        return null;
+    }
+
+    public int computarTodosLosProcesamientos(String cadena, String nombreArchivo) {
+        ArrayDeque<ArrayDeque<String[]>> q = new ArrayDeque<ArrayDeque<String[]>>();
+        ArrayDeque<ArrayDeque<String[]>> procesamientosTerminados = new ArrayDeque<ArrayDeque<String[]>>();
+        ArrayDeque<String[]> procesamientoInicial = new ArrayDeque<String[]>();
+        String[] configuracionInicial = {this.q0, cadena};
+        procesamientoInicial.add(configuracionInicial);
+        q.add(procesamientoInicial);
+        while (!q.isEmpty()) {
+            ArrayDeque<String[]> procesamiento = q.remove();
+            HashSet<String[]> nextProcesamientos = this.darPasoComputacional(procesamiento.peekLast());
+            if (nextProcesamientos!=null) {
+                for (String[] nextProcesamiento : nextProcesamientos) {
+                    ArrayDeque<String[]> nuevoStack = procesamiento.clone();
+                    nuevoStack.add(nextProcesamiento);
+                    q.add(nuevoStack);
+                }
+            } else {
+                procesamientosTerminados.add(procesamiento);
+            }
+        }
+        StringBuilder sb = new StringBuilder();
+        StringBuilder sbAceptacion = new StringBuilder();
+        StringBuilder sbAbortado = new StringBuilder();
+        StringBuilder sbRechazo = new StringBuilder();
+        for (ArrayDeque<String[]> procesamiento : procesamientosTerminados) {
+            String tipoDeProcesamiento = "No aceptacion";
+            if (procesamiento.peekLast()[1] == "") {
+                if (this.F.contains(procesamiento.peekLast()[0])) {
+                    tipoDeProcesamiento = "Aceptacion";
+                }
+            } else {
+                tipoDeProcesamiento = "Abortado";
+            }
+            Boolean masDeUnaconfiguracion = false;
+            while (!procesamiento.isEmpty()){
+                String[] configuracion = procesamiento.remove();
+                sb.append("[" + configuracion[0] + "," + configuracion[1] + "]->");
+                switch(tipoDeProcesamiento) {
+                    case "Aceptacion":
+                        if (masDeUnaconfiguracion) {
+                            sbAceptacion.append("->[" + configuracion[0] + "," + configuracion[1] + "]");
+                        } else {
+                            sbAceptacion.append("[" + configuracion[0] + "," + configuracion[1] + "]");
+                            masDeUnaconfiguracion = true;
+                        }
+                        break;
+                    case "Abortado":
+                        if (masDeUnaconfiguracion) {
+                            sbAbortado.append("->[" + configuracion[0] + "," + configuracion[1] + "]");
+                        } else {
+                            sbAbortado.append("[" + configuracion[0] + "," + configuracion[1] + "]");
+                            masDeUnaconfiguracion = true;
+                        }
+                        break;
+                    default:
+                        if (masDeUnaconfiguracion) {
+                            sbRechazo.append("->[" + configuracion[0] + "," + configuracion[1] + "]");
+                        } else {
+                            sbRechazo.append("[" + configuracion[0] + "," + configuracion[1] + "]");
+                            masDeUnaconfiguracion = true;
+                        }
+                }      
+            }
+            switch(tipoDeProcesamiento) {
+                case "Aceptacion":
+                    sbAceptacion.append("\n");
+                    break;
+                case "Abortado":
+                    sbAbortado.append("\n");
+                    break;
+                default:
+                    sbRechazo.append("\n");
+            }      
+            sb.append(tipoDeProcesamiento+"\n");
+        }
+        // Imprimir cada uno de los posibles procesamientos
+        System.out.println(sb.toString());
+
+        // Crear Los archivos
+        String nombreArchivoAceptadas  = nombreArchivo + "Aceptadas.txt";
+        String nombreArchivoRechazadas  = nombreArchivo + "Rechazadas.txt";
+        String nombreArchivoAbortadas  = nombreArchivo + "Abortadas.txt";
+
+        // Crear los archivos y llenarlo con toString
+        try {
+
+            // Crear el archivo de cadenas aceptadas
+            File archivoAceptadas = new File(nombreArchivoAceptadas);
+            archivoAceptadas.createNewFile();
+
+            // Escribir la lista en el archivo
+            FileWriter escritor = new FileWriter(archivoAceptadas);
+            escritor.write(sbAceptacion.toString());
+            escritor.close();
+
+            System.out.println("Archivo de cadenas aceptadas creado exitosamente.");
+
+        } catch (IOException e) {
+
+            System.out.println("Error al crear el archivo de cadenas aceptadas.");
+
+        }
+        try {
+
+            // Crear el archivo de cadenas rechazadas
+            File archivoRechazadas = new File(nombreArchivoRechazadas);
+            archivoRechazadas.createNewFile();
+
+            // Escribir la lista en el archivo
+            FileWriter escritor = new FileWriter(archivoRechazadas);
+            escritor.write(sbRechazo.toString());
+            escritor.close();
+
+            System.out.println("Archivo de cadenas rechazadas creado exitosamente.");
+
+        } catch (IOException e) {
+
+            System.out.println("Error al crear el archivo de cadenas rechazadas.");
+
+        }
+        try {
+
+            // Crear el archivo de procesamientos abortados
+            File archivoAbortadas = new File(nombreArchivoAbortadas);
+            archivoAbortadas.createNewFile();
+
+            // Escribir la lista en el archivo
+            FileWriter escritor = new FileWriter(archivoAbortadas);
+            escritor.write(sbAbortado.toString());
+            escritor.close();
+
+            System.out.println("Archivo de procesamientos abortados creado exitosamente.");
+
+        } catch (IOException e) {
+
+            System.out.println("Error al crear el archivo de procesamientos abortados.");
+
+        }
+
+        return procesamientosTerminados.size();
     }
 }
