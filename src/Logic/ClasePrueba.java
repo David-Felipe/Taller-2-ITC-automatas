@@ -1621,9 +1621,617 @@ public class ClasePrueba {
     // ** Probar AFN
     private static void probarAFN(Scanner input) {
 
-        // TODO
+        // Setup menu probar AFN
+        Boolean probandoAFN = true;
+        HashMap<String, AFN> automatasActuales = new HashMap<>();
+
+        // Menu que muestra las opciones para afn
+        while (probandoAFN) {
+
+            // Limpiar consola para que se vea mas fancy
+            System.out.print("\033c");
+
+            // Espacio al inicio para no saturar e indicar menu
+            System.out.println();
+            System.out.println("Prueba de AFN");
+            System.out.println();
+
+            if (automatasActuales.size() != 0) {
+
+                // Listar AFNS
+                imprimirListaNombresAFN(automatasActuales);
+
+            }
+
+            // Mostrar las opciones para probar AFN
+            System.out.println("Presionando el entero seguido de la tecla enter, por favor");
+            System.out.println("seleccione una opción:");
+            System.out.println();
+            System.out.println("1. Editar AFN ");
+            System.out.println("2. Procesar cadenas");
+            System.out.println("3. Exportar AFN");
+            System.out.println("0. Volver");
+            System.out.println();
+            System.out.print("Ingrese su opción: ");
+            Integer opcion = input.nextInt();
+            System.out.println();
+
+            // Redirigir a la opcion deseada
+            switch (opcion) {
+
+                case 1:
+                    editarAFN(automatasActuales, input);
+                    break;
+
+                case 2:
+                    procesarCadenasAFN(automatasActuales, input);
+                    break;
+
+                case 3:
+                    exportarAFN(automatasActuales, input);
+                    break;
+
+                case 0:
+                    probandoAFN = false;
+                    break;
+
+                default:
+
+                    System.out.println("Opción inválida");
+
+                    try {
+
+                        // Espera que lea el mensaje
+                        TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+                    } catch (InterruptedException e) {
+
+                        e.printStackTrace();
+
+                    }
+
+                    break;
+
+            }
+
+        }
 
     }
+
+    // * Editar AFN
+    private static void editarAFN(HashMap<String, AFN> automatasActuales, Scanner input) {
+
+        // Setup menu editar AFN
+        Boolean editandoAFN = true;
+
+        // Menu que muestra las opciones para editar AFN
+        while (editandoAFN) {
+
+            // Limpiar consola para que se vea mas fancy
+            System.out.print("\033c");
+
+            // Espacio al inicio para no saturar e indicar menu
+            System.out.println();
+            System.out.println("Edición de AFNs");
+            System.out.println();
+
+            if (automatasActuales.size() != 0) {
+
+                // Listar AFNS
+                imprimirListaNombresAFN(automatasActuales);
+
+            }
+
+            // Mostrar las opciones para editar AFN
+            System.out.println("Presionando el entero seguido de la tecla enter, por favor");
+            System.out.println("seleccione una opción:");
+            System.out.println();
+            System.out.println("1. Crear AFN ");
+            System.out.println("2. Eliminar AFN");
+            System.out.println("0. Volver");
+            System.out.println();
+            System.out.print("Ingrese su opción: ");
+            Integer opcion = input.nextInt();
+            System.out.println();
+
+            // Redirigir a la opcion deseada
+            switch (opcion) {
+
+                case 1:
+                    crearAFN(automatasActuales, input);
+                    break;
+
+                case 2:
+                    eliminarAFN(automatasActuales, input);
+                    break;
+
+                case 0:
+                    editandoAFN = false;
+                    break;
+
+                default:
+
+                    System.out.println("Opción inválida");
+
+                    try {
+
+                        // Espera que lea el mensaje
+                        TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+                    } catch (InterruptedException e) {
+
+                        e.printStackTrace();
+
+                    }
+
+                    break;
+
+            }
+
+        }
+
+    }
+
+    // Crear AFN
+    private static void crearAFN(HashMap<String, AFN> automatasActuales, Scanner input) {
+        
+        // Limpiar consola para que se vea mas fancy
+        System.out.print("\033c");
+
+        // Espacio al inicio para no saturar e indicar menu
+        System.out.println();
+        System.out.println("Creación de AFN desde archivo");
+        System.out.println();
+
+        // Pedir informacion necesaria para crear el AFN
+        // Pedir ruta al archivo
+        System.out.println("Por favor ingrese la ruta al archivo que contiene el AFN");
+        while (!input.hasNext()) {
+
+            // Esperar a que haya un input y luego sí avanzas
+
+        }
+        String rutaArchivo = input.next();
+        System.out.println();
+
+        // Pedir nombre del AFN
+        Boolean ingresandoNombre = true;
+        String nombreAFN = "";
+        while (ingresandoNombre) {
+            System.out.println(
+                    "Por favor ingrese un nombre de menos de " + Integer.toString(maxCharLenName)
+                            + " caracteres sin espacios para el AFD");
+            nombreAFN = input.next().trim();
+            System.out.println();
+
+            // Verificar condición
+            if (nombreAFN.length() <= maxCharLenName && nombreAFN.split(" ").length == 1) {
+
+                ingresandoNombre = false;
+
+            } else {
+
+                System.out.println("El nombre ingresado no es valido.");
+                System.out.println("Por favor intentelo de nuevo.");
+                System.out.println();
+
+            }
+
+        }
+
+        // Crear el AFN
+        try {
+
+            AFN nuevoAFN = new AFN(rutaArchivo);
+            automatasActuales.put(nombreAFN, nuevoAFN);
+
+        } catch (Exception e) {
+
+            if (devMode) {
+
+                e.printStackTrace();
+
+            }
+
+            System.out.println();
+            System.out.println("Ocurrió un error al buscar el archivo.");
+            System.out.println();
+
+            // Esperar hasta que presione enter
+            System.out.println("Presione enter para continuar");
+            try {
+                System.in.read(); // Waits for user to press Enter
+            } catch (IOException er) {
+                er.printStackTrace();
+            }
+
+        }
+
+    }
+
+    // Eliminar AFN
+    static void eliminarAFN(HashMap<String, AFN> automatasActuales, Scanner input) {
+
+        // Limpiar consola para que se vea mas fancy
+        System.out.print("\033c");
+
+        // Verificar que sí existan
+        if (automatasActuales.size() == 0) {
+
+            System.out.println();
+            System.out.println("Todavía no se ha creado ningún AFN.");
+            System.out.println();
+
+            try {
+
+                // Espera que lea el mensaje
+                TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+            } catch (InterruptedException e) {
+
+                e.printStackTrace();
+
+            }
+
+            return;
+
+        }
+
+        // Espacio al inicio para no saturar e indicar menu
+        System.out.println();
+        System.out.println("Eliminación de AFN");
+        System.out.println();
+
+        // Mostrar automatas creados
+        if (automatasActuales.size() != 0) {
+
+            // Listar AFNS
+            imprimirListaNombresAFN(automatasActuales);
+
+        }
+
+        Boolean ingresandoAFN = true;
+        String nombreAFN = "";
+
+        while (ingresandoAFN) {
+
+            // Pedir info necesaria
+            System.out.println("Indique el nombre del AFN que desea eliminar");
+            nombreAFN = input.next();
+            System.out.println();
+
+            if (!automatasActuales.keySet().contains(nombreAFN)) {
+
+                System.out.println("El nombre ingresado no es valido.");
+                System.out.println("Por favor intentelo nuevamente.");
+                System.out.println();
+
+            } else {
+
+                ingresandoAFN = false;
+                automatasActuales.remove(nombreAFN);
+
+            }
+
+        }
+
+    }
+
+    // * Exportar AFN
+    private static void exportarAFN(HashMap<String, AFN> automatasActuales, Scanner input) {
+
+        // Limpiar consola para que se vea mas fancy
+        System.out.print("\033c");
+
+        // Verificar que sí existan
+        if (automatasActuales.size() == 0) {
+
+            System.out.println();
+            System.out.println("Todavía no se ha creado ningún AFN.");
+            System.out.println();
+
+            try {
+
+                // Espera que lea el mensaje
+                TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+            } catch (InterruptedException e) {
+
+                e.printStackTrace();
+
+            }
+
+            return;
+
+        }
+
+        // Espacio al inicio para no saturar e indicar menu
+        System.out.println();
+        System.out.println("Exportar AFN");
+        System.out.println();
+
+        // Mostrar automatas existentes
+        if (automatasActuales.size() != 0) {
+
+            // Listar AFNS
+            imprimirListaNombresAFN(automatasActuales);
+
+        }
+
+        // Ingresar el AFN a exportar
+        Boolean ingresandoAFN = true;
+        String nombreAFN = "";
+
+        while (ingresandoAFN) {
+
+            // Pedir info necesaria
+            System.out.println("Indique el nombre del AFN a exportar");
+            nombreAFN = input.next();
+            System.out.println();
+
+            if (!automatasActuales.keySet().contains(nombreAFN)) {
+
+                System.out.println("El nombre ingresado no es valido.");
+                System.out.println("Por favor intentelo nuevamente.");
+                System.out.println();
+
+            } else {
+
+                ingresandoAFN = false;
+
+            }
+
+        }
+
+        // Ingresar nombre del archivo de salida
+        // Pedir info necesaria
+        System.out.println("Por favor ingrese el nombre del archivo de salida");
+        String nombreArchivoSalida = input.next();
+        System.out.println();
+
+        // Exportar el AFN
+        try {
+
+            automatasActuales.get(nombreAFN).exportar(nombreArchivoSalida);
+
+        } catch (IOException  e) {
+
+            e.printStackTrace();
+
+        }
+
+    }
+
+    // * Procesar cadenas AFN
+    private static void procesarCadenasAFN(HashMap<String, AFN> automatasActuales, Scanner input) {
+
+        // Verificar que sí existan
+        if (automatasActuales.size() == 0) {
+
+            // Limpiar consola para que se vea mas fancy
+            System.out.print("\033c");
+
+            System.out.println();
+            System.out.println("Todavía no se ha creado ningún AFN.");
+            System.out.println();
+
+            try {
+
+                // Espera que lea el mensaje
+                TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+            } catch (InterruptedException e) {
+
+                e.printStackTrace();
+
+            }
+
+            return;
+
+        }
+
+        // Limpiar consola para que se vea mas fancy
+        System.out.print("\033c");
+
+        // Espacio al inicio para no saturar e indicar menu
+        System.out.println();
+        System.out.println("Procesamiento de una cadena por AFN");
+        System.out.println();
+
+        if (automatasActuales.size() != 0) {
+
+            // Listar AFNS
+            imprimirListaNombresAFN(automatasActuales);
+
+        }
+
+        // Ingresar el AFN con el que se desea trabajar
+        Boolean ingresandoAFN = true;
+        String nombreAFN = "";
+
+        while (ingresandoAFN) {
+
+            // Pedir info necesaria
+            System.out.println("Indique el nombre del AFN que desea utilizar");
+            nombreAFN = input.next();
+            System.out.println();
+
+            if (!automatasActuales.keySet().contains(nombreAFN)) {
+
+                System.out.println("El nombre ingresado no es valido.");
+                System.out.println("Por favor intentelo nuevamente.");
+                System.out.println();
+
+            } else {
+
+                ingresandoAFN = false;
+
+            }
+        }
+        AFN afn = automatasActuales.get(nombreAFN);
+
+        // Ingresar la cadena a procesar
+        Boolean ingresandoCadena = true;
+        String cadena = "";
+
+        while (ingresandoCadena) {
+            
+            // Imprimir alfabeto
+            StringBuilder alfabeto = new StringBuilder();
+            alfabeto.append("{");
+            Boolean masDeUnCaracter = false;
+            for (Character simbolo : afn.getSigma()) { 
+                if (masDeUnCaracter) { 
+                    alfabeto.append("," + simbolo);
+                } else {
+                    alfabeto.append(simbolo);
+                    masDeUnCaracter = true;
+                }
+            }
+            alfabeto.append("}");
+            System.out.println("Alfabeto: " + alfabeto.toString());
+            System.out.println("lambda: $");
+            System.out.println();
+
+            // Pedir info necesaria
+            System.out.println("Ingrese la cadena a procesar");
+            cadena = input.next();
+            System.out.println();
+            Boolean cadenaValida = true;
+            for (int i = 0 ; i < cadena.length() ; i++) { 
+                if (!afn.getSigma().contains(cadena.charAt(i))) {
+                    cadenaValida = false;
+                    break;
+                }
+            }
+            if (!cadenaValida && !cadena.equals("$")) {
+                System.out.println("La cadena ingresada no es valida.");
+                System.out.println("Por favor intentelo nuevamente.");
+                System.out.println();
+
+            } else {
+                if (cadena.equals("$")){
+                    cadena = "";
+                }
+                ingresandoCadena = false;
+
+            }
+        }
+
+        ProcesamientoCadenaAFN pAFN = new ProcesamientoCadenaAFN(cadena, afn);
+
+        // Setup menu seleccion de tipo de procesamiento
+        Boolean procesandoCadenas = true;
+
+        // Seleccion de procesamiento que se repite hasta volver
+        while (procesandoCadenas) {
+
+            // Limpiar consola para que se vea mas fancy
+            System.out.print("\033c");
+
+            // Espacio al inicio para no saturar e indicar menu
+            System.out.println();
+            System.out.println("Selección tipo de procesamiento");
+            System.out.println();
+
+            // Mostrar las opciones de selección de automata
+            System.out.println("Presionando el entero seguido de la tecla enter, por favor");
+            System.out.println("seleccione una opción:");
+            System.out.println();
+            System.out.println("1. Procesar cadena: \"" + cadena + "\"");
+            System.out.println("2. Consultar todos los procesamiento posibles de la cadena: \"" + cadena + "\"");
+            System.out.println("3. Consultar los procesamientos de aceptacion de la cadena: \"" + cadena + "\"");
+            System.out.println("4. Consultar los procesamientos de rechazo de la cadena: \"" + cadena + "\"");
+            System.out.println("5. Consultar los procesamientos abortados de la cadena: \"" + cadena + "\"");
+            System.out.println("0. Volver");
+            System.out.println();
+            System.out.print("Ingrese su opción: ");
+            Integer opcion = input.nextInt();
+            System.out.println();
+
+            // Redirigir a la opcion deseada
+            switch (opcion) {
+
+                case 1:
+                    if (pAFN.esAceptada()) {
+                        System.out.println("La cadena: \"" + cadena + "\" es aceptada.");
+                        System.out.println("Un procesamiento aceptado es: ");
+                    } else {
+                        System.out.println("La cadena: \"" + cadena + "\" es rechazada.");
+                        System.out.println("Uno de los procesamientos mas cortos es: ");
+                    }
+                    System.out.println(pAFN.procesamientoMasCorto());
+                    break;
+
+                case 2:
+                    System.out.println(pAFN.listaProcesamientos());
+                    break;
+
+                case 3:
+                    System.out.println(pAFN.listaProcesamientosAceptacion());
+                    break;
+
+                case 4:
+                    System.out.println(pAFN.listaProcesamientosRechazados());
+                    break;
+
+                case 5:
+                    System.out.println(pAFN.listaProcesamientosAbortados());
+                    break;
+
+                case 0:
+                    procesandoCadenas = false;
+                    break;
+
+                default:
+
+                    System.out.println("Opción inválida");
+
+                    try {
+
+                        // Espera que lea el mensaje
+                        TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+                    } catch (InterruptedException e) {
+
+                        e.printStackTrace();
+
+                    }
+
+                    break;
+
+            }
+            // Esperar hasta que se presione enter
+            if (procesandoCadenas ) {
+                System.out.println("Presione enter para continuar");
+                try {
+                    System.in.read();
+                } catch (IOException er) {
+                    er.printStackTrace();
+                }
+            }
+        }
+
+    }
+
+
+    private static void imprimirListaNombresAFN(HashMap<String, AFN> automatas) {
+        Integer numActual = 1;
+
+        System.out.println("Sus AFN actuales son:");
+        System.out.println();
+
+        // Imprimir los AFN contenidos en automatasActuales
+        for (String strActual : automatas.keySet()) {
+
+            System.out.println(Integer.toString(numActual) + ". " + strActual + "\n");
+            numActual++;
+
+        }
+
+        System.out.println();
+    }
+
 
     // ** Probar AFN Lambda
     private static void probarAFNLambda(Scanner input) throws IOException {
