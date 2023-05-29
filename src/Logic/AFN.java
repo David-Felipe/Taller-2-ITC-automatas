@@ -139,6 +139,12 @@ public class AFN {
 
     }
 
+    public Alfabeto getAlfabeto() {
+
+        return this.sigma;
+
+    }
+
     // Determinar si un estado es de aceptacion
     public Boolean esDeAceptacion(String estado) {
         return this.F.contains(estado);
@@ -427,7 +433,7 @@ public class AFN {
         }
     }
 
-    public AFD AFNtoAFD(AFN afn) { 
+    public static AFD AFNtoAFD(AFN afn) { 
         int pad = afn.q0.length();
         ArrayDeque<String> estadosAlcanzables = new ArrayDeque<String>();
 
@@ -522,7 +528,7 @@ public class AFN {
             sb.append("\n");
         }
         System.out.println(sb.toString());
-        return new AFD(afn.sigma, Q, this.statesSetToString(q0), F, delta);
+        return new AFD(afn.sigma, Q, afn.statesSetToString(q0), F, delta);
     }
 
     private String statesSetToString(HashSet<String> estados){

@@ -6,6 +6,7 @@ public class Alfabeto {
 
     // Atributos de la clase alfabeto
     private NavigableSet<Character> simbolos;
+    private Random rand = new Random();
 
     // Constructor de la clase alfabeto para conjuntos
     public Alfabeto(Set<Character> simbolos) {
@@ -36,7 +37,7 @@ public class Alfabeto {
         this.simbolos = new TreeSet<Character>(simbolosCollection);
         // Verificamos que lambda no esté en el alfabeto
         isLambdaHere();
-
+        
     }
 
     // Metodo para verificar si un simbolos está en el alfabeto
@@ -67,8 +68,8 @@ public class Alfabeto {
 
     }
 
-    // Método para generar cadenas aleatorias a partir del contenido de simbolos
-    public String generarCadena(int longitud) {
+    // Método para generar una cadena aleatoria a partir del contenido de simbolos
+    public String generarCadena2(int longitud) {
 
         // Creamos un objeto de tipo StringBuilder
         StringBuilder cadena = new StringBuilder();
@@ -101,6 +102,71 @@ public class Alfabeto {
         // Regresamos la cadena generada
         return cadena.toString();
 
+    }
+
+    // Método para generar una cadena aleatoria a partir del contenido de simbolos
+    public String generarCadena(int longitud) {
+
+        // Creamos un objeto de tipo StringBuilder
+        StringBuilder cadena = new StringBuilder();
+
+        if (longitud == 0) {
+            return "$";
+        }
+
+        // Generamos una cadena aleatoria de longitud "longitud"
+        for (int i = 0; i < longitud; i++) {
+
+            // Tomamos un símbolo aleatorio del alfabeto
+            Character simbolo = ' ';
+
+            int size = this.simbolos.size();
+            int randInt = rand.nextInt(size);
+            int iterInt = 0;
+            for(Character caracter : this.simbolos)
+            {
+                if (iterInt == randInt){
+                    simbolo = caracter;
+                    break;
+                }
+                iterInt++;
+            }
+
+            // Agregamos el símbolo a la cadena
+            cadena.append(simbolo);
+
+        }
+
+        // Regresamos la cadena generada
+        return cadena.toString();
+
+    }
+
+    // Método para generar cantidad cadenas aleatorias a partir del contenido de simbolos
+    // y de lungitud aleatoria menor estricta  que maxLen
+    public Collection<String> generarCadenas(int cantidad, int maxLen) {
+
+        Collection<String> listaCadenas = new ArrayDeque<String>();
+        listaCadenas.add("$");
+
+        for (int i = 1 ; i < cantidad ; i++) {
+
+            int randInt = rand.nextInt(1, maxLen);
+            String cadena = this.generarCadena(randInt);
+            listaCadenas.add(cadena);
+
+        }
+        return listaCadenas;
+    }
+
+    public Collection<String> generarCadenas(int cantidad) {
+
+        int size = this.simbolos.size();
+        if (size == 1) {
+            return this.generarCadenas(cantidad, 50);
+        }
+        int maxLen = (int) Math.ceil(Math.log(500)/Math.log(size));
+        return this.generarCadenas(cantidad, maxLen);
     }
 
     // Método para verificar que el caracter '$' no esté en el alfabeto
