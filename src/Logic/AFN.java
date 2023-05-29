@@ -31,10 +31,10 @@ public class AFN {
         // Hallar estados inasequibles y guardarlos
         this.hallarEstadosInaccesibles();
     }
-    
+
     // Constructor de la clase AFN para archivo .nfa inicial
     public AFN(String rutaArchivo) throws Exception {
-        
+
         // Leer archivo .nfa y crear AFN
         this.Q = new HashSet<>();
         this.F = new HashSet<>();
@@ -67,7 +67,6 @@ public class AFN {
         List<String> seccionesEsperadas = new ArrayList<>(
                 Arrays.asList("#alphabet", "#states", "#initial", "#accepting", "#transitions"));
 
-
         Iterator<String> iteratorSigma = lineas.iterator();
         Iterator<String> iteratorQ = lineas.iterator();
         Iterator<String> iteratorq0 = lineas.iterator();
@@ -95,8 +94,8 @@ public class AFN {
             linea = iteratorq0.next();
             if (linea.startsWith("#initial")) {
                 linea = iteratorq0.next().trim();
-                if (!this.Q.contains(linea)){
-                    throw new IllegalArgumentException("\""+linea+"\" no pertenece al conjunto de estados.");
+                if (!this.Q.contains(linea)) {
+                    throw new IllegalArgumentException("\"" + linea + "\" no pertenece al conjunto de estados.");
                 }
                 this.q0 = linea;
                 seccionesEsperadas.remove("#initial");
@@ -119,7 +118,7 @@ public class AFN {
             }
         }
 
-        if(!seccionesEsperadas.isEmpty()){
+        if (!seccionesEsperadas.isEmpty()) {
             throw new IllegalArgumentException("Faltan secciones en el archivo.");
         }
         // Hallar estados inasequibles y guardarlos
@@ -174,7 +173,7 @@ public class AFN {
         }
         return sigmaSet;
     }
-    
+
     private void leerEstados(Iterator<String> iterator) {
         while (iterator.hasNext()) {
             String linea = iterator.next();
@@ -182,13 +181,13 @@ public class AFN {
             if (linea.startsWith("#") || linea.isEmpty()) {
                 break;
             }
-            if (linea.contains(";")){
+            if (linea.contains(";")) {
                 throw new IllegalArgumentException("Los estados no deben contener el caracter ';'.");
             }
             if (!linea.isEmpty()) {
                 this.Q.add(linea);
             }
-            
+
         }
     }
 
@@ -200,8 +199,8 @@ public class AFN {
                 break; // Salir del bucle al encontrar la siguiente sección
             }
             if (!linea.isEmpty()) {
-                if (!this.Q.contains(linea)){
-                    throw new IllegalArgumentException("\""+linea+"\" no pertenece al conjunto de estados.");
+                if (!this.Q.contains(linea)) {
+                    throw new IllegalArgumentException("\"" + linea + "\" no pertenece al conjunto de estados.");
                 }
                 this.F.add(linea);
             }
@@ -215,13 +214,13 @@ public class AFN {
             if (linea.isEmpty() || linea.startsWith("#")) {
                 break; // Salir del bucle al encontrar la siguiente sección
             }
-            
+
             String[] partes = linea.split(":");
             String estadoActual = partes[0].trim();
             String[] subpartes = partes[1].split(">");
             char simbolo = subpartes[0].trim().charAt(0);
             String[] estadosSiguientes = subpartes[1].split(";");
-            for (String estadoSiguiente : estadosSiguientes){
+            for (String estadoSiguiente : estadosSiguientes) {
                 estadoSiguiente = estadoSiguiente.trim();
                 addTransition(estadoActual, simbolo, estadoSiguiente);
             }
@@ -245,14 +244,14 @@ public class AFN {
         int oldSizeEstados = 0;
 
         NavigableSet<Character> alfabeto = this.sigma.getAlfabeto();
-        while (oldSizeEstados != estados.size()){
+        while (oldSizeEstados != estados.size()) {
             oldSizeEstados = estados.size();
             Iterator<String> iterator = estados.iterator();
             HashSet<String> copyEstados = new HashSet<String>();
             copyEstados.addAll(estados);
             while (iterator.hasNext()) {
                 String estado = iterator.next();
-                for (Character simbolo : alfabeto){
+                for (Character simbolo : alfabeto) {
                     HashSet<String> imagen = this.delta(estado, simbolo);
                     if (imagen != null) {
                         copyEstados.addAll(imagen);
@@ -273,7 +272,7 @@ public class AFN {
 
     // Implementacion de la funcion de trancision
     public HashSet<String> delta(String estado, Character simbolo) {
-        if (this.Q.contains(estado) && this.sigma.contains(simbolo) && this.delta.get(estado)!=null) {
+        if (this.Q.contains(estado) && this.sigma.contains(simbolo) && this.delta.get(estado) != null) {
             return this.delta.get(estado).get(simbolo);
         } else {
             return null;
@@ -282,8 +281,9 @@ public class AFN {
 
     public HashSet<String> delta(HashSet<String> estados, Character simbolo) {
         HashSet<String> imagen = new HashSet<String>();
-        for (String estado : estados){
-            if (this.Q.contains(estado) && this.sigma.contains(simbolo) && this.delta.get(estado)!=null && this.delta.get(estado).get(simbolo)!=null) {
+        for (String estado : estados) {
+            if (this.Q.contains(estado) && this.sigma.contains(simbolo) && this.delta.get(estado) != null
+                    && this.delta.get(estado).get(simbolo) != null) {
                 imagen.addAll(this.delta.get(estado).get(simbolo));
             }
         }
@@ -341,7 +341,7 @@ public class AFN {
         // Insertar Q
         sb.append("#states\n");
         for (String estado : this.Q) {
-            if (!mostrarInaccesibles && this.estadosInaccesibles.contains(estado)){
+            if (!mostrarInaccesibles && this.estadosInaccesibles.contains(estado)) {
                 continue;
             }
             sb.append(estado + " \n");
@@ -354,14 +354,14 @@ public class AFN {
         // Insertar F
         sb.append("#accepting\n");
         for (String estado : this.F) {
-            if (!mostrarInaccesibles && this.estadosInaccesibles.contains(estado)){
+            if (!mostrarInaccesibles && this.estadosInaccesibles.contains(estado)) {
                 continue;
             }
             sb.append(estado + " \n");
         }
 
         // Insertar estados inaccesibles si mostrarInaccesibles
-        if (addSeccionEstadosInaccesibles){
+        if (addSeccionEstadosInaccesibles) {
             sb.append("#inaccessible\n");
             for (String estado : this.estadosInaccesibles) {
                 sb.append(estado + " \n");
@@ -371,11 +371,11 @@ public class AFN {
         // Insertar transiciones
         sb.append("#transitions\n");
         for (String preEstado : this.delta.keySet()) {
-            for (Character simbolo : this.delta.get(preEstado).keySet()){
+            for (Character simbolo : this.delta.get(preEstado).keySet()) {
                 Boolean masDeUnPostEstado = false;
                 sb.append(preEstado + ":" + simbolo + ">");
-                for (String postEstado: this.delta.get(preEstado).get(simbolo)){
-                    if (masDeUnPostEstado){
+                for (String postEstado : this.delta.get(preEstado).get(simbolo)) {
+                    if (masDeUnPostEstado) {
                         sb.append(";" + postEstado);
                     } else {
                         sb.append(postEstado);
@@ -433,7 +433,7 @@ public class AFN {
         }
     }
 
-    public static AFD AFNtoAFD(AFN afn) { 
+    public static AFD AFNtoAFD(AFN afn) {
         int pad = afn.q0.length();
         ArrayDeque<String> estadosAlcanzables = new ArrayDeque<String>();
 
@@ -453,7 +453,7 @@ public class AFN {
             estadosAlcanzables.add(strEstadoNuevo);
 
             pad = Math.max(pad, strEstadoNuevo.length());
-            for (String estado : estadoNuevo){
+            for (String estado : estadoNuevo) {
                 if (afn.F.contains(estado)) {
                     F.add(strEstadoNuevo);
                     break;
@@ -461,7 +461,7 @@ public class AFN {
             }
             Q.add(strEstadoNuevo);
 
-            for (Character simbolo : afn.sigma.getAlfabeto()){
+            for (Character simbolo : afn.sigma.getAlfabeto()) {
                 HashSet<String> imagen = afn.delta(estadoNuevo, simbolo);
                 if (imagen == null) {
                     if (delta.get(strEstadoNuevo) != null) {
@@ -502,7 +502,7 @@ public class AFN {
                 }
             }
         }
-        
+
         pad += 3;
         int sizeAlfabeto = afn.sigma.getAlfabeto().size();
         StringBuilder sb = new StringBuilder();
@@ -511,7 +511,7 @@ public class AFN {
             sb.append(String.format("%" + pad + "s", simbolo + " |"));
         }
         sb.append("\n");
-        sb.append(String.join("", Collections.nCopies(1+pad*(sizeAlfabeto+1), "-")) + "\n");
+        sb.append(String.join("", Collections.nCopies(1 + pad * (sizeAlfabeto + 1), "-")) + "\n");
         while (!estadosAlcanzables.isEmpty()) {
             String estado = estadosAlcanzables.remove();
             sb.append("|" + String.format("%" + pad + "s", estado + " |"));
@@ -522,7 +522,7 @@ public class AFN {
         }
         sb.append("|");
         if (limboEsNecesario) {
-            for (int i = 0 ; i<=sizeAlfabeto ; i++) {
+            for (int i = 0; i <= sizeAlfabeto; i++) {
                 sb.append(String.format("%" + pad + "s", "limbo |"));
             }
             sb.append("\n");
@@ -531,7 +531,7 @@ public class AFN {
         return new AFD(afn.sigma, Q, afn.statesSetToString(q0), F, delta);
     }
 
-    private String statesSetToString(HashSet<String> estados){
+    private String statesSetToString(HashSet<String> estados) {
         StringBuilder sb = new StringBuilder();
         List<String> listaEstados = new ArrayList<String>(estados);
         java.util.Collections.sort(listaEstados);
@@ -549,14 +549,14 @@ public class AFN {
         return sb.toString();
     }
 
-    public HashSet<String[]> darPasoComputacional(String[] configuracion){
-        if (configuracion[1].length()>0){
+    public HashSet<String[]> darPasoComputacional(String[] configuracion) {
+        if (configuracion[1].length() > 0) {
             HashSet<String> estadosImagen = this.delta(configuracion[0], configuracion[1].charAt(0));
-            if (estadosImagen!=null){
+            if (estadosImagen != null) {
                 HashSet<String[]> postConfiguraciones = new HashSet<String[]>();
                 String subcadena = configuracion[1].substring(1);
                 for (String estado : estadosImagen) {
-                    String[] postConfiguracion = {estado,subcadena};
+                    String[] postConfiguracion = { estado, subcadena };
                     postConfiguraciones.add(postConfiguracion);
                 }
                 return postConfiguraciones;
@@ -566,16 +566,16 @@ public class AFN {
     }
 
     public int computarTodosLosProcesamientos(String cadena, String nombreArchivo) {
-        
+
         ProcesamientoCadenaAFN pAFN = new ProcesamientoCadenaAFN(cadena, this);
 
         // Imprimir cada uno de los posibles procesamientos
         System.out.println(pAFN.listaProcesamientos());
 
         // Crear Los archivos
-        String nombreArchivoAceptadas  = nombreArchivo + "Aceptadas.txt";
-        String nombreArchivoRechazadas  = nombreArchivo + "Rechazadas.txt";
-        String nombreArchivoAbortadas  = nombreArchivo + "Abortadas.txt";
+        String nombreArchivoAceptadas = nombreArchivo + "Aceptadas.txt";
+        String nombreArchivoRechazadas = nombreArchivo + "Rechazadas.txt";
+        String nombreArchivoAbortadas = nombreArchivo + "Abortadas.txt";
 
         // Crear los archivos y llenarlo con las lsitas de estados correspondientes
         try {
@@ -632,7 +632,7 @@ public class AFN {
             System.out.println("Error al crear el archivo de procesamientos abortados.");
 
         }
-        
+
         // Retornar el numero total de procesamientos posibles
         return pAFN.numProcesamientos();
     }
@@ -649,14 +649,14 @@ public class AFN {
             if (pAFN.esAceptada()) {
                 fueAceptada = "si";
             }
-            sb.append(cadena + "\t" 
-                        + pAFN.procesamientoMasCorto() + "\t"
-                        + pAFN.numProcesamientos() + "\t" 
-                        + pAFN.numProcesamientosAceptacion() + "\t"
-                        + pAFN.numProcesamientosAbortados() + "\t" 
-                        + pAFN.numProcesamientosRechazados() + "\t" 
-                        + fueAceptada + "\n" );
-            
+            sb.append(cadena + "\t"
+                    + pAFN.procesamientoMasCorto() + "\t"
+                    + pAFN.numProcesamientos() + "\t"
+                    + pAFN.numProcesamientosAceptacion() + "\t"
+                    + pAFN.numProcesamientosAbortados() + "\t"
+                    + pAFN.numProcesamientosRechazados() + "\t"
+                    + fueAceptada + "\n");
+
         }
 
         String listaProcesada = sb.toString();
@@ -665,25 +665,26 @@ public class AFN {
         if (imprimirPantalla) {
             System.out.println(listaProcesada);
         }
-        
+
         // Comprobar que el nombre del archivo es valido
         for (int i = 0; i < nombreArchivo.length(); i++) {
             Character simbolo = nombreArchivo.charAt(i);
-            if (!Character.isDigit(simbolo) && !Character.isLetter(simbolo) && !(simbolo >= ',' && simbolo <= '.') && !(simbolo == '_')) {
-                nombreArchivo = "procesamiento-cadenas_" 
-                                + LocalDateTime.now().getYear() + "-"
-                                + LocalDateTime.now().getMonthValue() + "-"
-                                + LocalDateTime.now().getDayOfMonth() + "-"
-                                + LocalDateTime.now().getHour() + "-"
-                                + LocalDateTime.now().getMinute() + "-"
-                                + LocalDateTime.now().getSecond() + "_" 
-                                + Integer.toString(this.hashCode());
+            if (!Character.isDigit(simbolo) && !Character.isLetter(simbolo) && !(simbolo >= ',' && simbolo <= '.')
+                    && !(simbolo == '_')) {
+                nombreArchivo = "procesamiento-cadenas_"
+                        + LocalDateTime.now().getYear() + "-"
+                        + LocalDateTime.now().getMonthValue() + "-"
+                        + LocalDateTime.now().getDayOfMonth() + "-"
+                        + LocalDateTime.now().getHour() + "-"
+                        + LocalDateTime.now().getMinute() + "-"
+                        + LocalDateTime.now().getSecond() + "_"
+                        + Integer.toString(this.hashCode());
                 break;
             }
         }
 
         // Crear el archivo y llenarlo con listaProcesada
-        nombreArchivo  += ".txt";
+        nombreArchivo += ".txt";
         try {
 
             // Crear el archivo de procesamientos de cadenas
@@ -708,32 +709,34 @@ public class AFN {
     }
 
     public Boolean procesarCadenaConversion(String cadena) {
-        AFD afd = this.AFNtoAFD(this);
+        AFD afd = AFNtoAFD(this);
         return afd.procesarCadena(cadena);
     }
 
     public Boolean procesarCadenaConDetallesConversion(String cadena) {
-        AFD afd = this.AFNtoAFD(this);
+        AFD afd = AFNtoAFD(this);
         return afd.procesarCadena(cadena, true);
     }
-    
-    public void procesarListaCadenasConversion(Iterable<String> listaCadenas, String nombreArchivo, Boolean imprimirPantalla) {
+
+    public void procesarListaCadenasConversion(Iterable<String> listaCadenas, String nombreArchivo,
+            Boolean imprimirPantalla) {
         // Comprobar que el nombre del archivo es valido
         for (int i = 0; i < nombreArchivo.length(); i++) {
             Character simbolo = nombreArchivo.charAt(i);
-            if (!Character.isDigit(simbolo) && !Character.isLetter(simbolo) && !(simbolo >= ',' && simbolo <= '.') && !(simbolo == '_')) {
-                nombreArchivo = "procesamiento-cadenas_" 
-                                + LocalDateTime.now().getYear() + "-"
-                                + LocalDateTime.now().getMonthValue() + "-"
-                                + LocalDateTime.now().getDayOfMonth() + "-"
-                                + LocalDateTime.now().getHour() + "-"
-                                + LocalDateTime.now().getMinute() + "-"
-                                + LocalDateTime.now().getSecond() + "_" 
-                                + Integer.toString(this.hashCode());
+            if (!Character.isDigit(simbolo) && !Character.isLetter(simbolo) && !(simbolo >= ',' && simbolo <= '.')
+                    && !(simbolo == '_')) {
+                nombreArchivo = "procesamiento-cadenas_"
+                        + LocalDateTime.now().getYear() + "-"
+                        + LocalDateTime.now().getMonthValue() + "-"
+                        + LocalDateTime.now().getDayOfMonth() + "-"
+                        + LocalDateTime.now().getHour() + "-"
+                        + LocalDateTime.now().getMinute() + "-"
+                        + LocalDateTime.now().getSecond() + "_"
+                        + Integer.toString(this.hashCode());
                 break;
             }
         }
-        AFD afd = this.AFNtoAFD(this);
+        AFD afd = AFNtoAFD(this);
         afd.procesarListaCadenas(listaCadenas, nombreArchivo, imprimirPantalla);
     }
 

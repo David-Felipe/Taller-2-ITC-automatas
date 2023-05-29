@@ -784,7 +784,7 @@ public class ClasePrueba {
             // Lanzar una excepción para salir del método
             throw e;
         }
-    
+
         // Verificar si el automata se creó correctamente
         if (automata != null) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -794,14 +794,16 @@ public class ClasePrueba {
             System.out.println("λ-Clausura de " + estado + ": " + lambdaClausura);
         }
     }
-    
+
     private static void determinarYMostrarEstadosInaccesibles(AFNLambda automata) {
         List<String> estadosInaccesibles = automata.hallarEstadosInaccesibles();
         System.out.println("Estados inaccesibles: " + estadosInaccesibles);
     }
+
     private static void imprimirAFNLSimplificado(AFNLambda automata) {
         automata.imprimirAFNLSimplificado();
     }
+
     private static void exportarAutomata(AFNLambda automata) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         System.out.println("Ingrese el nombre del archivo de exportación:");
@@ -809,6 +811,7 @@ public class ClasePrueba {
         automata.exportar(nombreArchivo);
         System.out.println("El autómata se ha exportado correctamente.");
     }
+
     private static void procesarCadena(AFNLambda automata) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         System.out.println("Ingrese la cadena a procesar:");
@@ -820,12 +823,14 @@ public class ClasePrueba {
             System.out.println("La cadena es rechazada por el autómata.");
         }
     }
+
     private static void procesarCadenaConDetalles(AFNLambda automata) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         System.out.println("Ingrese la cadena a procesar:");
         String cadena = reader.readLine();
         automata.procesarCadenaConDetalles(cadena);
     }
+
     private static void computarTodosLosProcesamientos(AFNLambda automata) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         System.out.println("Ingrese la cadena a procesar:");
@@ -835,6 +840,7 @@ public class ClasePrueba {
         int numProcesamientos = automata.computarTodosLosProcesamientos(cadena, nombreArchivo);
         System.out.println("Se realizaron " + numProcesamientos + " procesamientos.");
     }
+
     private static void procesarListaCadenasConDetalles(AFNLambda automata) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         System.out.println("Ingrese el nombre del archivo que contiene la lista de cadenas:");
@@ -847,6 +853,7 @@ public class ClasePrueba {
         List<String> listaCadenas = leerListaCadenasDesdeArchivo(nombreArchivo);
         automata.procesarListaCadenas(listaCadenas, nombreArchivoResultados, imprimirPantalla);
     }
+
     private static List<String> leerListaCadenasDesdeArchivo(String nombreArchivo) throws IOException {
         List<String> listaCadenas = new ArrayList<>();
         FileReader fileReader = new FileReader(nombreArchivo);
@@ -1774,7 +1781,7 @@ public class ClasePrueba {
 
     // Crear AFN
     private static void crearAFN(HashMap<String, AFN> automatasActuales, Scanner input) {
-        
+
         // Limpiar consola para que se vea mas fancy
         System.out.print("\033c");
 
@@ -1994,7 +2001,7 @@ public class ClasePrueba {
 
             automatasActuales.get(nombreAFN).exportar(nombreArchivoSalida);
 
-        } catch (IOException  e) {
+        } catch (IOException e) {
 
             e.printStackTrace();
 
@@ -2075,13 +2082,13 @@ public class ClasePrueba {
         String cadena = "";
 
         while (ingresandoCadena) {
-            
+
             // Imprimir alfabeto
             StringBuilder alfabeto = new StringBuilder();
             alfabeto.append("{");
             Boolean masDeUnCaracter = false;
-            for (Character simbolo : afn.getSigma()) { 
-                if (masDeUnCaracter) { 
+            for (Character simbolo : afn.getSigma()) {
+                if (masDeUnCaracter) {
                     alfabeto.append("," + simbolo);
                 } else {
                     alfabeto.append(simbolo);
@@ -2098,7 +2105,7 @@ public class ClasePrueba {
             cadena = input.next();
             System.out.println();
             Boolean cadenaValida = true;
-            for (int i = 0 ; i < cadena.length() ; i++) { 
+            for (int i = 0; i < cadena.length(); i++) {
                 if (!afn.getSigma().contains(cadena.charAt(i))) {
                     cadenaValida = false;
                     break;
@@ -2110,7 +2117,7 @@ public class ClasePrueba {
                 System.out.println();
 
             } else {
-                if (cadena.equals("$")){
+                if (cadena.equals("$")) {
                     cadena = "";
                 }
                 ingresandoCadena = false;
@@ -2202,7 +2209,7 @@ public class ClasePrueba {
 
             }
             // Esperar hasta que se presione enter
-            if (procesandoCadenas ) {
+            if (procesandoCadenas) {
                 System.out.println("Presione enter para continuar");
                 try {
                     System.in.read();
@@ -2213,7 +2220,6 @@ public class ClasePrueba {
         }
 
     }
-
 
     private static void imprimirListaNombresAFN(HashMap<String, AFN> automatas) {
         Integer numActual = 1;
@@ -2232,7 +2238,6 @@ public class ClasePrueba {
         System.out.println();
     }
 
-
     // ** Probar AFN Lambda
     private static void probarAFNLambda(Scanner input) throws IOException {
         System.out.print("Ingrese el nombre del archivo AFNLambda: ");
@@ -2240,19 +2245,20 @@ public class ClasePrueba {
         String nombreArchivo = scanner.nextLine();
         AFNLambda automata;
 
-        try{
+        try {
             automata = new AFNLambda(nombreArchivo);
-        }catch(Exception e){
+        } catch (Exception e) {
             System.out.println("Error al cargar el archivo AFNLambda: " + e.getMessage());
+            scanner.close();
             return;
         }
 
         Boolean probandoAFNLambda = true;
         TreeSet<AFD> automatasActuales = new TreeSet<>();
 
-        while(probandoAFNLambda){
+        while (probandoAFNLambda) {
 
-            //Limpiar consola
+            // Limpiar consola
             // System.out.print("\033c");
 
             // Espacio al inicio para no saturar e indicar menu
@@ -2274,7 +2280,7 @@ public class ClasePrueba {
             System.out.print("Ingrese su opción: ");
             Integer opcion = input.nextInt();
             System.out.println();
-            switch(opcion){
+            switch (opcion) {
                 case 1:
                     try {
                         calcularYMostrarLambdaClausura(nombreArchivo);
@@ -2289,7 +2295,7 @@ public class ClasePrueba {
                     try {
                         imprimirAFNLSimplificado(automata);
                     } catch (Exception e) {
-                        System.out.println("Error:"+e.getMessage());
+                        System.out.println("Error:" + e.getMessage());
                     }
                 case 4:
                     exportarAutomata(automata);
@@ -2317,6 +2323,8 @@ public class ClasePrueba {
                     break;
             }
         }
+
+        scanner.close();
     }
 
     // Probar conversiones
