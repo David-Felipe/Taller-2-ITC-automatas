@@ -264,15 +264,14 @@ public class AFD implements Comparable<AFD> {
 
         // Leer el archivo línea por línea
         // Leer primera linea
-        String linea = reader.readLine();
-        linea.trim();
+        String linea = reader.readLine().trim();
 
         // Verificar que sí corresponda a un AFD
         if (!linea.equals("#!dfa")) {
 
             // Cerrar el buffer
             reader.close();
-            throw new IOException("El archivo no corresponde a un AFD");
+            throw new IOException("El archivo no empieza con #!dfa");
 
         }
 
@@ -284,8 +283,7 @@ public class AFD implements Comparable<AFD> {
             if (linea == null)
                 break;
 
-            linea.trim();
-            lineasArchivo.add(linea);
+            lineasArchivo.add(linea.trim());
         }
 
         // Cerrar el buffer
@@ -315,7 +313,9 @@ public class AFD implements Comparable<AFD> {
             Integer indice = 0;
             for (String lineaArchivo : lineasArchivo) {
 
-                lineaArchivo.trim();
+                // Trimear la linea
+                lineaArchivo = lineaArchivo.trim();
+
                 // Si se encuentra la sección, guardar el contenido
                 if (lineaArchivo.equals(seccion)) {
 
@@ -389,7 +389,6 @@ public class AFD implements Comparable<AFD> {
     }
 
     // Depurar transiciones desde su lista de lineas
-    // TreeMap<Character, String>>
     private TreeMap<String, TreeMap<Character, String>> depurarTransiciones(ArrayList<String> listaLineas) {
 
         // Crear el mapa de transiciones

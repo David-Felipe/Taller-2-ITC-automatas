@@ -37,7 +37,7 @@ public class Alfabeto {
         this.simbolos = new TreeSet<Character>(simbolosCollection);
         // Verificamos que lambda no esté en el alfabeto
         isLambdaHere();
-        
+
     }
 
     // Metodo para verificar si un simbolos está en el alfabeto
@@ -123,9 +123,8 @@ public class Alfabeto {
             int size = this.simbolos.size();
             int randInt = rand.nextInt(size);
             int iterInt = 0;
-            for(Character caracter : this.simbolos)
-            {
-                if (iterInt == randInt){
+            for (Character caracter : this.simbolos) {
+                if (iterInt == randInt) {
                     simbolo = caracter;
                     break;
                 }
@@ -142,14 +141,15 @@ public class Alfabeto {
 
     }
 
-    // Método para generar cantidad cadenas aleatorias a partir del contenido de simbolos
-    // y de lungitud aleatoria menor estricta  que maxLen
+    // Método para generar cantidad cadenas aleatorias a partir del contenido de
+    // simbolos
+    // y de lungitud aleatoria menor estricta que maxLen
     public Collection<String> generarCadenas(int cantidad, int maxLen) {
 
         Collection<String> listaCadenas = new ArrayDeque<String>();
         listaCadenas.add("$");
 
-        for (int i = 1 ; i < cantidad ; i++) {
+        for (int i = 1; i < cantidad; i++) {
 
             int randInt = rand.nextInt(1, maxLen);
             String cadena = this.generarCadena(randInt);
@@ -165,7 +165,7 @@ public class Alfabeto {
         if (size == 1) {
             return this.generarCadenas(cantidad, 50);
         }
-        int maxLen = (int) Math.ceil(Math.log(500)/Math.log(size));
+        int maxLen = (int) Math.ceil(Math.log(500) / Math.log(size));
         return this.generarCadenas(cantidad, maxLen);
     }
 
@@ -184,6 +184,11 @@ public class Alfabeto {
 
     public Boolean contains(char simbolo) {
         return this.simbolos.contains(simbolo);
+    }
+
+    // Metodo para retornar el tamaño del alfabeto
+    public int size() {
+        return this.simbolos.size();
     }
 
 }
