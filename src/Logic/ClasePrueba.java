@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 // Paquetes creados por nosotros
 import Logic.AFD;
+import Logic.AFPN.Transicion;
 
 public class ClasePrueba {
 
@@ -132,6 +133,7 @@ public class ClasePrueba {
             System.out.println("1. Probar AFD");
             System.out.println("2. Probar AFN");
             System.out.println("3. Probar AFN Lambda");
+            System.out.println("4. Probar AFPN");
             System.out.println("0. Volver");
             System.out.println();
             System.out.print("Ingrese su opción: ");
@@ -158,6 +160,12 @@ public class ClasePrueba {
                         System.out.println("Error inesperado: " + e.getMessage());
                     }
                     break;
+                case 4:
+                    try {
+                        probarAFPN(input);
+                    } catch (Exception e) {
+                        System.out.println("Error inesperado: " + e.getMessage());
+                    }
                 case 0:
                     seleccionandoAutomata = false;
                     break;
@@ -2346,4 +2354,164 @@ public class ClasePrueba {
 
     }
 
+    private static void probarAFPN(Scanner input) throws IOException {
+        boolean probandoAFPN = true;
+        AFPN automata = null;
+
+        while (probandoAFPN) {
+            System.out.println();
+            System.out.println("Prueba de AFPN");
+            System.out.println();
+
+            System.out.println("Seleccione una opción:");
+            System.out.println("1. Ingresar nombre de archivo AFPN");
+            System.out.println("2. Ingresar datos del AFPN directamente");
+            System.out.println("Escriba 'exit' para salir");
+            System.out.print("Ingrese su opción: ");
+            String opcion = input.nextLine();
+            System.out.println();
+
+            switch (opcion) {
+                case "1":
+                    System.out.print("Ingrese el nombre del archivo AFPN: ");
+                    String nombreArchivo = input.nextLine();
+
+                    try {
+                        automata = new AFPN(nombreArchivo);
+                        System.out.println("Autómata listo. Su tipología es Autómata Finito con Pila No Determinista.");
+                        System.out.println("Elementos del autómata:");
+                        System.out.println(automata.toString());
+                    } catch (Exception e) {
+                        System.out.println("Error al cargar el archivo AFPN: " + e.getMessage());
+                    }
+                    break;
+                case "2":
+                    // Lógica para ingresar los datos del AFPN directamente
+                    // Utiliza los métodos correspondientes para llenar los conjuntos y crear las
+                    // transiciones
+
+                    Set<String> estados = new HashSet<>();
+                    String estadoInicial = "";
+                    Set<String> estadosAceptacion = new HashSet<>();
+                    Set<String> alfabetoCinta = new HashSet<>();
+                    Set<String> alfabetoPila = new HashSet<>();
+                    Set<Transicion> delta = new HashSet<>();
+
+                    // Lógica para llenar los conjuntos y crear las transiciones directamente
+
+                    automata = new AFPN(estados, estadoInicial, estadosAceptacion, alfabetoCinta, alfabetoPila, delta);
+                    break;
+                case "exit":
+                    probandoAFPN = false;
+                    break;
+                default:
+                    System.out.println("Opción no válida. Por favor, ingrese una opción válida.");
+                    break;
+            }
+            if (automata != null) {
+                mostrarOpcionesAFPN(input, automata);
+            }
+        }
+    }
+
+    private static void mostrarOpcionesAFPN(Scanner input, AFPN automata) {
+        boolean continuar = true;
+        while (continuar) {
+            System.out.println();
+            System.out.println("Seleccione una opción:");
+            System.out.println("1. Procesar cadena");
+            System.out.println("2. Procesar cadena con detalles");
+            System.out.println("3. Computar todos los procesamientos de una cadena");
+            System.out.println("4. Procesar lista de cadenas");
+            System.out.println("5. Calcular producto cartesiano con AFD");
+            System.out.println("Escriba 'back' para volver al menú anterior");
+            System.out.print("Ingrese su opción: ");
+            String opcion = input.nextLine();
+            System.out.println();
+            switch (opcion) {
+                case "1":
+                    // Lógica para procesar una cadena
+                    System.out.println("Ingrese la cadena a procesar:");
+                    String cadena = input.nextLine();
+                    try {
+                        boolean resultadoProcesamiento = automata.procesarCadena(cadena);
+                        System.out.println("El resultado del procesamiento de la cadena es: " + resultadoProcesamiento);
+                    } catch (Exception e) {
+                        System.out.println("Error al procesar la cadena: " + e.getMessage());
+                    }
+                    break;
+                case "2":
+                    // Lógica para procesar una cadena con detalles
+                    System.out.println("Ingrese la cadena a procesar:");
+                    String cadenaDetalles = input.nextLine();
+                    try {
+                        boolean resultadoProcesamientoDetalles = automata.procesarCadenaConDetalles(cadenaDetalles);
+                        System.out.println("El resultado del procesamiento detallado de la cadena es: "
+                                + resultadoProcesamientoDetalles);
+                    } catch (Exception e) {
+                        System.out.println("Error al procesar la cadena con detalles: " + e.getMessage());
+                    }
+                    break;
+                case "3":
+                    // Lógica para computar todos los procesamientos de una cadena
+                    System.out.println("Ingrese la cadena a computar:");
+                    String cadenaComputar = input.nextLine();
+                    System.out.println("Ingrese el nombre del archivo:");
+                    String nombreArchivo = input.nextLine();
+
+                    try {
+                        int numeroProcesamientos = automata.computarTodosLosProcesamientos(cadenaComputar,
+                                nombreArchivo);
+                        System.out.println("Se computaron " + numeroProcesamientos
+                                + " procesamientos y se guardaron en el archivo " + nombreArchivo);
+                    } catch (Exception e) {
+                        System.out.println("Error al computar los procesamientos: " + e.getMessage());
+                    }
+                    break;
+                case "4":
+                    // Lógica para procesar una lista de cadenas
+                    System.out.println("Ingrese el nombre del archivo de la lista de cadenas:");
+                    String nombreArchivoLista = input.nextLine();
+                    System.out.println("Ingrese el nombre del archivo de salida:");
+                    String nombreArchivoSalida = input.nextLine();
+                    List<String> listaCadenas = new ArrayList<>();
+                    try {
+                        Scanner scanner = new Scanner(new File(nombreArchivoLista));
+                        while (scanner.hasNextLine()) {
+                            String linea = scanner.nextLine();
+                            listaCadenas.add(linea);
+                        }
+                        scanner.close();
+                        boolean imprimirPantalla = false;
+                        automata.procesarListaCadenas(listaCadenas, nombreArchivoSalida, imprimirPantalla);
+                        System.out.println("El resultado se guardó en el archivo " + nombreArchivoSalida);
+                    } catch (FileNotFoundException e) {
+                        System.out.println("Error al cargar el archivo de la lista de cadenas: " + e.getMessage());
+                    }
+                    break;
+
+                case "5":
+                    // Lógica para calcular el producto cartesiano con un AFD
+                    System.out.println("Ingrese el nombre del archivo AFD:");
+                    String nombreArchivoAFD = input.nextLine();
+                    try {
+                        AFD afd = new AFD(nombreArchivoAFD);
+                        AFPN afpnProducto = automata.hallarProductoCartesianoConAFD(afd);
+                        System.out.println("AFPN producto:");
+                        System.out.println(afpnProducto);
+                    } catch (Exception e) {
+                        System.out.println("Error al cargar el archivo AFD: " + e.getMessage());
+                    }
+                    break;
+
+                case "back":
+                    continuar = false;
+                    break;
+
+                default:
+                    System.out.println("Opción no válida. Por favor, ingrese una opción válida.");
+                    break;
+            }
+        }
+    }
 }
