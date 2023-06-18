@@ -76,12 +76,13 @@ public class AF2P {
                 this.estadosInaccesibles.add(estado);
             }
         }
+        System.out.println(this.estadosInaccesibles);
     }
 
     // Implementacion de la funcion de trancision
     public HashSet<String[]> delta(String estado, Character simbolo, Character top1, Character top2) {
         if (this.Q.contains(estado) && 
-        this.sigma.contains(simbolo) && 
+        (this.sigma.contains(simbolo) || simbolo == '$') && 
         (this.gama.contains(top1) || top1 == '$') &&
         (this.gama.contains(top2) || top2 == '$') &&
         this.delta.get(estado) != null &&
@@ -96,11 +97,11 @@ public class AF2P {
     public void addTransition(String fromState, Character symbol, Character fromTop1, Character fromTop2, String toState,  Character toTop1, Character toTop2) {
         if (this.Q.contains(fromState) && 
         this.Q.contains(toState) && 
-        this.sigma.contains(symbol) &&
-        this.gama.contains(fromTop1) &&
-        this.gama.contains(fromTop2) &&
-        this.gama.contains(toTop1) &&
-        this.gama.contains(toTop2)) {
+        (this.sigma.contains(symbol) || symbol == '$') &&
+        (this.gama.contains(fromTop1) || fromTop1 == '$') &&
+        (this.gama.contains(fromTop2) || fromTop2 == '$') &&
+        (this.gama.contains(toTop1) || toTop1 == '$') &&
+        (this.gama.contains(toTop2) || toTop2 == '$')) {
             String[] toConfig = {toState, String.valueOf(toTop1), String.valueOf(toTop2)};
             HashMap<Character, HashMap<Character, HashMap<Character, HashSet<String[]>>>> stateTransitions = this.delta.computeIfAbsent(fromState,
                     k -> new HashMap<>());
@@ -112,6 +113,5 @@ public class AF2P {
                     k -> new HashSet<>());
             toStates.add(toConfig);
         }
-    System.out.println(this.delta);
     }
 }
