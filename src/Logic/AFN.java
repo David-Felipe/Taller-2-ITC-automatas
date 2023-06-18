@@ -27,6 +27,7 @@ public class AFN {
         this.q0 = q0;
         this.F = F;
         this.delta = delta;
+        this.estadosInaccesibles = new HashSet<>();
 
         // Hallar estados inasequibles y guardarlos
         this.hallarEstadosInaccesibles();
