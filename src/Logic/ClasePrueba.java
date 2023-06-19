@@ -16,6 +16,10 @@ public class ClasePrueba {
     static Boolean devMode = true;
     static Integer maxCharLenName = 15;
 
+    // Automatas guardados
+    static HashMap<String, AF2P> automatasAF2PActuales = new HashMap<>();
+    static HashMap<String, AFN> automatasAFNActuales = new HashMap<>();
+
     // Funcion de control, menu inicial
     public static void main() {
 
@@ -116,10 +120,6 @@ public class ClasePrueba {
         // Setup menu seleccion de prueba de automata
         Boolean seleccionandoAutomata = true;
 
-        // Setup automatas guardados
-        HashMap<String, AF2P> automatasAF2PActuales = new HashMap<>();
-        HashMap<String, AFN> automatasAFNActuales = new HashMap<>();
-
         // Seleccion de automata que se repite hasta volver
         while (seleccionandoAutomata) {
 
@@ -155,7 +155,7 @@ public class ClasePrueba {
                     break;
 
                 case 2:
-                    probarAFN(automatasAFNActuales, input);
+                    probarAFN(input);
                     break;
 
                 case 3:
@@ -179,7 +179,7 @@ public class ClasePrueba {
                     }
                     break;
                 case 6:
-                    probarAF2P(automatasAF2PActuales, input);
+                    probarAF2P(input);
                     break;
 
                 case 0:
@@ -1651,7 +1651,7 @@ public class ClasePrueba {
 
 
     // ** Probar AFN
-    private static void probarAFN(HashMap<String, AFN> automatasActuales, Scanner input) {
+    private static void probarAFN(Scanner input) {
 
         // Setup menu probar AFN
         Boolean probandoAFN = true;
@@ -1667,10 +1667,10 @@ public class ClasePrueba {
             System.out.println("Prueba de AFN");
             System.out.println();
 
-            if (automatasActuales.size() != 0) {
+            if (automatasAFNActuales.size() != 0) {
 
                 // Listar AFNS
-                imprimirListaNombresAFN(automatasActuales);
+                imprimirListaNombresAFN();
 
             }
 
@@ -1691,15 +1691,15 @@ public class ClasePrueba {
             switch (opcion) {
 
                 case 1:
-                    editarAFN(automatasActuales, input);
+                    editarAFN(input);
                     break;
 
                 case 2:
-                    procesarCadenasAFN(automatasActuales, input);
+                    procesarCadenasAFN(input);
                     break;
 
                 case 3:
-                    exportarAFN(automatasActuales, input);
+                    exportarAFN(input);
                     break;
 
                 case 0:
@@ -1730,7 +1730,7 @@ public class ClasePrueba {
     }
 
     // * Editar AFN
-    private static void editarAFN(HashMap<String, AFN> automatasActuales, Scanner input) {
+    private static void editarAFN(Scanner input) {
 
         // Setup menu editar AFN
         Boolean editandoAFN = true;
@@ -1746,10 +1746,10 @@ public class ClasePrueba {
             System.out.println("Edición de AFNs");
             System.out.println();
 
-            if (automatasActuales.size() != 0) {
+            if (automatasAFNActuales.size() != 0) {
 
                 // Listar AFNS
-                imprimirListaNombresAFN(automatasActuales);
+                imprimirListaNombresAFN();
 
             }
 
@@ -1769,11 +1769,11 @@ public class ClasePrueba {
             switch (opcion) {
 
                 case 1:
-                    crearAFN(automatasActuales, input);
+                    crearAFN(input);
                     break;
 
                 case 2:
-                    eliminarAFN(automatasActuales, input);
+                    eliminarAFN(input);
                     break;
 
                 case 0:
@@ -1804,7 +1804,7 @@ public class ClasePrueba {
     }
 
     // Crear AFN
-    private static void crearAFN(HashMap<String, AFN> automatasActuales, Scanner input) {
+    private static void crearAFN(Scanner input) {
 
         // Limpiar consola para que se vea mas fancy
         System.out.print("\033c");
@@ -1854,7 +1854,7 @@ public class ClasePrueba {
         try {
 
             AFN nuevoAFN = new AFN(rutaArchivo);
-            automatasActuales.put(nombreAFN, nuevoAFN);
+            automatasAFNActuales.put(nombreAFN, nuevoAFN);
 
         } catch (Exception e) {
 
@@ -1881,13 +1881,13 @@ public class ClasePrueba {
     }
 
     // Eliminar AFN
-    static void eliminarAFN(HashMap<String, AFN> automatasActuales, Scanner input) {
+    static void eliminarAFN(Scanner input) {
 
         // Limpiar consola para que se vea mas fancy
         System.out.print("\033c");
 
         // Verificar que sí existan
-        if (automatasActuales.size() == 0) {
+        if (automatasAFNActuales.size() == 0) {
 
             System.out.println();
             System.out.println("Todavía no se ha creado ningún AFN.");
@@ -1914,10 +1914,10 @@ public class ClasePrueba {
         System.out.println();
 
         // Mostrar automatas creados
-        if (automatasActuales.size() != 0) {
+        if (automatasAFNActuales.size() != 0) {
 
             // Listar AFNS
-            imprimirListaNombresAFN(automatasActuales);
+            imprimirListaNombresAFN();
 
         }
 
@@ -1931,7 +1931,7 @@ public class ClasePrueba {
             nombreAFN = input.next();
             System.out.println();
 
-            if (!automatasActuales.keySet().contains(nombreAFN)) {
+            if (!automatasAFNActuales.keySet().contains(nombreAFN)) {
 
                 System.out.println("No hay ningun AFN con ese nombre.");
                 System.out.println("Por favor intentelo nuevamente.");
@@ -1940,7 +1940,7 @@ public class ClasePrueba {
             } else {
 
                 ingresandoAFN = false;
-                automatasActuales.remove(nombreAFN);
+                automatasAFNActuales.remove(nombreAFN);
 
             }
 
@@ -1949,13 +1949,13 @@ public class ClasePrueba {
     }
 
     // * Exportar AFN
-    private static void exportarAFN(HashMap<String, AFN> automatasActuales, Scanner input) {
+    private static void exportarAFN(Scanner input) {
 
         // Limpiar consola para que se vea mas fancy
         System.out.print("\033c");
 
         // Verificar que sí existan
-        if (automatasActuales.size() == 0) {
+        if (automatasAFNActuales.size() == 0) {
 
             System.out.println();
             System.out.println("Todavía no se ha creado ningún AFN.");
@@ -1982,10 +1982,10 @@ public class ClasePrueba {
         System.out.println();
 
         // Mostrar automatas existentes
-        if (automatasActuales.size() != 0) {
+        if (automatasAFNActuales.size() != 0) {
 
             // Listar AFNS
-            imprimirListaNombresAFN(automatasActuales);
+            imprimirListaNombresAFN();
 
         }
 
@@ -2000,7 +2000,7 @@ public class ClasePrueba {
             nombreAFN = input.next();
             System.out.println();
 
-            if (!automatasActuales.keySet().contains(nombreAFN)) {
+            if (!automatasAFNActuales.keySet().contains(nombreAFN)) {
 
                 System.out.println("No hay ningun AFN con ese nombre.");
                 System.out.println("Por favor intentelo nuevamente.");
@@ -2023,7 +2023,7 @@ public class ClasePrueba {
         // Exportar el AFN
         try {
 
-            automatasActuales.get(nombreAFN).exportar(nombreArchivoSalida);
+            automatasAFNActuales.get(nombreAFN).exportar(nombreArchivoSalida);
 
         } catch (IOException e) {
 
@@ -2034,10 +2034,10 @@ public class ClasePrueba {
     }
 
     // * Procesar cadenas AFN
-    private static void procesarCadenasAFN(HashMap<String, AFN> automatasActuales, Scanner input) {
+    private static void procesarCadenasAFN(Scanner input) {
 
         // Verificar que sí existan
-        if (automatasActuales.size() == 0) {
+        if (automatasAFNActuales.size() == 0) {
 
             // Limpiar consola para que se vea mas fancy
             System.out.print("\033c");
@@ -2069,10 +2069,10 @@ public class ClasePrueba {
         System.out.println("Procesamiento de una cadena por AFN");
         System.out.println();
 
-        if (automatasActuales.size() != 0) {
+        if (automatasAFNActuales.size() != 0) {
 
             // Listar AFNS
-            imprimirListaNombresAFN(automatasActuales);
+            imprimirListaNombresAFN();
 
         }
 
@@ -2087,7 +2087,7 @@ public class ClasePrueba {
             nombreAFN = input.next();
             System.out.println();
 
-            if (!automatasActuales.keySet().contains(nombreAFN)) {
+            if (!automatasAFNActuales.keySet().contains(nombreAFN)) {
 
                 System.out.println("No hay ningun AFN con ese nombre.");
                 System.out.println("Por favor intentelo nuevamente.");
@@ -2099,160 +2099,175 @@ public class ClasePrueba {
 
             }
         }
-        AFN afn = automatasActuales.get(nombreAFN);
+        AFN afn = automatasAFNActuales.get(nombreAFN);
 
-        // Ingresar la cadena a procesar
-        Boolean ingresandoCadena = true;
-        String cadena = "";
-
-        while (ingresandoCadena) {
-
-            // Imprimir alfabeto
-            StringBuilder alfabeto = new StringBuilder();
-            alfabeto.append("{");
-            Boolean masDeUnCaracter = false;
-            for (Character simbolo : afn.getSigma()) {
-                if (masDeUnCaracter) {
-                    alfabeto.append("," + simbolo);
-                } else {
-                    alfabeto.append(simbolo);
-                    masDeUnCaracter = true;
-                }
-            }
-            alfabeto.append("}");
-            System.out.println("Alfabeto: " + alfabeto.toString());
-            System.out.println("lambda: $");
-            System.out.println();
-
-            // Pedir info necesaria
-            System.out.println("Ingrese la cadena a procesar");
-            cadena = input.next();
-            System.out.println();
-            Boolean cadenaValida = true;
-            for (int i = 0; i < cadena.length(); i++) {
-                if (!afn.getSigma().contains(cadena.charAt(i))) {
-                    cadenaValida = false;
-                    break;
-                }
-            }
-            if (!cadenaValida && !cadena.equals("$")) {
-                System.out.println("La cadena ingresada no es valida.");
-                System.out.println("Por favor intentelo nuevamente.");
-                System.out.println();
-
-            } else {
-                if (cadena.equals("$")) {
-                    cadena = "";
-                }
-                ingresandoCadena = false;
-
-            }
-        }
-
-        ProcesamientoCadenaAFN pAFN = new ProcesamientoCadenaAFN(cadena, afn);
-
-        // Setup menu seleccion de tipo de procesamiento
-        Boolean procesandoCadenas = true;
-
-        // Seleccion de procesamiento que se repite hasta volver
-        while (procesandoCadenas) {
-
-            // Limpiar consola para que se vea mas fancy
-            System.out.print("\033c");
-
-            // Espacio al inicio para no saturar e indicar menu
-            System.out.println();
-            System.out.println("Selección tipo de procesamiento");
-            System.out.println();
-
-            // Mostrar las opciones de selección de automata
-            System.out.println("Presionando el entero seguido de la tecla enter, por favor");
-            System.out.println("seleccione una opción:");
-            System.out.println();
-            System.out.println("1. Procesar cadena: \"" + cadena + "\"");
-            System.out.println("2. Consultar todos los procesamiento posibles de la cadena: \"" + cadena + "\"");
-            System.out.println("3. Consultar los procesamientos de aceptacion de la cadena: \"" + cadena + "\"");
-            System.out.println("4. Consultar los procesamientos de rechazo de la cadena: \"" + cadena + "\"");
-            System.out.println("5. Consultar los procesamientos abortados de la cadena: \"" + cadena + "\"");
-            System.out.println("0. Volver");
-            System.out.println();
-            System.out.print("Ingrese su opción: ");
-            Integer opcion = input.nextInt();
-            System.out.println();
-
-            // Redirigir a la opcion deseada
-            switch (opcion) {
-
-                case 1:
-                    if (pAFN.esAceptada()) {
-                        System.out.println("La cadena: \"" + cadena + "\" es aceptada.");
-                        System.out.println("Un procesamiento aceptado es: ");
-                    } else {
-                        System.out.println("La cadena: \"" + cadena + "\" es rechazada.");
-                        System.out.println("Uno de los procesamientos mas cortos es: ");
-                    }
-                    System.out.println(pAFN.procesamientoMasCorto());
-                    break;
-
-                case 2:
-                    System.out.println(pAFN.listaProcesamientos());
-                    break;
-
-                case 3:
-                    System.out.println(pAFN.listaProcesamientosAceptacion());
-                    break;
-
-                case 4:
-                    System.out.println(pAFN.listaProcesamientosRechazados());
-                    break;
-
-                case 5:
-                    System.out.println(pAFN.listaProcesamientosAbortados());
-                    break;
-
-                case 0:
-                    procesandoCadenas = false;
-                    break;
-
-                default:
-
-                    System.out.println("Opción inválida");
-
-                    try {
-
-                        // Espera que lea el mensaje
-                        TimeUnit.SECONDS.sleep(segundosEsperaLector);
-
-                    } catch (InterruptedException e) {
-
-                        e.printStackTrace();
-
-                    }
-
-                    break;
-
-            }
-            // Esperar hasta que se presione enter
-            if (procesandoCadenas) {
-                System.out.println("Presione enter para continuar");
-                try {
-                    System.in.read();
-                } catch (IOException er) {
-                    er.printStackTrace();
-                }
-            }
-        }
+        procesarCadenasAFNConEsteAFN(afn, input);
 
     }
 
-    private static void imprimirListaNombresAFN(HashMap<String, AFN> automatas) {
+    private static void procesarCadenasAFNConEsteAFN(AFN afn, Scanner input) {
+
+        Boolean procesandoVariasCadenas = true;
+        while (procesandoVariasCadenas){
+
+            // Ingresar la cadena a procesar
+            Boolean ingresandoCadena = true;
+            String cadena = "";
+
+            while (ingresandoCadena) {
+
+                // Imprimir alfabeto
+                StringBuilder alfabeto = new StringBuilder();
+                alfabeto.append("{");
+                Boolean masDeUnCaracter = false;
+                for (Character simbolo : afn.getSigma()) {
+                    if (masDeUnCaracter) {
+                        alfabeto.append("," + simbolo);
+                    } else {
+                        alfabeto.append(simbolo);
+                        masDeUnCaracter = true;
+                    }
+                }
+                alfabeto.append("}");
+                System.out.println("Alfabeto: " + alfabeto.toString());
+                System.out.println("lambda: $");
+                System.out.println();
+
+                // Pedir info necesaria
+                System.out.println("Ingrese la cadena a procesar");
+                cadena = input.next();
+                System.out.println();
+                Boolean cadenaValida = true;
+                for (int i = 0; i < cadena.length(); i++) {
+                    if (!afn.getSigma().contains(cadena.charAt(i))) {
+                        cadenaValida = false;
+                        break;
+                    }
+                }
+                if (!cadenaValida && !cadena.equals("$")) {
+                    System.out.println("La cadena ingresada no es valida.");
+                    System.out.println("Por favor intentelo nuevamente.");
+                    System.out.println();
+
+                } else {
+                    if (cadena.equals("$")) {
+                        cadena = "";
+                    }
+                    ingresandoCadena = false;
+
+                }
+            }
+
+            ProcesamientoCadenaAFN pAFN = new ProcesamientoCadenaAFN(cadena, afn);
+
+            // Setup menu seleccion de tipo de procesamiento
+            Boolean procesandoCadenas = true;
+
+            // Seleccion de procesamiento que se repite hasta volver
+            while (procesandoCadenas) {
+
+                // Limpiar consola para que se vea mas fancy
+                System.out.print("\033c");
+
+                // Espacio al inicio para no saturar e indicar menu
+                System.out.println();
+                System.out.println("Selección tipo de procesamiento");
+                System.out.println();
+
+                // Mostrar las opciones de selección de automata
+                System.out.println("Presionando el entero seguido de la tecla enter, por favor");
+                System.out.println("seleccione una opción:");
+                System.out.println();
+                System.out.println("1. Procesar cadena: \"" + cadena + "\"");
+                System.out.println("2. Consultar todos los procesamiento posibles de la cadena: \"" + cadena + "\"");
+                System.out.println("3. Consultar los procesamientos de aceptacion de la cadena: \"" + cadena + "\"");
+                System.out.println("4. Consultar los procesamientos de rechazo de la cadena: \"" + cadena + "\"");
+                System.out.println("5. Consultar los procesamientos abortados de la cadena: \"" + cadena + "\"");
+                System.out.println("6. Procesar una cadena distinta.");
+                System.out.println("0. Volver");
+                System.out.println();
+                System.out.print("Ingrese su opción: ");
+                Integer opcion = input.nextInt();
+                System.out.println();
+
+                // Redirigir a la opcion deseada
+                switch (opcion) {
+
+                    case 1:
+                        if (pAFN.esAceptada()) {
+                            System.out.println("La cadena: \"" + cadena + "\" es aceptada.");
+                            System.out.println("Un procesamiento aceptado es: ");
+                        } else {
+                            System.out.println("La cadena: \"" + cadena + "\" es rechazada.");
+                            System.out.println("Uno de los procesamientos mas cortos es: ");
+                        }
+                        System.out.println(pAFN.procesamientoMasCorto());
+                        break;
+
+                    case 2:
+                        System.out.println(pAFN.listaProcesamientos());
+                        break;
+
+                    case 3:
+                        System.out.println(pAFN.listaProcesamientosAceptacion());
+                        break;
+
+                    case 4:
+                        System.out.println(pAFN.listaProcesamientosRechazados());
+                        break;
+
+                    case 5:
+                        System.out.println(pAFN.listaProcesamientosAbortados());
+                        break;
+
+                    case 6:
+                        procesandoCadenas = false;
+                        break;
+
+                    case 0:
+                        procesandoCadenas = false;
+                        procesandoVariasCadenas = false;
+                        break;
+
+                    default:
+
+                        System.out.println("Opción inválida");
+
+                        try {
+
+                            // Espera que lea el mensaje
+                            TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+                        } catch (InterruptedException e) {
+
+                            e.printStackTrace();
+
+                        }
+
+                        break;
+
+                }
+                // Esperar hasta que se presione enter
+                if (procesandoCadenas) {
+                    System.out.println("Presione enter para continuar");
+                    try {
+                        System.in.read();
+                    } catch (IOException er) {
+                        er.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
+    private static void imprimirListaNombresAFN() {
         Integer numActual = 1;
 
         System.out.println("Sus AFN actuales son:");
         System.out.println();
 
         // Imprimir los AFN contenidos en automatasActuales
-        for (String strActual : automatas.keySet()) {
+        for (String strActual : automatasAFNActuales.keySet()) {
 
             System.out.println(Integer.toString(numActual) + ". " + strActual + "\n");
             numActual++;
@@ -2263,7 +2278,7 @@ public class ClasePrueba {
     }
 
     // ** Probar AF2P
-    private static void probarAF2P(HashMap<String, AF2P> automatasActuales, Scanner input) {
+    private static void probarAF2P(Scanner input) {
 
         // Setup menu probar AF2P
         Boolean probandoAF2P = true;
@@ -2279,10 +2294,10 @@ public class ClasePrueba {
             System.out.println("Prueba de AF2P");
             System.out.println();
 
-            if (automatasActuales.size() != 0) {
+            if (automatasAF2PActuales.size() != 0) {
 
                 // Listar AF2PS
-                imprimirListaNombresAF2P(automatasActuales);
+                imprimirListaNombresAF2P();
 
             }
 
@@ -2303,15 +2318,15 @@ public class ClasePrueba {
             switch (opcion) {
 
                 case 1:
-                    editarAF2P(automatasActuales, input);
+                    editarAF2P(input);
                     break;
 
                 case 2:
-                    procesarCadenasAF2P(automatasActuales, input);
+                    procesarCadenasAF2P(input);
                     break;
 
                 case 3:
-                    exportarAF2P(automatasActuales, input);
+                    exportarAF2P(input);
                     break;
 
                 case 0:
@@ -2342,7 +2357,7 @@ public class ClasePrueba {
     }
 
     // * Editar AF2P
-    private static void editarAF2P(HashMap<String, AF2P> automatasActuales, Scanner input) {
+    private static void editarAF2P(Scanner input) {
 
         // Setup menu editar AF2P
         Boolean editandoAF2P = true;
@@ -2358,10 +2373,10 @@ public class ClasePrueba {
             System.out.println("Edición de AF2Ps");
             System.out.println();
 
-            if (automatasActuales.size() != 0) {
+            if (automatasAF2PActuales.size() != 0) {
 
                 // Listar AF2PS
-                imprimirListaNombresAF2P(automatasActuales);
+                imprimirListaNombresAF2P();
 
             }
 
@@ -2381,11 +2396,11 @@ public class ClasePrueba {
             switch (opcion) {
 
                 case 1:
-                    crearAF2P(automatasActuales, input);
+                    crearAF2P(input);
                     break;
 
                 case 2:
-                    eliminarAF2P(automatasActuales, input);
+                    eliminarAF2P(input);
                     break;
 
                 case 0:
@@ -2416,7 +2431,7 @@ public class ClasePrueba {
     }
 
     // Crear AFN
-    private static void crearAF2P(HashMap<String, AF2P> automatasActuales, Scanner input) {
+    private static void crearAF2P(Scanner input) {
 
         // Limpiar consola para que se vea mas fancy
         System.out.print("\033c");
@@ -2466,7 +2481,7 @@ public class ClasePrueba {
         try {
 
             AF2P nuevoAF2P = new AF2P(rutaArchivo);
-            automatasActuales.put(nombreAF2P, nuevoAF2P);
+            automatasAF2PActuales.put(nombreAF2P, nuevoAF2P);
 
         } catch (Exception e) {
 
@@ -2493,13 +2508,13 @@ public class ClasePrueba {
     }
 
     // Eliminar AFN
-    static void eliminarAF2P(HashMap<String, AF2P> automatasActuales, Scanner input) {
+    static void eliminarAF2P(Scanner input) {
 
         // Limpiar consola para que se vea mas fancy
         System.out.print("\033c");
 
         // Verificar que sí existan
-        if (automatasActuales.size() == 0) {
+        if (automatasAF2PActuales.size() == 0) {
 
             System.out.println();
             System.out.println("Todavía no se ha creado ningún AF2P.");
@@ -2526,10 +2541,10 @@ public class ClasePrueba {
         System.out.println();
 
         // Mostrar automatas creados
-        if (automatasActuales.size() != 0) {
+        if (automatasAF2PActuales.size() != 0) {
 
             // Listar AF2PS
-            imprimirListaNombresAF2P(automatasActuales);
+            imprimirListaNombresAF2P();
 
         }
 
@@ -2543,7 +2558,7 @@ public class ClasePrueba {
             nombreAF2P = input.next();
             System.out.println();
 
-            if (!automatasActuales.keySet().contains(nombreAF2P)) {
+            if (!automatasAF2PActuales.keySet().contains(nombreAF2P)) {
 
                 System.out.println("No hay ningun AF2P con ese nombre.");
                 System.out.println("Por favor intentelo nuevamente.");
@@ -2552,7 +2567,7 @@ public class ClasePrueba {
             } else {
 
                 ingresandoAF2P = false;
-                automatasActuales.remove(nombreAF2P);
+                automatasAF2PActuales.remove(nombreAF2P);
 
             }
 
@@ -2561,13 +2576,13 @@ public class ClasePrueba {
     }
 
     // * Exportar AFN
-    private static void exportarAF2P(HashMap<String, AF2P> automatasActuales, Scanner input) {
+    private static void exportarAF2P(Scanner input) {
 
         // Limpiar consola para que se vea mas fancy
         System.out.print("\033c");
 
         // Verificar que sí existan
-        if (automatasActuales.size() == 0) {
+        if (automatasAF2PActuales.size() == 0) {
 
             System.out.println();
             System.out.println("Todavía no se ha creado ningún AF2P.");
@@ -2594,10 +2609,10 @@ public class ClasePrueba {
         System.out.println();
 
         // Mostrar automatas existentes
-        if (automatasActuales.size() != 0) {
+        if (automatasAF2PActuales.size() != 0) {
 
             // Listar AF2PS
-            imprimirListaNombresAF2P(automatasActuales);
+            imprimirListaNombresAF2P();
 
         }
 
@@ -2612,7 +2627,7 @@ public class ClasePrueba {
             nombreAF2P = input.next();
             System.out.println();
 
-            if (!automatasActuales.keySet().contains(nombreAF2P)) {
+            if (!automatasAF2PActuales.keySet().contains(nombreAF2P)) {
 
                 System.out.println("No hay ningun AF2P con ese nombre.");
                 System.out.println("Por favor intentelo nuevamente.");
@@ -2635,7 +2650,7 @@ public class ClasePrueba {
         // Exportar el AFN
         try {
 
-            automatasActuales.get(nombreAF2P).exportar(nombreArchivoSalida);
+            automatasAF2PActuales.get(nombreAF2P).exportar(nombreArchivoSalida);
 
         } catch (IOException e) {
 
@@ -2646,10 +2661,10 @@ public class ClasePrueba {
     }
 
     // * Procesar cadenas AF2P
-    private static void procesarCadenasAF2P(HashMap<String, AF2P> automatasActuales, Scanner input) {
+    private static void procesarCadenasAF2P(Scanner input) {
 
         // Verificar que sí existan automatas
-        if (automatasActuales.size() == 0) {
+        if (automatasAF2PActuales.size() == 0) {
 
             // Limpiar consola para que se vea mas fancy
             System.out.print("\033c");
@@ -2681,10 +2696,10 @@ public class ClasePrueba {
         System.out.println("Procesamiento de una cadena por AF2P");
         System.out.println();
 
-        if (automatasActuales.size() != 0) {
+        if (automatasAF2PActuales.size() != 0) {
 
             // Listar AF2PS
-            imprimirListaNombresAF2P(automatasActuales);
+            imprimirListaNombresAF2P();
 
         }
 
@@ -2699,7 +2714,7 @@ public class ClasePrueba {
             nombreAF2P = input.next();
             System.out.println();
 
-            if (!automatasActuales.keySet().contains(nombreAF2P)) {
+            if (!automatasAF2PActuales.keySet().contains(nombreAF2P)) {
 
                 System.out.println("No hay ningun AF2P con ese nombre.");
                 System.out.println("Por favor intentelo nuevamente.");
@@ -2711,158 +2726,173 @@ public class ClasePrueba {
 
             }
         }
-        AF2P af2p = automatasActuales.get(nombreAF2P);
+        AF2P af2p = automatasAF2PActuales.get(nombreAF2P);
 
-        // Ingresar la cadena a procesar
-        Boolean ingresandoCadena = true;
-        String cadena = "";
-
-        while (ingresandoCadena) {
-
-            // Imprimir alfabeto de cinta
-            StringBuilder alfabeto = new StringBuilder();
-            alfabeto.append("{");
-            Boolean masDeUnCaracter = false;
-            for (Character simbolo : af2p.getSigma()) {
-                if (masDeUnCaracter) {
-                    alfabeto.append("," + simbolo);
-                } else {
-                    alfabeto.append(simbolo);
-                    masDeUnCaracter = true;
-                }
-            }
-            alfabeto.append("}");
-            System.out.println("Alfabeto: " + alfabeto.toString());
-            System.out.println("lambda: $");
-            System.out.println();
-
-            // Pedir info necesaria
-            System.out.println("Ingrese la cadena a procesar");
-            cadena = input.next();
-            System.out.println();
-            Boolean cadenaValida = true;
-            for (int i = 0; i < cadena.length(); i++) {
-                if (!af2p.getSigma().contains(cadena.charAt(i))) {
-                    cadenaValida = false;
-                    break;
-                }
-            }
-            if (!cadenaValida && !cadena.equals("$")) {
-                System.out.println("La cadena ingresada no es valida.");
-                System.out.println("Por favor intentelo nuevamente.");
-                System.out.println();
-
-            } else {
-                if (cadena.equals("$")) {
-                    cadena = "";
-                }
-                ingresandoCadena = false;
-
-            }
-        }
-
-        // Procesar la cadena
-        af2p.preprocesarCadena(cadena);
-
-        // Setup menu seleccion de tipo de procesamiento
-        Boolean procesandoCadenas = true;
-
-        // Seleccion de procesamiento que se repite hasta volver
-        while (procesandoCadenas) {
-
-            // Limpiar consola para que se vea mas fancy
-            System.out.print("\033c");
-
-            // Espacio al inicio para no saturar e indicar menu
-            System.out.println();
-            System.out.println("Selección tipo de procesamiento");
-            System.out.println();
-
-            // Mostrar las opciones de selección de automata
-            System.out.println("Presionando el entero seguido de la tecla enter, por favor");
-            System.out.println("seleccione una opción:");
-            System.out.println();
-            System.out.println("1. Procesar cadena: \"" + cadena + "\"");
-            System.out.println("2. Consultar todos los procesamiento posibles de la cadena: \"" + cadena + "\"");
-            System.out.println("3. Consultar los procesamientos de aceptacion de la cadena: \"" + cadena + "\"");
-            System.out.println("4. Consultar los procesamientos de rechazo de la cadena: \"" + cadena + "\"");
-            System.out.println("0. Volver");
-            System.out.println();
-            System.out.print("Ingrese su opción: ");
-            Integer opcion = input.nextInt();
-            System.out.println();
-
-            // Redirigir a la opcion deseada
-            switch (opcion) {
-
-                case 1:
-                    if (af2p.getEsAceptada()) {
-                        System.out.println("La cadena: \"" + cadena + "\" es aceptada.");
-                        System.out.println("Un procesamiento aceptado es: ");
-                        System.out.println(af2p.getProcesamientoAceptacion());
-                    } else {
-                        System.out.println("La cadena: \"" + cadena + "\" es rechazada.");
-                        System.out.println("Uno de los procesamientos mas cortos es: ");
-                        System.out.println(af2p.getProcesamientoRechazo());
-                    }
-                    
-                    break;
-
-                case 2:
-                    System.out.println(af2p.getStringListaProcesamientos());
-                    break;
-
-                case 3:
-                    System.out.println(af2p.getStringProcesamientosAceptacion());
-                    break;
-
-                case 4:
-                    System.out.println(af2p.getStringProcesamientosRechazo());
-                    break;
-
-                case 0:
-                    procesandoCadenas = false;
-                    break;
-
-                default:
-
-                    System.out.println("Opción inválida");
-
-                    try {
-
-                        // Espera que lea el mensaje
-                        TimeUnit.SECONDS.sleep(segundosEsperaLector);
-
-                    } catch (InterruptedException e) {
-
-                        e.printStackTrace();
-
-                    }
-
-                    break;
-
-            }
-            // Esperar hasta que se presione enter
-            if (procesandoCadenas) {
-                System.out.println("Presione enter para continuar");
-                try {
-                    System.in.read();
-                } catch (IOException er) {
-                    er.printStackTrace();
-                }
-            }
-        }
+        procesarCadenasAF2PConEsteAF2P(af2p, input);
 
     }
 
-    private static void imprimirListaNombresAF2P(HashMap<String, AF2P> automatas) {
+    private static void procesarCadenasAF2PConEsteAF2P(AF2P af2p, Scanner input) {
+
+        Boolean procesandoVariasCadenas = true;
+        while (procesandoVariasCadenas){
+
+            // Ingresar la cadena a procesar
+            Boolean ingresandoCadena = true;
+            String cadena = "";
+
+            while (ingresandoCadena) {
+
+                // Imprimir alfabeto de cinta
+                StringBuilder alfabeto = new StringBuilder();
+                alfabeto.append("{");
+                Boolean masDeUnCaracter = false;
+                for (Character simbolo : af2p.getSigma()) {
+                    if (masDeUnCaracter) {
+                        alfabeto.append("," + simbolo);
+                    } else {
+                        alfabeto.append(simbolo);
+                        masDeUnCaracter = true;
+                    }
+                }
+                alfabeto.append("}");
+                System.out.println("Alfabeto: " + alfabeto.toString());
+                System.out.println("lambda: $");
+                System.out.println();
+
+                // Pedir info necesaria
+                System.out.println("Ingrese la cadena a procesar");
+                cadena = input.next();
+                System.out.println();
+                Boolean cadenaValida = true;
+                for (int i = 0; i < cadena.length(); i++) {
+                    if (!af2p.getSigma().contains(cadena.charAt(i))) {
+                        cadenaValida = false;
+                        break;
+                    }
+                }
+                if (!cadenaValida && !cadena.equals("$")) {
+                    System.out.println("La cadena ingresada no es valida.");
+                    System.out.println("Por favor intentelo nuevamente.");
+                    System.out.println();
+
+                } else {
+                    if (cadena.equals("$")) {
+                        cadena = "";
+                    }
+                    ingresandoCadena = false;
+
+                }
+            }
+
+            // Procesar la cadena
+            af2p.preprocesarCadena(cadena);
+
+            // Setup menu seleccion de tipo de procesamiento
+            Boolean procesandoCadenas = true;
+
+            // Seleccion de procesamiento que se repite hasta volver
+            while (procesandoCadenas) {
+
+                // Limpiar consola para que se vea mas fancy
+                System.out.print("\033c");
+
+                // Espacio al inicio para no saturar e indicar menu
+                System.out.println();
+                System.out.println("Selección tipo de procesamiento");
+                System.out.println();
+
+                // Mostrar las opciones de selección de automata
+                System.out.println("Presionando el entero seguido de la tecla enter, por favor");
+                System.out.println("seleccione una opción:");
+                System.out.println();
+                System.out.println("1. Procesar cadena: \"" + cadena + "\"");
+                System.out.println("2. Consultar todos los procesamiento posibles de la cadena: \"" + cadena + "\"");
+                System.out.println("3. Consultar los procesamientos de aceptacion de la cadena: \"" + cadena + "\"");
+                System.out.println("4. Consultar los procesamientos de rechazo de la cadena: \"" + cadena + "\"");
+                System.out.println("5. Procesar una cadena distinta.");
+                System.out.println("0. Volver");
+                System.out.println();
+                System.out.print("Ingrese su opción: ");
+                Integer opcion = input.nextInt();
+                System.out.println();
+
+                // Redirigir a la opcion deseada
+                switch (opcion) {
+
+                    case 1:
+                        if (af2p.getEsAceptada()) {
+                            System.out.println("La cadena: \"" + cadena + "\" es aceptada.");
+                            System.out.println("Un procesamiento aceptado es: ");
+                            System.out.println(af2p.getProcesamientoAceptacion());
+                        } else {
+                            System.out.println("La cadena: \"" + cadena + "\" es rechazada.");
+                            System.out.println("Uno de los procesamientos mas cortos es: ");
+                            System.out.println(af2p.getProcesamientoRechazo());
+                        }
+                        
+                        break;
+
+                    case 2:
+                        System.out.println(af2p.getStringListaProcesamientos());
+                        break;
+
+                    case 3:
+                        System.out.println(af2p.getStringProcesamientosAceptacion());
+                        break;
+
+                    case 4:
+                        System.out.println(af2p.getStringProcesamientosRechazo());
+                        break;
+
+                    case 5:
+                        procesandoCadenas = false;
+                        break;
+
+                    case 0:
+                        procesandoCadenas = false;
+                        procesandoVariasCadenas = false;
+                        break;
+
+                    default:
+
+                        System.out.println("Opción inválida");
+
+                        try {
+
+                            // Espera que lea el mensaje
+                            TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+                        } catch (InterruptedException e) {
+
+                            e.printStackTrace();
+
+                        }
+
+                        break;
+
+                }
+                // Esperar hasta que se presione enter
+                if (procesandoCadenas) {
+                    System.out.println("Presione enter para continuar");
+                    try {
+                        System.in.read();
+                    } catch (IOException er) {
+                        er.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
+    private static void imprimirListaNombresAF2P() {
         Integer numActual = 1;
 
         System.out.println("Sus AF2P actuales son:");
         System.out.println();
 
         // Imprimir los AF2P contenidos en automatasActuales
-        for (String strActual : automatas.keySet()) {
+        for (String strActual : automatasAF2PActuales.keySet()) {
 
             System.out.println(Integer.toString(numActual) + ". " + strActual + "\n");
             numActual++;
