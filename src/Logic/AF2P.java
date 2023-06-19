@@ -14,7 +14,7 @@ public class AF2P {
     private HashSet<String> Q;
     private String q0;
     private HashSet<String> F;
-    private HashSet<String> estadosInaccesibles;
+    public HashSet<String> estadosInaccesibles;
     private HashMap<String, HashMap<Character, HashMap<Character, HashMap<Character, HashSet<String[]>>>>> delta;
     private String procesamientoAceptacion = null;
     private String procesamientoRechazo = null;
@@ -29,7 +29,7 @@ public class AF2P {
     private int numProcesamientos = 0;
 
 
-    // Constructores de la clase AFN
+    // Constructores de la clase AF2P
     // Constructor de la clase AFN para conjuntos
     public AF2P(Alfabeto sigma, Alfabeto gama, HashSet<String> Q, String q0, HashSet<String> F,
             HashMap<String, HashMap<Character, HashMap<Character, HashMap<Character, HashSet<String[]>>>>> delta) {
@@ -39,21 +39,220 @@ public class AF2P {
         this.q0 = q0;
         this.F = F;
         this.delta = delta;
-        this.estadosInaccesibles = new HashSet<>();
 
         // Hallar estados inasequibles y guardarlos
         this.hallarEstadosInaccesibles();
     }
 
+    // Constructor de la clase AF2P para archivo .msm inicial
+    public AF2P(String rutaArchivo) throws Exception {
+
+        // Leer archivo .msm y crear AF2P
+        this.Q = new HashSet<>();
+        this.F = new HashSet<>();
+        this.estadosInaccesibles = new HashSet<>();
+        this.delta = new HashMap<>();
+
+        // Leer todas las líneas del archivo y almacenarlas en un ArrayList
+        List<String> lineas = new ArrayList<>();
+        String linea;
+        try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivo))) {
+            String linea0 = br.readLine();
+            linea0.trim();
+
+            // Verificar que sí corresponda a un AFN
+            if (!linea0.startsWith("#!msm")) {
+
+                // Cerrar el buffer
+                br.close();
+                throw new IllegalArgumentException("El archivo no corresponde a un AFN");
+
+            }
+            while ((linea = br.readLine()) != null) {
+                linea = linea.trim();
+                if (!linea.isEmpty()) {
+                    lineas.add(linea);
+                }
+            }
+        }
+
+        List<String> seccionesEsperadas = new ArrayList<>(
+                Arrays.asList("#states", "#initial", "#accepting", "#tapeAlphabet", "#stackAlphabet", "#transitions"));
+
+        Iterator<String> iteratorSigma = lineas.iterator();
+        Iterator<String> iteratorGama = lineas.iterator();
+        Iterator<String> iteratorQ = lineas.iterator();
+        Iterator<String> iteratorq0 = lineas.iterator();
+        Iterator<String> iteratorF = lineas.iterator();
+        Iterator<String> iteratorDelta = lineas.iterator();
+
+        while (iteratorQ.hasNext()) {
+            linea = iteratorQ.next();
+            if (linea.startsWith("#states")) {
+                leerEstados(iteratorQ);
+                seccionesEsperadas.remove("#states");
+            }
+        }
+
+        while (iteratorq0.hasNext()) {
+            linea = iteratorq0.next();
+            if (linea.startsWith("#initial")) {
+                linea = iteratorq0.next().trim();
+                if (!this.Q.contains(linea)) {
+                    throw new IllegalArgumentException("El estado inicial \"" + linea + "\" no pertenece al conjunto de estados.");
+                }
+                this.q0 = linea;
+                seccionesEsperadas.remove("#initial");
+            }
+        }
+
+        while (iteratorF.hasNext()) {
+            linea = iteratorF.next();
+            if (linea.startsWith("#accepting")) {
+                leerEstadosAceptacion(iteratorF);
+                seccionesEsperadas.remove("#accepting");
+            }
+        }
+
+        while (iteratorSigma.hasNext()) {
+            linea = iteratorSigma.next();
+            if (linea.startsWith("#tapeAlphabet")) {
+                Set<Character> sigmaSet = leerAlfabeto(iteratorSigma);
+                this.sigma = new Alfabeto(sigmaSet);
+                seccionesEsperadas.remove("#tapeAlphabet");
+            }
+        }
+
+        while (iteratorGama.hasNext()) {
+            linea = iteratorGama.next();
+            if (linea.startsWith("#stackAlphabet")) {
+                Set<Character> gamaSet = leerAlfabeto(iteratorGama);
+                this.gama = new Alfabeto(gamaSet);
+                seccionesEsperadas.remove("#stackAlphabet");
+            }
+        }
+
+        while (iteratorDelta.hasNext()) {
+            linea = iteratorDelta.next();
+            if (linea.startsWith("#transitions")) {
+                leerTransiciones(iteratorDelta);
+                seccionesEsperadas.remove("#transitions");
+            }
+        }
+
+        if (!seccionesEsperadas.isEmpty()) {
+            throw new IllegalArgumentException("Faltan secciones en el archivo.");
+        }
+        // Hallar estados inasequibles y guardarlos
+        this.hallarEstadosInaccesibles();
+    }
+
+    private void leerEstados(Iterator<String> iterator) {
+        while (iterator.hasNext()) {
+            String linea = iterator.next();
+            linea = linea.replaceAll("\\s","");
+            if (linea.startsWith("#") || linea.isEmpty()) {
+                break;
+            }
+            if (linea.contains(";")) {
+                throw new IllegalArgumentException("Los estados no deben contener el caracter ';'.");
+            }
+            if (!linea.isEmpty()) {
+                this.Q.add(linea);
+            }
+
+        }
+    }
+
+    private void leerEstadosAceptacion(Iterator<String> iterator) {
+        while (iterator.hasNext()) {
+            String linea = iterator.next();
+            linea = linea.trim();
+
+            // Salir del bucle al encontrar la siguiente sección
+            if (linea.startsWith("#")) {
+                break;
+            }
+            if (!linea.isEmpty()) {
+                if (!this.Q.contains(linea)) {
+                    throw new IllegalArgumentException("\"" + linea + "\" no pertenece al conjunto de estados.");
+                } else {
+                    this.F.add(linea);
+                }
+            }
+        }
+    }
+
+    private Set<Character> leerAlfabeto(Iterator<String> iterator) {
+        Set<Character> alfSet = new HashSet<>();
+        while (iterator.hasNext()) {
+            String linea = iterator.next();
+            linea = linea.trim();
+
+            // Salir del bucle al encontrar la siguiente sección
+            if (linea.isEmpty() || linea.startsWith("#")) {
+                break;
+            }
+
+            if (!linea.contains("$") && !linea.isBlank()) {
+                if (linea.contains("-")) {
+                    String[] rangos = linea.split("-");
+                    char inicio = rangos[0].charAt(0);
+                    char fin = rangos[1].charAt(0);
+
+                    for (char c = inicio; c <= fin; c++) {
+                        alfSet.add(c);
+                    }
+                } else {
+                    char c = linea.charAt(0);
+                    alfSet.add(c);
+                }
+            }
+        }
+        return alfSet;
+    }
+
+    private void leerTransiciones(Iterator<String> iterator) {
+        while (iterator.hasNext()) {
+            String linea = iterator.next();
+            linea = linea.trim();
+            if (linea.isEmpty() || linea.startsWith("#")) {
+                break; // Salir del bucle al encontrar la siguiente sección
+            }
+
+            String[] in_out = linea.split(">");
+            String[] ins = in_out[0].split(":");
+
+            String fromState = ins[0].trim();
+            Character symbol = ins[1].trim().charAt(0);
+            Character fromTop1 = ins[2].trim().charAt(0);
+            Character fromTop2 = ins[3].trim().charAt(0);
+
+            String[] outs = in_out[1].split(";");
+            for (String singleOut : outs) {
+                String[] outParts = singleOut.split(":");
+                String toState = outParts[0].trim();
+                Character toTop1 = outParts[1].trim().charAt(0);
+                Character toTop2 = outParts[2].trim().charAt(0);
+                this.addTransition(fromState, 
+                                symbol,
+                                fromTop1,
+                                fromTop2,
+                                toState,
+                                toTop1,
+                                toTop2);
+            }
+        }
+    }
+
     // Hallar los estados inasequibles del automata y guardarlos en
     // "this.estadosInasequibles"
-    private void hallarEstadosInaccesibles() {
+    public void hallarEstadosInaccesibles() {
+        this.estadosInaccesibles = new HashSet<>();
         HashSet<String> estados = new HashSet<String>();
         estados.add(this.q0);
         int oldSizeEstados = 0;
 
-        NavigableSet<Character> alfabeto = this.sigma.getAlfabeto();
-        NavigableSet<Character> alfabetoStack = this.gama.getAlfabeto();
         while (oldSizeEstados != estados.size()) {
             oldSizeEstados = estados.size();
             Iterator<String> iterator = estados.iterator();
@@ -61,15 +260,21 @@ public class AF2P {
             copyEstados.addAll(estados);
             while (iterator.hasNext()) {
                 String estado = iterator.next();
-                for (Character simbolo : alfabeto) {
-                    for (Character top1 : alfabetoStack) {
-                        for (Character top2 : alfabetoStack) {
-                            HashSet<String[]> imagen = this.delta(estado, simbolo, top1, top2);
 
-                            // Agregar cada estado de llegada (elemento[0] para todo elemento en imagen)
-                            if (imagen != null) {
+                if (this.delta.get(estado) != null){
+
+                    for (Character symbol : this.delta.get(estado).keySet()) {
+                        
+                        for (Character fromTop1 : this.delta.get(estado).get(symbol).keySet()) {
+
+                            for (Character fromTop2 : this.delta.get(estado).get(symbol).get(fromTop1).keySet()) {
+
+                                HashSet<String[]> imagen = this.delta.get(estado).get(symbol).get(fromTop1).get(fromTop2);
+
+                                // Agregar cada estado de llegada (elemento[0] para todo elemento en imagen) 
+                                // al set de estados accesibles
                                 for (String[] elemento : imagen) {
-                                    copyEstados.add(elemento[0]);
+                                        copyEstados.add(elemento[0]);
                                 }
                             }
                         }
@@ -414,15 +619,6 @@ public class AF2P {
         this.numProcesamientos = 0;
         String str = "(" + this.q0 + "," + cadena + ",$,$)";
         preprocesarCadena(this.q0, cadena, this.pila1, this.pila2, str, 0);
-        System.out.println(this.procesamientoAceptacion);
-        System.out.println(this.procesamientoRechazo);
-        System.out.println(this.procesamientos);
-        System.out.println(this.procesamientosAceptacion);
-        System.out.println(this.procesamientosRechazo);
-        System.out.println(this.numPasosProcesamientoAceptacion);
-        System.out.println(this.numPasosProcesamientoRechazo);
-        System.out.println(this.esAceptado);
-        System.out.println(this.numProcesamientos);
 
     }
 
@@ -435,7 +631,6 @@ public class AF2P {
         this.preprocesarCadena(cadena);
         System.out.println("Cadena: " + cadena);
         if (this.esAceptado){
-            
             System.out.println(this.procesamientoAceptacion);
         } else {
             for (String procesamiento : this.procesamientosRechazo) {
@@ -609,6 +804,116 @@ public class AF2P {
 
     public void procesarListaCadenas(String[] listaCadenas, String nombreArchivo, Boolean imprimirPantalla) {
         this.procesarListaCadenas(Arrays.asList(listaCadenas), nombreArchivo, imprimirPantalla);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        // formato nfa
+        sb.append("#!msm\n");
+
+        // Insertar Q
+        sb.append("#states\n");
+        for (String estado : this.Q) {
+            if (this.estadosInaccesibles.contains(estado)) {
+                continue;
+            }
+            sb.append(estado + " \n");
+        }
+
+        // Insertar q0
+        sb.append("#initial\n");
+        sb.append(this.q0 + "\n");
+
+        // Insertar F
+        sb.append("#accepting\n");
+        for (String estado : this.F) {
+            if (this.estadosInaccesibles.contains(estado)) {
+                continue;
+            }
+            sb.append(estado + " \n");
+        }
+
+        // Insertar sigma
+        sb.append("#tapeAlphabet\n");
+        for (Character simbolo : this.sigma.getAlfabeto()) {
+            sb.append(simbolo + " \n");
+        }
+
+        // Insertar gama
+        sb.append("#stackAlphabet\n");
+        for (Character simbolo : this.gama.getAlfabeto()) {
+            sb.append(simbolo + " \n");
+        }
+
+        // Insertar transiciones
+        sb.append("#transitions\n");
+        for (String fromState : this.delta.keySet()) {
+
+            if (this.estadosInaccesibles.contains(fromState)){
+
+                for (Character symbol : this.delta.get(fromState).keySet()) {
+                    
+                    for (Character fromTop1 : this.delta.get(fromState).get(symbol).keySet()) {
+
+                        for (Character fromTop2 : this.delta.get(fromState).get(symbol).get(fromTop1).keySet()) {
+
+                            Boolean masDeUnaImagen = false;
+                            sb.append(fromState + ":" + symbol + ":" + fromTop1 + ":" + fromTop2 + ">");
+
+                            for (String[] imagen : this.delta.get(fromState).get(symbol).get(fromTop1).get(fromTop2)) {
+
+                                if (masDeUnaImagen) {
+                                    sb.append(";" + imagen[0] + ":" + imagen[1] + ":" + imagen[2]);
+                                } else {
+                                    sb.append(imagen[0] + ":" + imagen[1] + ":" + imagen[2]);
+                                    masDeUnaImagen = true;
+                                }
+                            }
+                            sb.append("\n");
+                        }
+                    }
+                }
+            }
+        }
+        return sb.toString();
+    }
+
+    public void exportar(String archivo) throws IOException {
+        String[] nombreArchivoSplit = archivo.split("\\.");
+        String extension = nombreArchivoSplit[nombreArchivoSplit.length - 1].trim();
+        String nombreNuevoArchivo;
+
+        if (extension.equals("msm")) {
+
+            nombreNuevoArchivo = archivo;
+
+        } else {
+
+            nombreNuevoArchivo = nombreArchivoSplit[0] + ".msm";
+
+        }
+
+        // Crear el archivo y llenarlo con toString
+        try {
+
+            // Crear el archivo
+            File archivoAF2P = new File(nombreNuevoArchivo);
+            archivoAF2P.createNewFile();
+
+            // Escribir el AFD en el archivo
+            FileWriter escritor = new FileWriter(archivoAF2P);
+            escritor.write(this.toString());
+            escritor.close();
+
+            System.out.println("Archivo del AF2P creado exitosamente.");
+
+        } catch (IOException e) {
+
+            System.out.println("Error al crear el archivo.");
+
+        }
     }
 
 }
