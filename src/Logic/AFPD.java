@@ -18,7 +18,7 @@ public class AFPD implements Comparable<AFPD> {
     private TreeMap<String, TreeMap<Character, TreeMap<Character, Destino>>> delta;
 
     // Atributos funcionales AFPD
-    private LinkedList<Character> pila = new LinkedList<Character>();
+    private LinkedList<Character> pila;
     private StringBuilder logUltimoProcesamiento;
 
     // * Constructores de la clase AFPD
@@ -53,7 +53,7 @@ public class AFPD implements Comparable<AFPD> {
         this.Q = new TreeSet<>(secciones.get("#states"));
 
         // Depurar estado inicial
-        this.q0 = secciones.get("#initial").get(0);
+        this.q0 = secciones.get("#initial").get(0).trim();
 
         // Depurar estados de aceptacion
         this.F = new TreeSet<>(secciones.get("#accepting"));
@@ -74,6 +74,7 @@ public class AFPD implements Comparable<AFPD> {
     }
 
     // ** Subclases de la clase AFPD
+    // Subclase Destino para el par estadoDestino y topeDestino
     private class Destino {
 
         private String estadoDes;
@@ -101,6 +102,53 @@ public class AFPD implements Comparable<AFPD> {
 
         public void setTopeDestino(Character topeDestino) {
             this.topeDestino = topeDestino;
+        }
+
+    }
+
+    // Sublclase tupla de estados para hacer productos cartesianos
+    private class TuplaEstados implements Comparable<TuplaEstados> {
+
+        private String estadoAFPD;
+        private String estadoAFD;
+
+        public TuplaEstados(String estadoAFPD, String estadoAFD) {
+
+            this.estadoAFPD = estadoAFPD;
+            this.estadoAFD = estadoAFD;
+
+        }
+
+        @Override
+        public int compareTo(TuplaEstados tuplaComparada) {
+
+            if (this.estadoAFPD.equals(tuplaComparada.getEstado1())) {
+
+                return this.estadoAFD.compareTo(tuplaComparada.getEstado2());
+
+            } else {
+
+                return this.estadoAFPD.compareTo(tuplaComparada.getEstado1());
+
+            }
+
+        }
+
+        // Getters y Setters atributos TuplaEstados
+        public String getEstado1() {
+            return estadoAFPD;
+        }
+
+        public void setEstado1(String estadoAFPD) {
+            this.estadoAFPD = estadoAFPD;
+        }
+
+        public String getEstado2() {
+            return estadoAFD;
+        }
+
+        public void setEstado2(String estadoAFD) {
+            this.estadoAFD = estadoAFD;
         }
 
     }
@@ -559,14 +607,24 @@ public class AFPD implements Comparable<AFPD> {
 
     }
 
-    // TODO Procesar una cadena y devolver si es aceptada o no
+    // Procesar una cadena y devolver si es aceptada o no
     public Boolean procesarCadena(String cadena, Boolean detalles) {
+
+        // Trimear la cadena
+        cadena = cadena.trim();
+
+        // Crear nueva pila
+        this.pila = new LinkedList<Character>();
 
         // Crear una lista enlazada a partir de la cadena
         LinkedList<Character> listaCadena = new LinkedList<Character>();
         for (Character caracter : cadena.toCharArray()) {
 
-            listaCadena.addLast(caracter);
+            if (caracter != '$' && caracter != ' ' && caracter != '\t' && caracter != '\n') {
+
+                listaCadena.addLast(caracter);
+
+            }
 
         }
 
@@ -593,23 +651,15 @@ public class AFPD implements Comparable<AFPD> {
 
         // Obtener el alfabeto de cinta y declarar cinta y pila restante
         NavigableSet<Character> alfabetoCinta = this.sigma.getAlfabeto();
-        StringBuilder pilaRestante = new StringBuilder();
-        StringBuilder cadenaRestante = new StringBuilder();
+        NavigableSet<Character> alfabetoPila = this.gamma.getAlfabeto();
 
-        // Por cada caracter de la cadena
-        while (!listaCadena.isEmpty()) {
+        // Por cada caracter de la cadena hasta que esta y la pila esten vacias o pase
+        // algo
+        while (!listaCadena.isEmpty() || !this.pila.isEmpty()) {
 
-            // Si la pila o la cadena estan vacias, agregarles lambda
-            if (this.pila.isEmpty()) {
-
-                this.pila.addFirst('$');
-
-            }
-            if (listaCadena.isEmpty()) {
-
-                listaCadena.addFirst('$');
-
-            }
+            // Declarar la cadena y la pila restante
+            StringBuilder pilaRestante = new StringBuilder();
+            StringBuilder cadenaRestante = new StringBuilder();
 
             // Obtener la cadena y la pila restante
             for (Character caracter : listaCadena) {
@@ -618,11 +668,38 @@ public class AFPD implements Comparable<AFPD> {
             for (Character caracter : this.pila) {
                 pilaRestante.append(caracter);
             }
+            // Si la pila o la cadena estan vacias, meter lambda a la pilaRestante o cadena
+            // segun corresponda
+            if (this.pila.isEmpty()) {
+                pilaRestante.append('$');
+            }
+            if (listaCadena.isEmpty()) {
+                cadenaRestante.append('$');
+            }
 
-            // Obtener el caracter actual
-            Character caracterActual = listaCadena.pop();
+            // Obtener el caracter actual de cinta y de pila
+            Character caracterActual;
+            if (listaCadena.isEmpty()) {
+                caracterActual = '$';
+            } else {
+                caracterActual = listaCadena.pop();
+            }
+            Character topeActual;
+            if (this.pila.isEmpty()) {
+                topeActual = '$';
+            } else {
+                topeActual = this.pila.pop();
+            }
 
-            // Si el caracter no pertenece al alfabetoCinta y NO es lambda
+            // Declarar la pila pospaso y la cinta pospaso
+            StringBuilder pilaPosPaso = new StringBuilder();
+            StringBuilder cintaPosPaso = new StringBuilder();
+
+            // ** Transicion por caracter de cinta
+            // Obtener las transiciones del estado actual por caracter
+            TreeMap<Character, TreeMap<Character, Destino>> transicionesEstAct = this.delta.get(estadoActual);
+
+            // Si el caracter no pertenece al alfabetoCinta y NO es lambda, rechazar
             if (!alfabetoCinta.contains(caracterActual) && caracterActual != '$') {
 
                 if (detalles) {
@@ -638,7 +715,7 @@ public class AFPD implements Comparable<AFPD> {
                 log.append("[" + estadoActual + ", " + cadenaRestante + ", " + pilaRestante + "] -> ?\n");
                 log.append("No\n");
                 log.append("La cadena no es aceptada\n");
-                log.append("El caracter " + caracterActual + " no pertenece al alfabeto ni es lambda\n");
+                log.append("El caracter " + caracterActual + " no pertenece al alfabeto de cinta ni es lambda\n");
 
                 // Guardar procesamiento en logUltimoProcesamiento
                 this.logUltimoProcesamiento = log;
@@ -647,16 +724,666 @@ public class AFPD implements Comparable<AFPD> {
 
             }
 
-            // TODO Verificar si la transicion NO existe para el caracter actual
+            // Verificar si puedo hacer transiciones lambda y de ser posible, hacerlas
+            if (transicionesEstAct.containsKey('$')) {
 
-            // TODO Verificar si la transicion NO existe para el tope actual
+                // Camino a la transicion lambda
+                // Obtener las transiciones lambda del estado actual
+                TreeMap<Character, Destino> transicionesTop = transicionesEstAct.get('$');
 
-            // TODO Obtener el destino y pasar al destino modificando la pila
+                // Verificar si hay transiciones lambda entre las transicionesTop
+                if (transicionesTop.containsKey('$')) {
+
+                    // Obtener destinos
+                    Destino destinoTranscn = transicionesTop.get('$');
+                    String estadoDestino = destinoTranscn.getEstadoDes();
+                    Character topeDestino = destinoTranscn.getTopeDestino();
+
+                    // Hacer la transicion/paso computacional
+                    // Dejar la cadena sin cambios
+                    listaCadena.addFirst(caracterActual);
+
+                    // Dejar la pila sin cambios
+                    if (topeActual != '$') {
+                        this.pila.addFirst(topeActual);
+                        topeActual = '$';
+                    }
+
+                    // Paso computacional
+                    estadoActual = estadoDestino;
+                    this.modificarPila(topeActual, topeDestino);
+
+                    // informar el paso computacional
+                    for (Character caracter : this.pila) {
+                        pilaPosPaso.append(caracter);
+                    }
+
+                    // informar detalles en consola
+                    if (detalles) {
+
+                        System.out.println("(" + estadoActual + ", " + cadenaRestante + ", " + pilaRestante
+                                + ") -> (" + estadoDestino + ", " + cadenaRestante + ", " + pilaPosPaso + ")");
+
+                    }
+
+                    // Meter lo mismo al log
+                    log.append("[" + estadoActual + ", " + cadenaRestante + ", " + pilaRestante + "] -> ["
+                            + estadoDestino + ", " + cadenaRestante + ", " + pilaPosPaso + "]\n");
+
+                    // Seguir en el bucle
+                    continue;
+
+                }
+
+                if (transicionesTop.containsKey(topeActual)) {
+
+                    // Obtener destinos
+                    Destino destinoTranscn = transicionesTop.get(topeActual);
+                    String estadoDestino = destinoTranscn.getEstadoDes();
+                    Character topeDestino = destinoTranscn.getTopeDestino();
+
+                    // Hacer la transicion/paso computacional
+                    // Dejar la cadena sin cambios
+                    listaCadena.addFirst(caracterActual);
+
+                    // Paso computacional
+                    estadoActual = estadoDestino;
+                    this.modificarPila(topeActual, topeDestino);
+
+                    // informar el paso computacional
+                    for (Character caracter : this.pila) {
+                        pilaPosPaso.append(caracter);
+                    }
+
+                    // Dar los detalles en consola
+                    if (detalles) {
+
+                        System.out.println("(" + estadoActual + ", " + cadenaRestante + ", " + pilaRestante
+                                + ") -> (" + estadoDestino + ", " + cadenaRestante + ", " + pilaPosPaso + ")");
+
+                    }
+
+                    // Meter lo mismo al log
+                    log.append("[" + estadoActual + ", " + cadenaRestante + ", " + pilaRestante + "] -> ["
+                            + estadoDestino + ", " + cadenaRestante + ", " + pilaPosPaso + "]\n");
+
+                    // Seguir en el bucle
+                    continue;
+
+                }
+
+            }
+
+            // Verificar si NO puedo hacer transicion por caracter, Abortar
+            if (!transicionesEstAct.containsKey(caracterActual)) {
+
+                // Informar el aborto del proceso
+                if (detalles) {
+
+                    System.out.println("(" + estadoActual + ", " + cadenaRestante + ", " + pilaRestante + ") -> ?");
+                    System.out.println("La cadena no es aceptada");
+                    System.out.println("En el estado " + estadoActual + " no existe una transicion para el caracter "
+                            + caracterActual);
+
+                }
+
+                // Meter lo mismo al log
+                log.append("[" + estadoActual + ", " + cadenaRestante + ", " + pilaRestante + "] -> ?\n");
+                log.append("No\n");
+                log.append("La cadena no es aceptada\n");
+                log.append("En el estado " + estadoActual + " no existe una transicion para el caracter "
+                        + caracterActual + "\n");
+
+                // Guardar procesamiento en logUltimoProcesamiento
+                this.logUltimoProcesamiento = log;
+
+                return false;
+
+            }
+
+            // ** Transicion por tope
+            // Obtener las transiciones por tope del estado actual con el caracter actual
+            TreeMap<Character, Destino> transicionesTop = transicionesEstAct.get(caracterActual);
+
+            // Verificar si con el tope puedo hacer transiciones lambda y de ser posible,
+            // hacerlas
+            if (transicionesTop.containsKey('$')) {
+
+                // Obtener destinos
+                Destino destinoTranscn = transicionesTop.get('$');
+                String estadoDestino = destinoTranscn.getEstadoDes();
+                Character topeDestino = destinoTranscn.getTopeDestino();
+
+                // Paso computacional
+                estadoActual = estadoDestino;
+                this.modificarPila(topeActual, topeDestino);
+
+                // informar el paso computacional
+                for (Character caracter : this.pila) {
+                    pilaPosPaso.append(caracter);
+                }
+                for (Character caracter : listaCadena) {
+                    cintaPosPaso.append(caracter);
+                }
+
+                // dar los detalles en consola
+                if (detalles) {
+
+                    System.out.println("(" + estadoActual + ", " + cadenaRestante + ", " + pilaRestante + ") -> ("
+                            + estadoDestino + ", " + cintaPosPaso + ", " + pilaPosPaso + ")");
+
+                }
+
+                // Meter lo mismo al log
+                log.append("[" + estadoActual + ", " + cadenaRestante + ", " + pilaRestante + "] -> [" + estadoDestino
+                        + ", " + cintaPosPaso + ", " + pilaPosPaso + "]\n");
+
+                // Seguir en el bucle
+                continue;
+
+            }
+
+            // Si el topeActual no pertenece al alfabeto de pila y no es lambda, abortar
+            if (!alfabetoPila.contains(topeActual) && topeActual != '$') {
+
+                // Informar el aborto del proceso
+                if (detalles) {
+
+                    System.out.println("(" + estadoActual + ", " + cadenaRestante + ", " + pilaRestante + ") -> ?");
+                    System.out.println("La cadena no es aceptada");
+                    System.out.println("El tope de la pila " + topeActual + " no pertenece al alfabeto de pila");
+
+                }
+
+                // Meter lo mismo al log
+                log.append("[" + estadoActual + ", " + cadenaRestante + ", " + pilaRestante + "] -> ?\n");
+                log.append("No\n");
+                log.append("La cadena no es aceptada\n");
+                log.append("El tope de la pila " + topeActual + " no pertenece al alfabeto de pila\n");
+
+                // Guardar procesamiento en logUltimoProcesamiento
+                this.logUltimoProcesamiento = log;
+
+                return false;
+
+            }
+
+            // Verificar si NO puedo hacer transicion por tope, de ser asi, Abortar
+            if (!transicionesTop.containsKey(topeActual)) {
+
+                // Informar el aborto del proceso
+                if (detalles) {
+
+                    System.out.println("(" + estadoActual + ", " + cadenaRestante + ", " + pilaRestante + ") -> ?");
+                    System.out.println("La cadena no es aceptada");
+                    System.out.println("En el estado " + estadoActual + " no existe una transicion para el caracter "
+                            + caracterActual + " y el tope de la pila " + topeActual);
+
+                }
+
+                // Meter lo mismo al log
+                log.append("[" + estadoActual + ", " + cadenaRestante + ", " + pilaRestante + "] -> ?\n");
+                log.append("No\n");
+                log.append("La cadena no es aceptada\n");
+                log.append("En el estado " + estadoActual + " no existe una transicion para el caracter "
+                        + caracterActual + " y el tope de la pila " + topeActual + "\n");
+
+                // Guardar procesamiento en logUltimoProcesamiento
+                this.logUltimoProcesamiento = log;
+
+                return false;
+
+            }
+
+            // ** Paso computacional común
+            // Hacer el paso computacional con el top verificado
+            Destino destinoTranscn = transicionesTop.get(topeActual);
+            String estadoDestino = destinoTranscn.getEstadoDes();
+            Character topeDestino = destinoTranscn.getTopeDestino();
+
+            // Paso computacional
+            estadoActual = estadoDestino;
+            this.modificarPila(topeActual, topeDestino);
+
+            // informar el paso computacional
+            for (Character caracter : this.pila) {
+                pilaPosPaso.append(caracter);
+            }
+            for (Character caracter : listaCadena) {
+                cintaPosPaso.append(caracter);
+            }
+
+            // dar los detalles en consola
+            if (detalles) {
+
+                System.out.println("(" + estadoActual + ", " + cadenaRestante + ", " + pilaRestante + ") -> ("
+                        + estadoDestino + ", " + cintaPosPaso + ", " + pilaPosPaso + ")");
+
+            }
+
+            // Meter lo mismo al log
+            log.append("[" + estadoActual + ", " + cadenaRestante + ", " + pilaRestante + "] -> [" + estadoDestino
+                    + ", " + cintaPosPaso + ", " + pilaPosPaso + "]\n");
 
         }
 
-        // TODO Verificar si el estado actual es final
-        return true; // Caso en que descarte todas las negaciones y me dió aceptada
+        // Finalizar el proceso verificando aceptacion
+        // Guardar procesamiento en logUltimoProcesamiento
+        this.logUltimoProcesamiento = log;
+
+        // Si el estado actual es de aceptacion, aceptar
+        if (this.F.contains(estadoActual)) {
+
+            // Informar el exito del proceso
+            if (detalles) {
+
+                System.out.println("La cadena es aceptada");
+                System.out.println();
+
+            }
+
+            // Meter lo mismo al log
+            log.append("Si\n");
+            log.append("La cadena es aceptada\n");
+
+            return true; // Caso en que el estado actual es de aceptacion
+
+        } else {
+
+            // La cadena NO es aceptada
+            // Informar que se rechazo la cadena
+            if (detalles) {
+
+                System.out.println("La cadena no es aceptada");
+                System.out.println();
+
+            }
+
+            // Meter lo mismo al log
+            log.append("No\n");
+            log.append("La cadena no es aceptada\n");
+
+            return false; // Caso en que el estado actual no es de aceptacion
+
+        }
+
+    }
+
+    public Boolean procesarCadena(String cadena) {
+
+        return this.procesarCadena(cadena, false);
+
+    }
+
+    public Boolean procesarCadenaConDetalles(String cadena) {
+
+        return this.procesarCadena(cadena, true);
+
+    }
+
+    public void procesarListaCadenas(Iterable<String> listaCadenas, String nombreArchivo, Boolean imprimirPantalla) {
+
+        // Meter todo el contenido de los procesamientos en un StringBuilder
+        StringBuilder resultado = new StringBuilder();
+
+        for (String cadena : listaCadenas) {
+
+            this.procesarCadena(cadena, imprimirPantalla);
+
+            resultado.append(this.logUltimoProcesamiento);
+
+        }
+
+        // Escribir en un archivo nombreArchivo el resultado
+        String[] nombreArchivoSplit = nombreArchivo.split("\\.");
+        String extension = nombreArchivoSplit[nombreArchivoSplit.length - 1];
+        String nombreNuevoArchivo;
+
+        if (extension.equals("txt")) {
+
+            nombreNuevoArchivo = nombreArchivo;
+
+        } else {
+
+            nombreNuevoArchivo = nombreArchivo + ".txt";
+
+        }
+
+        // Crear el archivo y llenarlo con resultado
+        try {
+
+            // Crear el archivo
+            File archivo = new File(nombreNuevoArchivo);
+            archivo.createNewFile();
+
+            // Escribir el AFD en el archivo
+            FileWriter escritor = new FileWriter(archivo);
+            escritor.write(resultado.toString());
+            escritor.close();
+
+            System.out.println("Archivo creado exitosamente");
+
+        } catch (IOException e) {
+
+            System.out.println("Error al crear el archivo");
+
+        }
+
+    }
+
+    // ** Operaciones AFPD
+    // Producto Cartesiano con un AFD
+    public AFPD hallarProductoCartesianoConAFD(AFD afdInput, String operacion) throws Exception {
+
+        // Obterner los atributos basicos de afdInput
+        TreeSet<String> QInput = afdInput.getQ();
+        String q0Input = afdInput.getQ0();
+        TreeSet<String> FInput = afdInput.getF();
+        TreeMap<String, TreeMap<Character, String>> deltaInput = afdInput.getDelta();
+
+        // Inicializar los que van a ser los nuevos atributos del AFPD nuevo
+        TreeSet<String> QNuevo = new TreeSet<String>();
+        String q0Nuevo = "(" + this.q0 + ", " + q0Input + ")";
+        TreeSet<String> FNuevo = new TreeSet<String>();
+        TreeMap<String, TreeMap<Character, TreeMap<Character, Destino>>> deltaNuevo = new TreeMap<String, TreeMap<Character, TreeMap<Character, Destino>>>();
+
+        // Inicializar el TreeSet para las tuplas de estados
+        TreeSet<TuplaEstados> tuplasEstados = new TreeSet<TuplaEstados>();
+
+        // Obtener el QNuevo
+        for (String estadoAFPD : this.Q) {
+
+            for (String estadoAFD : QInput) {
+
+                String tuplaEstados = "(" + estadoAFPD + ", " + estadoAFD + ")";
+                QNuevo.add(tuplaEstados);
+                tuplasEstados.add(new TuplaEstados(estadoAFPD, estadoAFD));
+
+            }
+
+        }
+
+        // Obtener el FNuevo
+        for (String estadoAFPD : this.Q) {
+
+            for (String estadoAFD : QInput) {
+
+                switch (operacion) {
+
+                    case "union":
+
+                        if (this.F.contains(estadoAFPD) || FInput.contains(estadoAFD)) {
+
+                            FNuevo.add("(" + estadoAFPD + ", " + estadoAFD + ")");
+
+                        }
+
+                        break;
+
+                    case "interseccion":
+
+                        if (this.F.contains(estadoAFPD) && FInput.contains(estadoAFD)) {
+
+                            FNuevo.add("(" + estadoAFPD + ", " + estadoAFD + ")");
+
+                        }
+
+                        break;
+
+                    case "diferencia":
+
+                        if (this.F.contains(estadoAFPD) && !FInput.contains(estadoAFD)) {
+
+                            FNuevo.add("(" + estadoAFPD + ", " + estadoAFD + ")");
+
+                        }
+
+                        break;
+
+                    case "diferencia simetrica":
+
+                        if ((this.F.contains(estadoAFPD) && !FInput.contains(estadoAFD))
+                                || (!this.F.contains(estadoAFPD) && FInput.contains(estadoAFD))) {
+
+                            FNuevo.add("(" + estadoAFPD + ", " + estadoAFD + ")");
+
+                        }
+
+                        break;
+
+                    default:
+
+                        System.out.println("Operacion no valida");
+
+                        break;
+                }
+
+            }
+
+        }
+
+        // ** Obtener el deltaNuevo
+        // ! Solo se agrega algo al prod si el AFPD lo contenía, si no, se pierde el
+        // determinismo
+        // Obtener los alfabetos
+        NavigableSet<Character> alfabetoCinta = this.sigma.getAlfabeto();
+
+        // Obtener el deltaNuevo
+        for (TuplaEstados pareja : tuplasEstados) {
+
+            // Obtener los estados de la pareja de origen
+            String estadoAFPD = pareja.getEstado1();
+            String estadoAFD = pareja.getEstado2();
+            String estadoOrigen = "(" + estadoAFPD + ", " + estadoAFD + ")";
+
+            // Inicializar transiciones de esta tupla y agregarlas a deltaNuevo
+            TreeMap<Character, TreeMap<Character, Destino>> transicionesCarProd = new TreeMap<Character, TreeMap<Character, Destino>>();
+            deltaNuevo.put(estadoOrigen, transicionesCarProd);
+
+            // Obtener transiciones por caracter para este origen
+            TreeMap<Character, String> transicionesCarAFD = deltaInput.get(estadoAFD);
+            TreeMap<Character, TreeMap<Character, Destino>> transicionesCarAFPD = this.delta.get(estadoAFPD);
+
+            // Si el estadoAFPD tiene transiciones lambda, ya que no está en el alfabeto de
+            // cinta
+            if (transicionesCarAFPD.containsKey('$')) {
+
+                // Obtener la transicion con lambda como caracter para el AFPD
+                TreeMap<Character, Destino> transicionesLambda = transicionesCarAFPD.get('$');
+
+                // Inicializar transicionesLambda en tope para este prod y agregarlas a
+                // transicionesCarProd
+                TreeMap<Character, Destino> transicionesLambdaTopeProd = new TreeMap<Character, Destino>();
+                transicionesCarProd.put('$', transicionesLambdaTopeProd);
+
+                // Por cada transicion posible desde este estado con lambda
+                for (Map.Entry<Character, Destino> posTranLamb : transicionesLambda.entrySet()) {
+
+                    // Crear el nuevo destino a la transicion con lambda
+                    Character topeTransLambda = posTranLamb.getKey();
+                    Destino destinoLambda = posTranLamb.getValue();
+                    String estadoDestTransLambda = destinoLambda.getEstadoDes();
+                    Character topeDestTransLambda = destinoLambda.getTopeDestino();
+                    String estadoDestinoProd = "(" + estadoDestTransLambda + ", " + estadoAFD + ")";
+
+                    // Agregar la transicion con lambda al AFPD nuevo
+                    transicionesLambdaTopeProd.put(topeTransLambda,
+                            new Destino(estadoDestinoProd, topeDestTransLambda));
+
+                }
+
+            }
+
+            // Por cada caracter en sigma
+            for (Character caracterCinta : alfabetoCinta) {
+
+                // ! Solo se agrega algo al prod si el AFPD lo contenía, si no, se pierde el
+                // determinismo
+                // Si el AFPD tiene transiciones para este caracter
+                if (transicionesCarAFPD.containsKey(caracterCinta)) {
+
+                    // Inicializar transiciones de este caracter para el prod y agregarlas a
+                    // transicionesCarProd
+                    TreeMap<Character, Destino> transicionesPilaProd = new TreeMap<Character, Destino>();
+                    transicionesCarProd.put(caracterCinta, transicionesPilaProd);
+
+                    // Obtener transiciones por caracter para este origen
+                    // Obtener el destino del AFD
+                    String destinoAFD = transicionesCarAFD.get(caracterCinta);
+
+                    // Obtenemos las transiciones de la pila del AFPD para este caracter
+                    TreeMap<Character, Destino> transicionesPilaAFPD = transicionesCarAFPD.get(caracterCinta);
+
+                    // Por cada transicion de la pila del AFPD para este caracter
+                    for (Map.Entry<Character, Destino> posTranPila : transicionesPilaAFPD.entrySet()) {
+
+                        // Obtenemos el tope y el destino de la transicion por pila actual
+                        Character topePilaActAFPD = posTranPila.getKey();
+                        Destino destinoPilaActAFPD = posTranPila.getValue();
+                        String estadoDestinoPilaActual = destinoPilaActAFPD.getEstadoDes();
+                        Character topePilaDestino = destinoPilaActAFPD.getTopeDestino();
+
+                        // Creamos el destino del prod
+                        String estadoDestinoProd = "(" + estadoDestinoPilaActual + ", " + destinoAFD + ")";
+                        Destino destinoPilaProd = new Destino(estadoDestinoProd, topePilaDestino);
+
+                        // Agregamos la transicion al las transicionesPilaProd
+                        transicionesPilaProd.put(topePilaActAFPD, destinoPilaProd);
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        // Retornar el AFPD resultante
+        return new AFPD(QNuevo, q0Nuevo, FNuevo, this.sigma, this.gamma, deltaNuevo);
+
+    }
+
+    public AFPD hallarProductoCartesianoConAFD(AFD afdInput) throws Exception {
+
+        return this.hallarProductoCartesianoConAFD(afdInput, "interseccion");
+
+    }
+
+    // ** Imprimir y exportar AFPD
+    // Devolver todos los parametros del AFPD en un String
+    @Override
+    public String toString() {
+
+        // Instanciar el StringBuilder
+        StringBuilder automata = new StringBuilder();
+
+        // Formato .dpda
+        automata.append("#!dpda\n");
+
+        // Insertar Q
+        automata.append("#states\n");
+        for (String estado : this.Q) {
+            automata.append(estado + "\n");
+        }
+
+        // Insertar q0
+        automata.append("#initial\n");
+        automata.append(this.q0 + "\n");
+
+        // Insertar F
+        automata.append("#accepting\n");
+        for (String estado : this.F) {
+            automata.append(estado + "\n");
+        }
+
+        // Insertar Sigma
+        automata.append("#tapeAlphabet\n");
+        NavigableSet<Character> alfabetoCinta = this.sigma.getAlfabeto();
+        for (Character caracter : alfabetoCinta) {
+            automata.append(caracter + "\n");
+        }
+
+        // Insertar Gamma
+        automata.append("#stackAlphabet\n");
+        NavigableSet<Character> alfabetoPila = this.gamma.getAlfabeto();
+        for (Character caracter : alfabetoPila) {
+            automata.append(caracter + "\n");
+        }
+
+        // Insertar Delta
+        automata.append("#transitions\n");
+        // Por cada estado
+        for (String estado : this.Q) {
+
+            // Adquiero las transiciones de ese estado con Caracter
+            TreeMap<Character, TreeMap<Character, Destino>> transicionesCar = this.delta.get(estado);
+
+            // Por cada transicion con caracter en este estado
+            for (Map.Entry<Character, TreeMap<Character, Destino>> entradaCar : transicionesCar.entrySet()) {
+
+                Character caracterEntrada = entradaCar.getKey();
+                TreeMap<Character, Destino> transicionesTop = entradaCar.getValue();
+
+                // Por cada transicion con tope en este estado con este caracter
+                for (Map.Entry<Character, Destino> entradaTope : transicionesTop.entrySet()) {
+
+                    Character topeEntrada = entradaTope.getKey();
+                    Destino destino = entradaTope.getValue();
+
+                    String estadoDestino = destino.getEstadoDes();
+                    Character topeDestino = destino.getTopeDestino();
+
+                    automata.append(estado + " : " + caracterEntrada + " : " + topeEntrada + " > " + estadoDestino
+                            + " : " + topeDestino
+                            + "\n");
+
+                }
+
+            }
+
+        }
+
+        // Devolver el resultado
+        return automata.toString();
+
+    }
+
+    // Exportar AFPD a un archivo .dpda
+    public void exportar(String nombreArchivo) {
+
+        String[] nombreArchivoSplit = nombreArchivo.split("\\.");
+        String extension = nombreArchivoSplit[nombreArchivoSplit.length - 1].trim();
+        String nombreNuevoArchivo;
+
+        if (extension.equals("dpda")) {
+
+            nombreNuevoArchivo = nombreArchivo;
+
+        } else {
+
+            nombreNuevoArchivo = nombreArchivoSplit[0] + ".dpda";
+
+        }
+
+        // Crear el archivo y llenarlo con toString
+        try {
+
+            // Crear el archivo
+            File archivo = new File(nombreNuevoArchivo);
+            archivo.createNewFile();
+
+            // Escribir el AFD en el archivo
+            FileWriter escritor = new FileWriter(archivo);
+            escritor.write(this.toString());
+            escritor.close();
+
+            System.out.println("Archivo del automata creado exitosamente");
+
+        } catch (IOException e) {
+
+            System.out.println("Error al crear el archivo");
+
+        }
 
     }
 
