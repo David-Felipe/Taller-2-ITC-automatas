@@ -19,6 +19,7 @@ public class ClasePrueba {
     // Automatas guardados
     static HashMap<String, AF2P> automatasAF2PActuales = new HashMap<>();
     static HashMap<String, AFN> automatasAFNActuales = new HashMap<>();
+    static HashMap<String, MT> MTActuales = new HashMap<>();
 
     // Funcion de control, menu inicial
     public static void main() {
@@ -141,6 +142,7 @@ public class ClasePrueba {
             System.out.println("4. Probar AFPD");
             System.out.println("5. Probar AFPN");
             System.out.println("6. Probar AF2P");
+            System.out.println("7. Probar MT");
             System.out.println("0. Volver");
             System.out.println();
             System.out.print("Ingrese su opción: ");
@@ -180,6 +182,10 @@ public class ClasePrueba {
                     break;
                 case 6:
                     probarAF2P(input);
+                    break;
+
+                case 7:
+                    probarMT(input);
                     break;
 
                 case 0:
@@ -2732,6 +2738,7 @@ public class ClasePrueba {
 
     }
 
+    // * Procesar una cadena con un AF2P determinado
     private static void procesarCadenasAF2PConEsteAF2P(AF2P af2p, Scanner input) {
 
         Boolean procesandoVariasCadenas = true;
@@ -2893,6 +2900,623 @@ public class ClasePrueba {
 
         // Imprimir los AF2P contenidos en automatasActuales
         for (String strActual : automatasAF2PActuales.keySet()) {
+
+            System.out.println(Integer.toString(numActual) + ". " + strActual + "\n");
+            numActual++;
+
+        }
+
+        System.out.println();
+    }
+
+
+    // ** Probar MT
+    private static void probarMT(Scanner input) {
+
+        // Setup menu probar MT
+        Boolean probandoMT = true;
+
+        // Menu que muestra las opciones para la maquina de turing estandar
+        while (probandoMT) {
+
+            // Limpiar consola para que se vea mas fancy
+            System.out.print("\033c");
+
+            // Espacio al inicio para no saturar e indicar menu
+            System.out.println();
+            System.out.println("Prueba de MT");
+            System.out.println();
+
+            if (MTActuales.size() != 0) {
+
+                // Listar MTs
+                imprimirListaNombresMT();
+
+            }
+
+            // Mostrar las opciones para probar MT
+            System.out.println("Presionando el entero seguido de la tecla enter, por favor");
+            System.out.println("seleccione una opción:");
+            System.out.println();
+            System.out.println("1. Editar MT");
+            System.out.println("2. Procesar cadenas");
+            System.out.println("3. Exportar MT");
+            System.out.println("0. Volver");
+            System.out.println();
+            System.out.print("Ingrese su opción: ");
+            Integer opcion = input.nextInt();
+            System.out.println();
+
+            // Redirigir a la opcion deseada
+            switch (opcion) {
+
+                case 1:
+                    editarMT(input);
+                    break;
+
+                case 2:
+                    procesarCadenasMT(input);
+                    break;
+
+                case 3:
+                    exportarMT(input);
+                    break;
+
+                case 0:
+                    probandoMT = false;
+                    break;
+
+                default:
+
+                    System.out.println("Opción inválida.");
+
+                    try {
+
+                        // Espera que lea el mensaje
+                        TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+                    } catch (InterruptedException e) {
+
+                        e.printStackTrace();
+
+                    }
+
+                    break;
+
+            }
+
+        }
+
+    }
+
+    // * Editar MT
+    private static void editarMT(Scanner input) {
+
+        // Setup menu editar MT
+        Boolean editandoMT = true;
+
+        // Menu que muestra las opciones para editar MT
+        while (editandoMT) {
+
+            // Limpiar consola para que se vea mas fancy
+            System.out.print("\033c");
+
+            // Espacio al inicio para no saturar e indicar menu
+            System.out.println();
+            System.out.println("Edición de MTs");
+            System.out.println();
+
+            if (MTActuales.size() != 0) {
+
+                // Listar MT
+                imprimirListaNombresMT();
+
+            }
+
+            // Mostrar las opciones para editar MT
+            System.out.println("Presionando el entero seguido de la tecla enter, por favor");
+            System.out.println("seleccione una opción:");
+            System.out.println();
+            System.out.println("1. Crear MT");
+            System.out.println("2. Eliminar MT");
+            System.out.println("0. Volver");
+            System.out.println();
+            System.out.print("Ingrese su opción: ");
+            Integer opcion = input.nextInt();
+            System.out.println();
+
+            // Redirigir a la opcion deseada
+            switch (opcion) {
+
+                case 1:
+                    crearMT(input);
+                    break;
+
+                case 2:
+                    eliminarMT(input);
+                    break;
+
+                case 0:
+                    editandoMT = false;
+                    break;
+
+                default:
+
+                    System.out.println("Opción inválida.");
+
+                    try {
+
+                        // Espera que lea el mensaje
+                        TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+                    } catch (InterruptedException e) {
+
+                        e.printStackTrace();
+
+                    }
+
+                    break;
+
+            }
+
+        }
+
+    }
+
+    // Crear MT
+    private static void crearMT(Scanner input) {
+
+        // Limpiar consola para que se vea mas fancy
+        System.out.print("\033c");
+
+        // Espacio al inicio para no saturar e indicar menu
+        System.out.println();
+        System.out.println("Creación de MT desde archivo");
+        System.out.println();
+
+        // Pedir informacion necesaria para crear el MT
+        // Pedir ruta al archivo
+        System.out.println("Por favor ingrese la ruta al archivo que contiene a la MT");
+        while (!input.hasNext()) {
+
+            // Esperar a que haya un input y luego sí avanzas
+
+        }
+        String rutaArchivo = input.next();
+        System.out.println();
+
+        // Pedir nombre del MT
+        Boolean ingresandoNombre = true;
+        String nombreMT = "";
+        while (ingresandoNombre) {
+            System.out.println(
+                    "Por favor ingrese un nombre de menos de " + Integer.toString(maxCharLenName)
+                            + " caracteres sin espacios para la MT");
+            nombreMT = input.next().trim();
+            System.out.println();
+
+            // Verificar condición
+            if (nombreMT.length() <= maxCharLenName && nombreMT.split(" ").length == 1) {
+
+                ingresandoNombre = false;
+
+            } else {
+
+                System.out.println("El nombre ingresado no es valido.");
+                System.out.println("Por favor intentelo de nuevo.");
+                System.out.println();
+
+            }
+
+        }
+
+        // Crear la MT
+        try {
+
+            MT nuevaMT = new MT(rutaArchivo);
+            MTActuales.put(nombreMT, nuevaMT);
+
+        } catch (Exception e) {
+
+            if (devMode) {
+
+                e.printStackTrace();
+
+            }
+
+            System.out.println();
+            System.out.println("Ocurrió un error al buscar el archivo.");
+            System.out.println();
+
+            // Esperar hasta que presione enter
+            System.out.println("Presione enter para continuar");
+            try {
+                System.in.read(); // Waits for user to press Enter
+            } catch (IOException er) {
+                er.printStackTrace();
+            }
+
+        }
+
+    }
+
+    // Eliminar MT
+    static void eliminarMT(Scanner input) {
+
+        // Limpiar consola para que se vea mas fancy
+        System.out.print("\033c");
+
+        // Verificar que sí existan
+        if (MTActuales.size() == 0) {
+
+            System.out.println();
+            System.out.println("Todavía no se ha creado ninguna MT.");
+            System.out.println();
+
+            try {
+
+                // Espera que lea el mensaje
+                TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+            } catch (InterruptedException e) {
+
+                e.printStackTrace();
+
+            }
+
+            return;
+
+        }
+
+        // Espacio al inicio para no saturar e indicar menu
+        System.out.println();
+        System.out.println("Eliminación de MTs");
+        System.out.println();
+
+        // Mostrar MTs creadas
+        if (MTActuales.size() != 0) {
+
+            // Listar MTs
+            imprimirListaNombresMT();
+
+        }
+
+        Boolean ingresandoMT = true;
+        String nombreMT = "";
+
+        while (ingresandoMT) {
+
+            // Pedir info necesaria
+            System.out.println("Indique el nombre de la MT que desea eliminar");
+            nombreMT = input.next();
+            System.out.println();
+
+            if (!MTActuales.keySet().contains(nombreMT)) {
+
+                System.out.println("No hay ninguna MT con ese nombre.");
+                System.out.println("Por favor intentelo nuevamente.");
+                System.out.println();
+
+            } else {
+
+                ingresandoMT = false;
+                MTActuales.remove(nombreMT);
+
+            }
+
+        }
+
+    }
+
+    // * Exportar MT
+    private static void exportarMT(Scanner input) {
+
+        // Limpiar consola para que se vea mas fancy
+        System.out.print("\033c");
+
+        // Verificar que sí existan
+        if (MTActuales.size() == 0) {
+
+            System.out.println();
+            System.out.println("Todavía no se ha creado ninguna MT.");
+            System.out.println();
+
+            try {
+
+                // Espera que lea el mensaje
+                TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+            } catch (InterruptedException e) {
+
+                e.printStackTrace();
+
+            }
+
+            return;
+
+        }
+
+        // Espacio al inicio para no saturar e indicar menu
+        System.out.println();
+        System.out.println("Exportar MT");
+        System.out.println();
+
+        // Mostrar automatas existentes
+        if (automatasAF2PActuales.size() != 0) {
+
+            // Listar MTs
+            imprimirListaNombresMT();
+
+        }
+
+        // Ingresar el MT a exportar
+        Boolean ingresandoMT = true;
+        String nombreMT = "";
+
+        while (ingresandoMT) {
+
+            // Pedir info necesaria
+            System.out.println("Indique el nombre de la MT a exportar");
+            nombreMT = input.next();
+            System.out.println();
+
+            if (!MTActuales.keySet().contains(nombreMT)) {
+
+                System.out.println("No hay ninguna MT con ese nombre.");
+                System.out.println("Por favor intentelo nuevamente.");
+                System.out.println();
+
+            } else {
+
+                ingresandoMT = false;
+
+            }
+
+        }
+
+        // Ingresar nombre del archivo de salida
+        // Pedir info necesaria
+        System.out.println("Por favor ingrese el nombre del archivo de salida");
+        String nombreArchivoSalida = input.next();
+        System.out.println();
+
+        // Exportar el MT
+        try {
+
+            MTActuales.get(nombreMT).exportar(nombreArchivoSalida);
+
+        } catch (IOException e) {
+
+            e.printStackTrace();
+
+        }
+
+    }
+
+    // * Procesar cadenas MT
+    private static void procesarCadenasMT(Scanner input) {
+
+        // Verificar que sí existan automatas
+        if (MTActuales.size() == 0) {
+
+            // Limpiar consola para que se vea mas fancy
+            System.out.print("\033c");
+
+            System.out.println();
+            System.out.println("Todavía no se ha creado ninguna MT.");
+            System.out.println();
+
+            try {
+
+                // Espera que lea el mensaje
+                TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+            } catch (InterruptedException e) {
+
+                e.printStackTrace();
+
+            }
+
+            return;
+
+        }
+
+        // Limpiar consola para que se vea mas fancy
+        System.out.print("\033c");
+
+        // Espacio al inicio para no saturar e indicar menu
+        System.out.println();
+        System.out.println("Procesamiento de una cadena por MT");
+        System.out.println();
+
+        if (MTActuales.size() != 0) {
+
+            // Listar MTs
+            imprimirListaNombresMT();
+
+        }
+
+        // Ingresar la MT con la que se desea trabajar
+        Boolean ingresandoMT = true;
+        String nombreMT = "";
+
+        while (ingresandoMT) {
+
+            // Pedir info necesaria
+            System.out.println("Indique el nombre del MT que desea utilizar");
+            nombreMT = input.next();
+            System.out.println();
+
+            if (!MTActuales.keySet().contains(nombreMT)) {
+
+                System.out.println("No hay ningun AF2P con ese nombre.");
+                System.out.println("Por favor intentelo nuevamente.");
+                System.out.println();
+
+            } else {
+
+                ingresandoMT = false;
+
+            }
+        }
+        MT mt = MTActuales.get(nombreMT);
+
+        procesarCadenasMTConEstaMT(mt, input);
+
+    }
+
+    // * Procesar una cadena con una MT determinado
+    private static void procesarCadenasMTConEstaMT(MT mt, Scanner input) {
+
+        Boolean procesandoVariasCadenas = true;
+        while (procesandoVariasCadenas){
+
+            // Ingresar la cadena a procesar
+            Boolean ingresandoCadena = true;
+            String cadena = "";
+
+            while (ingresandoCadena) {
+
+                // Imprimir alfabeto de cinta
+                StringBuilder alfabeto = new StringBuilder();
+                alfabeto.append("{");
+                Boolean masDeUnCaracter = false;
+                for (Character simbolo : mt.getSigma()) {
+                    if (masDeUnCaracter) {
+                        alfabeto.append("," + simbolo);
+                    } else {
+                        alfabeto.append(simbolo);
+                        masDeUnCaracter = true;
+                    }
+                }
+                alfabeto.append("}");
+                System.out.println("Alfabeto: " + alfabeto.toString());
+                System.out.println("lambda: $");
+                System.out.println();
+
+                // Pedir info necesaria
+                System.out.println("Ingrese la cadena a procesar");
+                cadena = input.next();
+                System.out.println();
+                Boolean cadenaValida = true;
+                for (int i = 0; i < cadena.length(); i++) {
+                    if (!mt.getSigma().contains(cadena.charAt(i)) && (cadena.charAt(i) != '!')) {
+                        cadenaValida = false;
+                        break;
+                    }
+                }
+                if (!cadenaValida && !cadena.equals("$")) {
+                    System.out.println("La cadena ingresada no es valida.");
+                    System.out.println("Por favor intentelo nuevamente.");
+                    System.out.println();
+
+                } else {
+                    if (cadena.equals("$")) {
+                        cadena = "";
+                    }
+                    ingresandoCadena = false;
+
+                }
+            }
+
+            // Procesar la cadena
+            mt.preprocesarCadena(cadena);
+
+            // Setup menu seleccion de tipo de procesamiento
+            Boolean procesandoCadenas = true;
+
+            // Seleccion de procesamiento que se repite hasta volver
+            while (procesandoCadenas) {
+
+                // Limpiar consola para que se vea mas fancy
+                System.out.print("\033c");
+
+                // Espacio al inicio para no saturar e indicar menu
+                System.out.println();
+                System.out.println("Selección tipo de procesamiento");
+                System.out.println();
+
+                // Mostrar las opciones de selección de procesamiento
+                System.out.println("Presionando el entero seguido de la tecla enter, por favor");
+                System.out.println("seleccione una opción:");
+                System.out.println();
+                System.out.println("1. Procesar cadena: \"" + cadena + "\"");
+                System.out.println("2. Procesar como funcion con entrada: \"" + cadena + "\"");
+                System.out.println("3. Procesar una cadena distinta.");
+                System.out.println("0. Volver");
+                System.out.println();
+                System.out.print("Ingrese su opción: ");
+                Integer opcion = input.nextInt();
+                System.out.println();
+
+                // Redirigir a la opcion deseada
+                switch (opcion) {
+
+                    case 1:
+                        if (mt.getEsAceptada()) {
+                            System.out.println("La cadena: \"" + cadena + "\" es aceptada:");
+                        } else {
+                            System.out.println("La cadena: \"" + cadena + "\" es rechazada:");
+                        }
+                        System.out.println(mt.getProcesamiento());
+                        break;
+
+                    case 2:
+                        if (mt.getEsAceptada()) {
+                            System.out.println("La cadena: \"" + cadena + "\" es aceptada, la saldia es:");
+                        } else {
+                            System.out.println("La cadena: \"" + cadena + "\" es rechazada, la saldia es:");
+                        }
+                        System.out.println(mt.procesarFuncion(cadena));
+                        break;
+                    case 3:
+                        procesandoCadenas = false;
+                        break;
+
+                    case 0:
+                        procesandoCadenas = false;
+                        procesandoVariasCadenas = false;
+                        break;
+
+                    default:
+
+                        System.out.println("Opción inválida");
+
+                        try {
+
+                            // Espera que lea el mensaje
+                            TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+                        } catch (InterruptedException e) {
+
+                            e.printStackTrace();
+
+                        }
+
+                        break;
+
+                }
+                // Esperar hasta que se presione enter
+                if (procesandoCadenas) {
+                    System.out.println("Presione enter para continuar");
+                    try {
+                        System.in.read();
+                    } catch (IOException er) {
+                        er.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
+    private static void imprimirListaNombresMT() {
+        Integer numActual = 1;
+
+        System.out.println("Sus MTs actuales son:");
+        System.out.println();
+
+        // Imprimir las MT contenidas en MTActuales
+        for (String strActual : MTActuales.keySet()) {
 
             System.out.println(Integer.toString(numActual) + ". " + strActual + "\n");
             numActual++;

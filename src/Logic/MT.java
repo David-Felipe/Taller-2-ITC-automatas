@@ -399,16 +399,13 @@ public class MT {
             readOnTape = this.sufijo.peek();
 
             String[] image = this.delta(currentState, readOnTape);
-            System.out.println("asd image " + currentState + readOnTape + image);
-            System.out.println("asd image 2 " + this.delta);
             if (image != null){
                 this.modificarCinta(image[1].charAt(0), image[2].charAt(0));
-                System.out.println("asd" + this.sufijo.toString() +  this.prefijo.toString());
                 currentState = image[0];
                 this.ultimoEstado = currentState;
 
-                String prefijoStr = prefijo.toString().replaceAll(", |\\[|\\]","");
-                String sufijoStr = sufijo.toString().replaceAll(", |\\[|\\]","");
+                String prefijoStr = prefijo.toString().replaceAll(", |\\[|\\]","").replaceFirst("^!+", "");
+                String sufijoStr = sufijo.toString().replaceAll(", |\\[|\\]","").replaceFirst("^!+", "");
                 sufijoStr = new StringBuilder(sufijoStr).reverse().toString();
 
                 sbProcesamiento.append("->" + prefijoStr +"(" + currentState + ")" + sufijoStr);
@@ -439,7 +436,7 @@ public class MT {
 
     public String procesarFuncion(String cadena) {
         this.preprocesarCadena(cadena);
-        String sufijoStr = sufijo.toString().replaceAll(", |\\[|\\]","");
+        String sufijoStr = sufijo.toString().replaceAll(", |\\[|\\]","").replaceFirst("^!+", "");
         sufijoStr = new StringBuilder(sufijoStr).reverse().toString();
         return "("+this.ultimoEstado+")"+sufijoStr;
     }
@@ -456,7 +453,7 @@ public class MT {
             if (this.esAceptado) {
                 fueAceptada = "yes";
             }
-            String sufijoStr = sufijo.toString().replaceAll(", |\\[|\\]","");
+            String sufijoStr = sufijo.toString().replaceAll(", |\\[|\\]","").replaceFirst("^!+", "");
             sufijoStr = new StringBuilder(sufijoStr).reverse().toString();
 
             sb.append(cadena + "\t"
