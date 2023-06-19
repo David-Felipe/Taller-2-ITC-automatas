@@ -73,6 +73,16 @@ public class AFPD implements Comparable<AFPD> {
 
     }
 
+    // * Getters y Setters de la clase AFPD
+    // Getters y Setters atributos AFPD
+    public String getNombreAFPD() {
+        return nombreAFPD;
+    }
+
+    public void setNombreAFPD(String nombreAFPD) {
+        this.nombreAFPD = nombreAFPD;
+    }
+
     // ** Subclases de la clase AFPD
     // Subclase Destino para el par estadoDestino y topeDestino
     private class Destino {

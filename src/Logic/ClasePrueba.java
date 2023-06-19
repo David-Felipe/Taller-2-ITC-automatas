@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 // Paquetes creados por nosotros
 import Logic.AFD;
+import Logic.AFPD;
 import Logic.AFPN.Transicion;
 
 public class ClasePrueba {
@@ -133,7 +134,8 @@ public class ClasePrueba {
             System.out.println("1. Probar AFD");
             System.out.println("2. Probar AFN");
             System.out.println("3. Probar AFN Lambda");
-            System.out.println("4. Probar AFPN");
+            System.out.println("4. Probar AFPD");
+            System.out.println("5. Probar AFPN");
             System.out.println("0. Volver");
             System.out.println();
             System.out.print("Ingrese su opción: ");
@@ -161,6 +163,10 @@ public class ClasePrueba {
                     }
                     break;
                 case 4:
+                    probarAFPD(input);
+                    break;
+
+                case 5:
                     try {
                         probarAFPN(input);
                     } catch (Exception e) {
@@ -883,7 +889,7 @@ public class ClasePrueba {
         if (automatasActuales.size() == 0) {
 
             System.out.println();
-            System.out.println("No hay ningún automata creado,por favor");
+            System.out.println("No hay ningún automata creado, por favor");
             System.out.println("primero cree uno antes de usar esta opción");
             System.out.println();
 
@@ -1447,7 +1453,7 @@ public class ClasePrueba {
 
         // Espacio al inicio para no saturar e indicar menu
         System.out.println();
-        System.out.println("Selección de operación Producto Cartesiano");
+        System.out.println("Producto cartesiano:" + operacion);
         System.out.println();
 
         // Mostrar automatas existentes
@@ -2514,4 +2520,966 @@ public class ClasePrueba {
             }
         }
     }
+
+    // ** Probar AFPD
+    private static void probarAFPD(Scanner input) {
+
+        // Setup menu probar AFPD
+        Boolean probandoAFPD = true;
+        TreeSet<AFPD> automatasActuales = new TreeSet<>();
+
+        // Menu que muestra las opciones para AFPD
+        while (probandoAFPD) {
+
+            // Limpiar la consola para que se vea más fancy
+            System.out.print("\033c");
+
+            // Espacio al inicio para no saturar e indicar menu
+            System.out.println();
+            System.out.println("Prueba de AFPD");
+            System.out.println();
+
+            // Mostrar los automatas actuales
+            if (automatasActuales.size() != 0) {
+
+                Integer numActual = 1;
+
+                System.out.println("Sus AFPD actuales son:");
+                System.out.println();
+
+                // Imprimir los AFPD contenidos en automatasActuales
+                for (AFPD actual : automatasActuales) {
+
+                    System.out.println(Integer.toString(numActual) + ". " + actual.getNombreAFPD() + "\n");
+                    numActual++;
+
+                }
+
+                System.out.println();
+
+            }
+
+            // Mostrar las opciones para probar AFPD
+            System.out.println("Presionando el entero seguido de la tecla enter, por favor");
+            System.out.println("seleccione una opción:");
+            System.out.println();
+            System.out.println("1. Editar AFPD's ");
+            System.out.println("2. Procesar cadenas");
+            System.out.println("3. Producto cartesiano con AFD");
+            System.out.println("4. Exportar AFPD");
+            System.out.println("0. Volver");
+            System.out.println();
+            System.out.print("Ingrese su opción: ");
+            Integer opcion = input.nextInt();
+            System.out.println();
+
+            // Redirigir a la opcion deseada
+            switch (opcion) {
+
+                case 1:
+                    editarAFPD(automatasActuales, input);
+                    break;
+
+                case 2:
+                    procesarCadenasAFPD(automatasActuales, input);
+                    break;
+
+                case 3:
+                    productoCartesianoConAFD(automatasActuales, input);
+                    break;
+
+                case 4:
+                    exportarAFPD(automatasActuales, input);
+                    break;
+
+                case 0:
+                    probandoAFPD = false;
+                    break;
+
+                default:
+
+                    System.out.println("Opción inválida");
+
+                    try {
+
+                        // Espera que lea el mensaje
+                        TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+                    } catch (InterruptedException e) {
+
+                        e.printStackTrace();
+
+                    }
+
+                    break;
+
+            }
+
+        }
+
+    }
+
+    // ** Editar AFPD
+    private static void editarAFPD(TreeSet<AFPD> automatasActuales, Scanner input) {
+
+        // Setup menu editar AFPD
+        Boolean editandoAFPD = true;
+
+        // Menu que muestra las opciones para editar AFD
+        while (editandoAFPD) {
+
+            // Limpiar consola para que se vea mas fancy
+            System.out.print("\033c");
+
+            // Espacio al inicio para no saturar e indicar menu
+            System.out.println();
+            System.out.println("Edición de AFPD's");
+            System.out.println();
+
+            if (automatasActuales.size() != 0) {
+
+                Integer numActual = 1;
+
+                System.out.println("Sus AFPD actuales son:");
+                System.out.println();
+
+                // Imprimir los AFPD contenidos en automatasActuales
+                for (AFPD actual : automatasActuales) {
+
+                    System.out.println(Integer.toString(numActual) + ". " + actual.getNombreAFPD() + "\n");
+                    numActual++;
+
+                }
+
+                System.out.println();
+
+            }
+
+            // Mostrar las opciones para editar AFPD
+            System.out.println("Presionando el entero seguido de la tecla enter, por favor");
+            System.out.println("seleccione una opción:");
+            System.out.println();
+            System.out.println("1. Crear AFPD ");
+            System.out.println("2. Eliminar AFPD");
+            System.out.println("0. Volver");
+            System.out.println();
+            System.out.print("Ingrese su opción: ");
+            Integer opcion = input.nextInt();
+            System.out.println();
+
+            // Redirigir a la opcion deseada
+            switch (opcion) {
+
+                case 1:
+                    crearAFPD(automatasActuales, input);
+                    break;
+
+                case 2:
+                    eliminarAFPD(automatasActuales, input);
+                    break;
+
+                case 0:
+                    editandoAFPD = false;
+                    break;
+
+                default:
+
+                    System.out.println("Opción inválida");
+
+                    try {
+
+                        // Espera que lea el mensaje
+                        TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+                    } catch (InterruptedException e) {
+
+                        e.printStackTrace();
+
+                    }
+
+                    break;
+
+            }
+
+        }
+
+    }
+
+    private static void crearAFPD(TreeSet<AFPD> automatasActuales, Scanner input) {
+
+        // Limpiar consola para que se vea mas fancy
+        System.out.print("\033c");
+
+        // Espacio al inicio para no saturar e indicar menu
+        System.out.println();
+        System.out.println("Creación de AFPD desde archivo");
+        System.out.println();
+
+        // Pedir informacion necesaria para crear el AFPD
+        // Pedir ruta al archivo
+        System.out.println("Por favor ingrese la ruta al archivo que contiene el AFPD");
+        while (!input.hasNext()) {
+
+            // Esperar a que haya un input y luego sí avanzas
+
+        }
+        String rutaArchivo = input.next();
+        System.out.println();
+
+        // Pedir nombre del AFPD
+        Boolean ingresandoNombre = true;
+        String nombreAFPD = "";
+        while (ingresandoNombre) {
+
+            System.out.println(
+                    "Por favor ingrese un nombre de menos de " + Integer.toString(maxCharLenName)
+                            + " caracteres sin espacios para el AFPD");
+            nombreAFPD = input.next().trim();
+            System.out.println();
+
+            // Verificar condición
+            if (nombreAFPD.length() <= maxCharLenName && nombreAFPD.split(" ").length == 1) {
+
+                ingresandoNombre = false;
+
+            } else {
+
+                System.out.println("El nombre ingresado no es valido");
+                System.out.println("Por favor intentelo de nuevo");
+                System.out.println();
+
+            }
+
+        }
+
+        // Crear el AFPD
+        try {
+
+            AFPD nuevoAFPD = new AFPD(rutaArchivo);
+            nuevoAFPD.setNombreAFPD(nombreAFPD);
+            automatasActuales.add(nuevoAFPD);
+
+        } catch (Exception e) {
+
+            if (devMode) {
+
+                e.printStackTrace();
+
+            }
+
+            System.out.println();
+            System.out.println("Ocurrió un error al buscar el archivo");
+            System.out.println();
+
+            // Esperar hasta que presione enter
+            System.out.println("Presione enter para continuar");
+            try {
+                System.in.read(); // Waits for user to press Enter
+            } catch (IOException er) {
+                er.printStackTrace();
+            }
+
+        }
+
+    }
+
+    static void eliminarAFPD(TreeSet<AFPD> automatasActuales, Scanner input) {
+
+        // Limpiar consola para que se vea mas fancy
+        System.out.print("\033c");
+
+        // Verificar que sí existan
+        if (automatasActuales.size() == 0) {
+
+            System.out.println();
+            System.out.println("No hay ningún automata creado, por favor");
+            System.out.println("primero cree uno antes de usar esta opción");
+            System.out.println();
+
+            try {
+
+                // Espera que lea el mensaje
+                TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+            } catch (InterruptedException e) {
+
+                e.printStackTrace();
+
+            }
+
+            return;
+
+        }
+
+        // Espacio al inicio para no saturar e indicar menu
+        System.out.println();
+        System.out.println("Eliminación de AFPD");
+        System.out.println();
+
+        // Mostrar automatas creados
+        if (automatasActuales.size() != 0) {
+
+            Integer numActual = 1;
+
+            System.out.println("Sus AFPD actuales son:");
+            System.out.println();
+
+            // Imprimir los AFPD contenidos en automatasActuales
+            for (AFPD actual : automatasActuales) {
+
+                System.out.println(Integer.toString(numActual) + ". " + actual.getNombreAFPD() + "\n");
+                numActual++;
+
+            }
+
+            System.out.println();
+
+        }
+
+        // Pedir indicacion sobre el AFPD a eliminar
+        Boolean ingresandoAFPD = true;
+        Integer numAFPD = 0;
+
+        while (ingresandoAFPD) {
+
+            // Pedir info necesaria
+            System.out.println("Indique el número del AFPD que desea eliminar");
+            numAFPD = input.nextInt();
+            System.out.println();
+
+            if (numAFPD <= 0 || numAFPD > automatasActuales.size()) {
+
+                System.out.println("El número ingresado no es valido");
+                System.out.println("Por favor intentelo de nuevo");
+                System.out.println();
+
+            } else {
+
+                ingresandoAFPD = false;
+                numAFPD--;
+
+            }
+
+        }
+
+        // Eliminar el AFPD
+        ArrayList<AFPD> listaAutomatas = new ArrayList<>(automatasActuales);
+        AFPD afpdEliminado = listaAutomatas.get(numAFPD);
+        automatasActuales.remove(afpdEliminado);
+
+    }
+
+    // ** Procesar cadenas
+    private static void procesarCadenasAFPD(TreeSet<AFPD> automatasActuales, Scanner input) {
+
+        // Verificar que sí existan
+        if (automatasActuales.size() == 0) {
+
+            // Limpiar consola para que se vea mas fancy
+            System.out.print("\033c");
+
+            System.out.println();
+            System.out.println("No hay ningún automata creado,por favor");
+            System.out.println("primero cree uno antes de usar esta opción");
+            System.out.println();
+
+            try {
+
+                // Espera que lea el mensaje
+                TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+            } catch (InterruptedException e) {
+
+                e.printStackTrace();
+
+            }
+
+            return;
+
+        }
+
+        // Setup menu seleccion de tipo de procesamiento
+        Boolean procesandoCadenas = true;
+
+        // Seleccion de procesamiento que se repite hasta volver
+        while (procesandoCadenas) {
+
+            // Limpiar consola para que se vea mas fancy
+            System.out.print("\033c");
+
+            // Espacio al inicio para no saturar e indicar menu
+            System.out.println();
+            System.out.println("Selección tipo de procesamiento");
+            System.out.println();
+
+            if (automatasActuales.size() != 0) {
+
+                Integer numActual = 1;
+
+                System.out.println("Sus AFPD actuales son:");
+                System.out.println();
+
+                // Imprimir los AFPD contenidos en automatasActuales
+                for (AFPD actual : automatasActuales) {
+
+                    System.out.println(Integer.toString(numActual) + ". " + actual.getNombreAFPD() + "\n");
+                    numActual++;
+
+                }
+
+                System.out.println();
+
+            }
+
+            // Mostrar las opciones de selección de automata
+            System.out.println("Presionando el entero seguido de la tecla enter, por favor");
+            System.out.println("seleccione una opción:");
+            System.out.println();
+            System.out.println("1. Procesar cadena");
+            System.out.println("2. Procesar lista de cadenas desde archivo");
+            System.out.println("0. Volver");
+            System.out.println();
+            System.out.print("Ingrese su opción: ");
+            Integer opcion = input.nextInt();
+            System.out.println();
+
+            // Redirigir a la opcion deseada
+            switch (opcion) {
+
+                case 1:
+                    procesarCadenaAFPD(automatasActuales, input);
+                    break;
+
+                case 2:
+                    procesarListaCadenasAFPD(automatasActuales, input);
+                    break;
+
+                case 0:
+                    procesandoCadenas = false;
+                    break;
+
+                default:
+
+                    System.out.println("Opción inválida");
+
+                    try {
+
+                        // Espera que lea el mensaje
+                        TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+                    } catch (InterruptedException e) {
+
+                        e.printStackTrace();
+
+                    }
+
+                    break;
+
+            }
+
+        }
+
+    }
+
+    private static void procesarCadenaAFPD(TreeSet<AFPD> automatasActuales, Scanner input) {
+
+        // Limpiar consola para que se vea mas fancy
+        System.out.print("\033c");
+
+        // Espacio al inicio para no saturar e indicar menu
+        System.out.println();
+        System.out.println("Procesamiento de cadena");
+        System.out.println();
+
+        // Mostrar automatas existentes
+        if (automatasActuales.size() != 0) {
+
+            Integer numActual = 1;
+
+            System.out.println("Sus AFPD actuales son:");
+            System.out.println();
+
+            // Imprimir los AFPD contenidos en automatasActuales
+            for (AFPD actual : automatasActuales) {
+
+                System.out.println(Integer.toString(numActual) + ". " + actual.getNombreAFPD() + "\n");
+                numActual++;
+
+            }
+
+            System.out.println();
+
+        }
+
+        // Ingresar el AFPD a usar
+        Boolean ingresandoAFPD = true;
+        Integer numAFPD = 0;
+
+        while (ingresandoAFPD) {
+
+            // Pedir info necesaria
+            System.out.println("Indique el número del AFPD a partir del cual quiere procesar");
+            System.out.println("la cadena");
+            numAFPD = input.nextInt();
+            System.out.println();
+
+            if (numAFPD <= 0 || numAFPD > automatasActuales.size()) {
+
+                System.out.println("El número ingresado no es valido");
+                System.out.println("Por favor intentelo de nuevo");
+                System.out.println();
+
+            } else {
+
+                ingresandoAFPD = false;
+                numAFPD--;
+
+            }
+
+        }
+
+        // Ingresar la cadena a procesar
+        // Pedir info necesaria
+        System.out.println("Por favor ingrese la cadena a procesar");
+        String cadenaEntrada = input.next();
+        System.out.println();
+
+        // Preguntar si desea detalles
+        System.out.println("Desea imprimir los detalles del procesamiento?");
+        System.out.println("por favor digite 1 para sí y 0 para no:");
+        Integer detalles = input.nextInt();
+        System.out.println();
+
+        // Procesar la cadena
+        ArrayList<AFPD> listaAutomatas = new ArrayList<>(automatasActuales);
+        AFPD afpdBase = listaAutomatas.get(numAFPD);
+        Boolean resultado = afpdBase.procesarCadena(cadenaEntrada, detalles == 1);
+        System.out.println();
+
+        // Mostrar el resultado
+        if (resultado) {
+
+            System.out.println("La cadena fue aceptada por el AFPD");
+            System.out.println();
+
+        } else {
+
+            System.out.println("La cadena no fue aceptada por el AFPD");
+            System.out.println();
+
+        }
+
+        // Esperar hasta que presione enter
+        System.out.println("Presione enter para continuar");
+        try {
+            System.in.read(); // Waits for user to press Enter
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private static void procesarListaCadenasAFPD(TreeSet<AFPD> automatasActuales, Scanner input) {
+
+        // Limpiar consola para que se vea mas fancy
+        System.out.print("\033c");
+
+        // Espacio al inicio para no saturar e indicar menu
+        System.out.println();
+        System.out.println("Procesamiento de lista de cadenas desde archivo");
+        System.out.println();
+
+        // Mostrar automatas existentes
+        if (automatasActuales.size() != 0) {
+
+            Integer numActual = 1;
+
+            System.out.println("Sus AFPD actuales son:");
+            System.out.println();
+
+            // Imprimir los AFPD contenidos en automatasActuales
+            for (AFPD actual : automatasActuales) {
+
+                System.out.println(Integer.toString(numActual) + ". " + actual.getNombreAFPD() + "\n");
+                numActual++;
+
+            }
+
+            System.out.println();
+
+        }
+
+        // Ingresar el AFPD a usar
+        Boolean ingresandoAFPD = true;
+        Integer numAFPD = 0;
+
+        while (ingresandoAFPD) {
+
+            // Pedir info necesaria
+            System.out.println("Indique el número del AFPD a partir del cual quiere procesar");
+            System.out.println("la lista de cadenas");
+            numAFPD = input.nextInt();
+            System.out.println();
+
+            if (numAFPD <= 0 || numAFPD > automatasActuales.size()) {
+
+                System.out.println("El número ingresado no es valido");
+                System.out.println("Por favor intentelo de nuevo");
+                System.out.println();
+
+            } else {
+
+                ingresandoAFPD = false;
+                numAFPD--;
+
+            }
+
+        }
+
+        // Ingresar la ruta al archivo
+        // Pedir info necesaria
+        System.out.println("Por favor ingrese la ruta al archivo que contiene la lista de cadenas");
+        while (!input.hasNext()) {
+
+            // Esperar a que haya un input y luego sí avanzas
+
+        }
+        String rutaArchivo = input.next();
+        System.out.println();
+
+        // Obtener cadenas desde el archivo
+        ArrayList<String> listaCadenas = new ArrayList<>();
+        try {
+
+            // Abrir el archivo
+            File archivo = new File(rutaArchivo);
+            Scanner lector = new Scanner(archivo);
+
+            // Leer todas las lineas y agregarlas
+            while (lector.hasNextLine()) {
+
+                String lineaActual = lector.nextLine().trim();
+                listaCadenas.add(lineaActual);
+
+            }
+
+            // Cerrar el lector
+            lector.close();
+
+        } catch (FileNotFoundException e) {
+
+            if (devMode) {
+
+                e.printStackTrace();
+
+            }
+
+            System.out.println();
+            System.out.println("Ocurrió un error al buscar el archivo");
+            System.out.println();
+
+            // Esperar hasta que presione enter
+            System.out.println("Presione enter para continuar");
+            try {
+                System.in.read(); // Waits for user to press Enter
+            } catch (IOException err) {
+                err.printStackTrace();
+            }
+
+            return;
+
+        }
+
+        // Ingresar nombre del archivo de salida
+        // Pedir info necesaria
+        System.out.println("Por favor ingrese el nombre del archivo de salida");
+        while (!input.hasNext()) {
+
+            // Esperar a que haya un input y luego sí avanzas
+
+        }
+        String nombreArchivoSalida = input.next();
+        System.out.println();
+
+        // Preguntar si desea detalles
+        System.out.println("Desea imprimir los detalles del procesamiento?");
+        System.out.println("por favor digite 1 para sí y 0 para no:");
+        Integer detalles = input.nextInt();
+        System.out.println();
+
+        // Procesar las cadenas
+        ArrayList<AFPD> listaAutomatas = new ArrayList<>(automatasActuales);
+        AFPD afpdBase = listaAutomatas.get(numAFPD);
+        afpdBase.procesarListaCadenas(listaCadenas, nombreArchivoSalida, detalles == 1);
+        System.out.println();
+
+        // Si pidió detalles, esperar a que los lea
+        if (detalles == 1) {
+
+            // Esperar hasta que presione enter
+            System.out.println("Presione enter para continuar");
+            try {
+                System.in.read(); // Waits for user to press Enter
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+    }
+
+    // * Producto cartesiano con AFD
+    private static void productoCartesianoConAFD(TreeSet<AFPD> automatasActuales, Scanner input) {
+
+        // Verificar que sí existan
+        if (automatasActuales.size() == 0) {
+
+            // Limpiar consola para que se vea mas fancy
+            System.out.print("\033c");
+
+            System.out.println();
+            System.out.println("No hay ningún automata creado,por favor");
+            System.out.println("primero cree uno antes de usar esta opción");
+            System.out.println();
+
+            try {
+
+                // Espera que lea el mensaje
+                TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+            } catch (InterruptedException e) {
+
+                e.printStackTrace();
+
+            }
+
+            return;
+
+        }
+
+        // Limpiar consola para que se vea mas fancy
+        System.out.print("\033c");
+
+        // Espacio al inicio para no saturar e indicar menu
+        System.out.println();
+        System.out.println("Producto cartesiano con AFD: interseccion");
+        System.out.println();
+
+        // Mostrar automatas existentes
+        if (automatasActuales.size() != 0) {
+
+            Integer numActual = 1;
+
+            System.out.println("Sus AFPD actuales son:");
+            System.out.println();
+
+            // Imprimir los AFPD contenidos en automatasActuales
+            for (AFPD actual : automatasActuales) {
+
+                System.out.println(Integer.toString(numActual) + ". " + actual.getNombreAFPD() + "\n");
+                numActual++;
+
+            }
+
+            System.out.println();
+
+        }
+
+        // Ingresar el AFPD a usar
+        Boolean ingresandoAFPD = true;
+        Integer numAFPD = 0;
+
+        while (ingresandoAFPD) {
+
+            // Pedir info necesaria
+            System.out.println("Indique el número del AFPD a partir del cual quiere hacer");
+            System.out.println("el producto cartesiano");
+            numAFPD = input.nextInt();
+            System.out.println();
+
+            if (numAFPD <= 0 || numAFPD > automatasActuales.size()) {
+
+                System.out.println("El número ingresado no es valido");
+                System.out.println("Por favor intentelo de nuevo");
+                System.out.println();
+
+            } else {
+
+                ingresandoAFPD = false;
+                numAFPD--;
+
+            }
+
+        }
+
+        // Obtener AFPD a usar
+        ArrayList<AFPD> listaAutomatas = new ArrayList<>(automatasActuales);
+        AFPD afpdBase = listaAutomatas.get(numAFPD);
+
+        // Ingresar el AFD a usar
+        // Pedir ruta al archivo
+        System.out.println("Por favor ingrese la ruta al archivo que contiene el AFD");
+        while (!input.hasNext()) {
+
+            // Esperar a que haya un input y luego sí avanzas
+
+        }
+        String rutaArchivo = input.next();
+        System.out.println();
+
+        // Pedir nombre del AFPD
+        Boolean ingresandoNombre = true;
+        String nombreAFPD = "";
+        while (ingresandoNombre) {
+
+            System.out.println(
+                    "Por favor ingrese un nombre de menos de " + Integer.toString(maxCharLenName)
+                            + " caracteres sin espacios para el nuevo AFPD");
+            System.out.println("(Nombre del AFPD resultado del producto cartesiano)");
+            nombreAFPD = input.next().trim();
+            System.out.println();
+
+            // Verificar condición
+            if (nombreAFPD.length() <= maxCharLenName && nombreAFPD.split(" ").length == 1) {
+
+                ingresandoNombre = false;
+
+            } else {
+
+                System.out.println("El nombre ingresado no es valido");
+                System.out.println("Por favor intentelo de nuevo");
+                System.out.println();
+
+            }
+
+        }
+
+        // Crear el AFD y hacer el producto cartesiano
+        try {
+
+            AFD afdBase = new AFD(rutaArchivo);
+            AFPD afpdProductoCartesiano = afpdBase.hallarProductoCartesianoConAFD(afdBase);
+            afpdProductoCartesiano.setNombreAFPD(nombreAFPD);
+            automatasActuales.add(afpdProductoCartesiano);
+
+        } catch (Exception e) {
+
+            if (devMode) {
+
+                e.printStackTrace();
+
+            }
+
+            System.out.println();
+            System.out.println("Ocurrió un error al buscar el archivo");
+            System.out.println();
+
+            // Esperar hasta que presione enter
+            System.out.println("Presione enter para continuar");
+            try {
+                System.in.read(); // Waits for user to press Enter
+            } catch (IOException er) {
+                er.printStackTrace();
+            }
+
+        }
+
+    }
+
+    // * Exportar AFPD
+    private static void exportarAFPD(TreeSet<AFPD> automatasActuales, Scanner input) {
+
+        // Verificar que sí existan
+        if (automatasActuales.size() == 0) {
+
+            // Limpiar consola para que se vea mas fancy
+            System.out.print("\033c");
+
+            System.out.println();
+            System.out.println("No hay ningún automata creado,por favor");
+            System.out.println("primero cree uno antes de usar esta opción");
+            System.out.println();
+
+            try {
+
+                // Espera que lea el mensaje
+                TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+            } catch (InterruptedException e) {
+
+                e.printStackTrace();
+
+            }
+
+            return;
+
+        }
+
+        // Limpiar consola para que se vea mas fancy
+        System.out.print("\033c");
+
+        // Espacio al inicio para no saturar e indicar menu
+        System.out.println();
+        System.out.println("Exportar AFPD");
+        System.out.println();
+
+        // Mostrar automatas existentes
+        if (automatasActuales.size() != 0) {
+
+            Integer numActual = 1;
+
+            System.out.println("Sus AFPD actuales son:");
+            System.out.println();
+
+            // Imprimir los AFPD contenidos en automatasActuales
+            for (AFPD actual : automatasActuales) {
+
+                System.out.println(Integer.toString(numActual) + ". " + actual.getNombreAFPD() + "\n");
+                numActual++;
+
+            }
+
+            System.out.println();
+
+        }
+
+        // Ingresar el AFPD a exportar
+        Boolean ingresandoAFPD = true;
+        Integer numAFPD = 0;
+
+        while (ingresandoAFPD) {
+
+            // Pedir info necesaria
+            System.out.println("Indique el número del AFPD que desea exportar");
+            numAFPD = input.nextInt();
+            System.out.println();
+
+            if (numAFPD <= 0 || numAFPD > automatasActuales.size()) {
+
+                System.out.println("El número ingresado no es valido");
+                System.out.println("Por favor intentelo de nuevo");
+                System.out.println();
+
+            } else {
+
+                ingresandoAFPD = false;
+                numAFPD--;
+
+            }
+
+        }
+
+        // Ingresar nombre del archivo de salida
+        // Pedir info necesaria
+        System.out.println("Por favor ingrese el nombre del archivo de salida");
+        String nombreArchivoSalida = input.next();
+        System.out.println();
+
+        // Exportar el AFD
+        ArrayList<AFPD> listaAutomatas = new ArrayList<>(automatasActuales);
+        AFPD afpdExportado = listaAutomatas.get(numAFPD);
+        afpdExportado.exportar(nombreArchivoSalida);
+
+    }
+
 }
