@@ -1,9 +1,5 @@
 package Logic;
 
-import java.io.BufferedReader;
-import java.io.FileWriter;
-import java.io.FileReader;
-import java.io.IOException;
 import java.time.*;
 import java.util.*;
 import java.io.*;
@@ -578,7 +574,7 @@ public class AFN {
         String nombreArchivoRechazadas = nombreArchivo + "Rechazadas.txt";
         String nombreArchivoAbortadas = nombreArchivo + "Abortadas.txt";
 
-        // Crear los archivos y llenarlo con las lsitas de estados correspondientes
+        // Crear los archivos y llenarlo con las listas de estados correspondientes
         try {
 
             // Crear el archivo de cadenas aceptadas
@@ -683,6 +679,16 @@ public class AFN {
                 break;
             }
         }
+        if (nombreArchivo.isBlank()){
+            nombreArchivo = "procesamiento-cadenas_"
+                        + LocalDateTime.now().getYear() + "-"
+                        + LocalDateTime.now().getMonthValue() + "-"
+                        + LocalDateTime.now().getDayOfMonth() + "-"
+                        + LocalDateTime.now().getHour() + "-"
+                        + LocalDateTime.now().getMinute() + "-"
+                        + LocalDateTime.now().getSecond() + "_"
+                        + Integer.toString(this.hashCode());
+        }
 
         // Crear el archivo y llenarlo con listaProcesada
         nombreArchivo += ".txt";
@@ -737,6 +743,17 @@ public class AFN {
                 break;
             }
         }
+        if (nombreArchivo.isBlank()){
+            nombreArchivo = "procesamiento-cadenas_"
+                        + LocalDateTime.now().getYear() + "-"
+                        + LocalDateTime.now().getMonthValue() + "-"
+                        + LocalDateTime.now().getDayOfMonth() + "-"
+                        + LocalDateTime.now().getHour() + "-"
+                        + LocalDateTime.now().getMinute() + "-"
+                        + LocalDateTime.now().getSecond() + "_"
+                        + Integer.toString(this.hashCode());
+        }
+
         AFD afd = AFNtoAFD(this);
         afd.procesarListaCadenas(listaCadenas, nombreArchivo, imprimirPantalla);
     }
