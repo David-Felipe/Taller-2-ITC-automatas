@@ -405,6 +405,7 @@ public class AFPD implements Comparable<AFPD> {
     private void eliminarEstadosInalcanzables() {
 
         TreeSet<String> estadosAlcanzables = this.hallarEstadosAlcanzables();
+        TreeSet<String> estadosInalcanzables = new TreeSet<String>();
 
         // Por cada estado del AFPD
         for (String estado : this.Q) {
@@ -412,13 +413,20 @@ public class AFPD implements Comparable<AFPD> {
             // Si el estado NO esta en la lista de estados alcanzables
             if (!estadosAlcanzables.contains(estado)) {
 
-                // Eliminar el estado del AFPD, de Q, de F(si esta) y de delta
-                this.Q.remove(estado);
-                if (this.F.contains(estado))
-                    this.F.remove(estado);
-                this.delta.remove(estado);
+                // Agregarlo a la lista de estados inalcanzables
+                estadosInalcanzables.add(estado);
 
             }
+
+        }
+
+        // Eliminar los estados inalcanzables de F y delta
+        for (String estado : estadosInalcanzables) {
+
+            this.Q.remove(estado);
+            if (this.F.contains(estado))
+                this.F.remove(estado);
+            this.delta.remove(estado);
 
         }
 
@@ -662,6 +670,9 @@ public class AFPD implements Comparable<AFPD> {
         // Obtener el alfabeto de cinta y declarar cinta y pila restante
         NavigableSet<Character> alfabetoCinta = this.sigma.getAlfabeto();
         NavigableSet<Character> alfabetoPila = this.gamma.getAlfabeto();
+        // Declarar la pila pospaso y la cinta pospaso
+        StringBuilder pilaPosPaso;
+        StringBuilder cintaPosPaso;
 
         // Por cada caracter de la cadena hasta que esta y la pila esten vacias o pase
         // algo
@@ -698,12 +709,12 @@ public class AFPD implements Comparable<AFPD> {
             if (this.pila.isEmpty()) {
                 topeActual = '$';
             } else {
-                topeActual = this.pila.pop();
+                topeActual = this.pila.getFirst();
             }
 
             // Declarar la pila pospaso y la cinta pospaso
-            StringBuilder pilaPosPaso = new StringBuilder();
-            StringBuilder cintaPosPaso = new StringBuilder();
+            pilaPosPaso = new StringBuilder();
+            cintaPosPaso = new StringBuilder();
 
             // ** Transicion por caracter de cinta
             // Obtener las transiciones del estado actual por caracter
@@ -734,7 +745,8 @@ public class AFPD implements Comparable<AFPD> {
 
             }
 
-            // Verificar si puedo hacer transiciones lambda y de ser posible, hacerlas
+            // Verificar si puedo hacer transiciones lambda desde caracter y de ser posible,
+            // hacerlas
             if (transicionesEstAct.containsKey('$')) {
 
                 // Camino a la transicion lambda
@@ -751,11 +763,12 @@ public class AFPD implements Comparable<AFPD> {
 
                     // Hacer la transicion/paso computacional
                     // Dejar la cadena sin cambios
-                    listaCadena.addFirst(caracterActual);
+                    if (caracterActual != '$') {
+                        listaCadena.addFirst(caracterActual);
+                    }
 
                     // Dejar la pila sin cambios
                     if (topeActual != '$') {
-                        this.pila.addFirst(topeActual);
                         topeActual = '$';
                     }
 
@@ -766,6 +779,11 @@ public class AFPD implements Comparable<AFPD> {
                     // informar el paso computacional
                     for (Character caracter : this.pila) {
                         pilaPosPaso.append(caracter);
+                    }
+
+                    // si la pila o la cinta estan vacias, agregar lambda
+                    if (this.pila.isEmpty()) {
+                        pilaPosPaso.append('$');
                     }
 
                     // informar detalles en consola
@@ -794,7 +812,9 @@ public class AFPD implements Comparable<AFPD> {
 
                     // Hacer la transicion/paso computacional
                     // Dejar la cadena sin cambios
-                    listaCadena.addFirst(caracterActual);
+                    if (caracterActual != '$') {
+                        listaCadena.addFirst(caracterActual);
+                    }
 
                     // Paso computacional
                     estadoActual = estadoDestino;
@@ -803,6 +823,10 @@ public class AFPD implements Comparable<AFPD> {
                     // informar el paso computacional
                     for (Character caracter : this.pila) {
                         pilaPosPaso.append(caracter);
+                    }
+                    // si la pila o la cinta estan vacias, agregar lambda
+                    if (this.pila.isEmpty()) {
+                        pilaPosPaso.append('$');
                     }
 
                     // Dar los detalles en consola
@@ -864,6 +888,11 @@ public class AFPD implements Comparable<AFPD> {
                 String estadoDestino = destinoTranscn.getEstadoDes();
                 Character topeDestino = destinoTranscn.getTopeDestino();
 
+                // Dejar la pila sin cambios
+                if (topeActual != '$') {
+                    topeActual = '$';
+                }
+
                 // Paso computacional
                 estadoActual = estadoDestino;
                 this.modificarPila(topeActual, topeDestino);
@@ -874,6 +903,14 @@ public class AFPD implements Comparable<AFPD> {
                 }
                 for (Character caracter : listaCadena) {
                     cintaPosPaso.append(caracter);
+                }
+
+                // si la pila o la cinta estan vacias, agregar lambda
+                if (this.pila.isEmpty()) {
+                    pilaPosPaso.append('$');
+                }
+                if (listaCadena.isEmpty()) {
+                    cintaPosPaso.append('$');
                 }
 
                 // dar los detalles en consola
@@ -961,6 +998,13 @@ public class AFPD implements Comparable<AFPD> {
             }
             for (Character caracter : listaCadena) {
                 cintaPosPaso.append(caracter);
+            }
+            // si la pila o la cinta estan vacias, agregar lambda
+            if (this.pila.isEmpty()) {
+                pilaPosPaso.append('$');
+            }
+            if (listaCadena.isEmpty()) {
+                cintaPosPaso.append('$');
             }
 
             // dar los detalles en consola

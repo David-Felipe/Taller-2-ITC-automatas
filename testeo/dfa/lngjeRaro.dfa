@@ -18,4 +18,4 @@ q1: b> q2
 q2: a> q2
 q2: b> q2
 #comentario
-AFD que acepta el lenguaje de cadenas que terminan con "ab"
+AFD que acepta el lenguaje de cadenas (a*b(ab)*)+b(aUb)*

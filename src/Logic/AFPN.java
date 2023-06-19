@@ -209,9 +209,6 @@ public class AFPN {
         return sb.toString();
     }
 
-    public static void main(String[] args) {
-    }
-
     public void addEstado(String estado) {
         estados.add(estado);
     }

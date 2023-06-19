@@ -1,0 +1,21 @@
+#!dpda
+#states
+q0
+q1
+q2
+#initial
+q0
+#accepting
+q0
+q2
+#tapeAlphabet
+0-1
+#stackAlphabet
+A
+#transitions
+q0 : 0: $ > q1: A
+q0 : 1: A > q2: $
+q1 : 0: $ > q0: $
+q2 : 1: A > q2: $
+#comentario
+AFPD que acepta las cadenas (0^2n)(1^n) donde n >= 0 sobre el alfabeto {0, 1}
