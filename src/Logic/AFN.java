@@ -578,7 +578,7 @@ public class AFN {
         String nombreArchivoRechazadas = nombreArchivo + "Rechazadas.txt";
         String nombreArchivoAbortadas = nombreArchivo + "Abortadas.txt";
 
-        // Crear los archivos y llenarlo con las lsitas de estados correspondientes
+        // Crear los archivos y llenarlo con las listas de estados correspondientes
         try {
 
             // Crear el archivo de cadenas aceptadas
