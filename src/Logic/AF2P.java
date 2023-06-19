@@ -14,7 +14,7 @@ public class AF2P {
     private HashSet<String> Q;
     private String q0;
     private HashSet<String> F;
-    public HashSet<String> estadosInaccesibles;
+    private HashSet<String> estadosInaccesibles;
     private HashMap<String, HashMap<Character, HashMap<Character, HashMap<Character, HashSet<String[]>>>>> delta;
     private String procesamientoAceptacion = null;
     private String procesamientoRechazo = null;
@@ -147,6 +147,54 @@ public class AF2P {
         this.hallarEstadosInaccesibles();
     }
 
+    // Getters
+    public Boolean getEsAceptada() {
+
+        return this.esAceptado;
+    }
+
+    public String getProcesamientoAceptacion() {
+
+        return this.procesamientoAceptacion;
+    }
+
+    public String getProcesamientoRechazo() {
+
+        return this.procesamientoRechazo;
+    }
+
+    public String getStringListaProcesamientos() {
+
+        StringBuilder sb = new StringBuilder("");
+        for (String procesamiento : this.procesamientos) {
+            sb.append(procesamiento + "\n");
+        }
+        return sb.toString();
+    }
+
+    public String getStringProcesamientosAceptacion() {
+
+        StringBuilder sb = new StringBuilder();
+        for (String procesamientoAceptado : this.procesamientosAceptacion) {
+            sb.append(procesamientoAceptado + "\n");
+        }
+        return sb.toString();
+    }
+
+    public String getStringProcesamientosRechazo() {
+
+        StringBuilder sb = new StringBuilder();
+        for (String procesamientoRechazado : this.procesamientosRechazo) {
+            sb.append(procesamientoRechazado + "\n");
+        }
+        return sb.toString();
+    }
+
+    public NavigableSet<Character> getSigma() {
+
+        return this.sigma.getAlfabeto();
+    }
+    
     private void leerEstados(Iterator<String> iterator) {
         while (iterator.hasNext()) {
             String linea = iterator.next();
@@ -643,21 +691,11 @@ public class AF2P {
     public int computarTodosLosProcesamientos(String cadena, String nombreArchivo) {
         this.preprocesarCadena(cadena);
 
-        StringBuilder sbAceptacion = new StringBuilder();
-        StringBuilder sbRechazo = new StringBuilder();
-
         // Imprimir cada uno de los posibles procesamientos
         System.out.println("Procesamientos posibles para la cadena: " + cadena);
-        for (String procesamiento : this.procesamientos) {
-            System.out.println(procesamiento);
-        }
-        System.out.println();
+        System.out.println(this.getStringListaProcesamientos());
 
-
-        for (String procesamientoAceptado : this.procesamientosAceptacion) {
-            sbAceptacion.append(procesamientoAceptado + "\n");
-        }
-        String aceptacion = sbAceptacion.toString();
+        String aceptacion = this.getStringProcesamientosAceptacion();
         System.out.println("Procesamientos de aceptacion de la cadena: " + cadena);
         if (this.esAceptado){
             System.out.println(aceptacion);
@@ -665,11 +703,7 @@ public class AF2P {
             System.out.println("La cadena \"" + cadena + "\" no es aceptada.");
         }
 
-
-        for (String procesamientoRechazado : this.procesamientosRechazo) {
-            sbRechazo.append(procesamientoRechazado + "\n");
-        }
-        String rechazo = sbRechazo.toString();
+        String rechazo = this.getStringProcesamientosRechazo();
         System.out.println("Procesamientos rechazados de la cadena: " + cadena);
         if (rechazo.isBlank()){
             System.out.println("todos los procesamientos de la cadena \"" + cadena + "\" son de aceptacion.");
@@ -851,7 +885,7 @@ public class AF2P {
         sb.append("#transitions\n");
         for (String fromState : this.delta.keySet()) {
 
-            if (this.estadosInaccesibles.contains(fromState)){
+            if (!this.estadosInaccesibles.contains(fromState)){
 
                 for (Character symbol : this.delta.get(fromState).keySet()) {
                     
