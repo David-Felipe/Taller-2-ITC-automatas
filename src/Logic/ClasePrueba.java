@@ -116,6 +116,10 @@ public class ClasePrueba {
         // Setup menu seleccion de prueba de automata
         Boolean seleccionandoAutomata = true;
 
+        // Setup automatas guardados
+        HashMap<String, AF2P> automatasAF2PActuales = new HashMap<>();
+        HashMap<String, AFN> automatasAFNActuales = new HashMap<>();
+
         // Seleccion de automata que se repite hasta volver
         while (seleccionandoAutomata) {
 
@@ -136,6 +140,7 @@ public class ClasePrueba {
             System.out.println("3. Probar AFN Lambda");
             System.out.println("4. Probar AFPD");
             System.out.println("5. Probar AFPN");
+            System.out.println("6. Probar AF2P");
             System.out.println("0. Volver");
             System.out.println();
             System.out.print("Ingrese su opción: ");
@@ -150,7 +155,7 @@ public class ClasePrueba {
                     break;
 
                 case 2:
-                    probarAFN(input);
+                    probarAFN(automatasAFNActuales, input);
                     break;
 
                 case 3:
@@ -172,6 +177,11 @@ public class ClasePrueba {
                     } catch (Exception e) {
                         System.out.println("Error inesperado: " + e.getMessage());
                     }
+                    break;
+                case 6:
+                    probarAF2P(automatasAF2PActuales, input);
+                    break;
+
                 case 0:
                     seleccionandoAutomata = false;
                     break;
@@ -1639,12 +1649,12 @@ public class ClasePrueba {
 
     }
 
+
     // ** Probar AFN
-    private static void probarAFN(Scanner input) {
+    private static void probarAFN(HashMap<String, AFN> automatasActuales, Scanner input) {
 
         // Setup menu probar AFN
         Boolean probandoAFN = true;
-        HashMap<String, AFN> automatasActuales = new HashMap<>();
 
         // Menu que muestra las opciones para afn
         while (probandoAFN) {
@@ -1923,7 +1933,7 @@ public class ClasePrueba {
 
             if (!automatasActuales.keySet().contains(nombreAFN)) {
 
-                System.out.println("El nombre ingresado no es valido.");
+                System.out.println("No hay ningun AFN con ese nombre.");
                 System.out.println("Por favor intentelo nuevamente.");
                 System.out.println();
 
@@ -1992,7 +2002,7 @@ public class ClasePrueba {
 
             if (!automatasActuales.keySet().contains(nombreAFN)) {
 
-                System.out.println("El nombre ingresado no es valido.");
+                System.out.println("No hay ningun AFN con ese nombre.");
                 System.out.println("Por favor intentelo nuevamente.");
                 System.out.println();
 
@@ -2079,7 +2089,7 @@ public class ClasePrueba {
 
             if (!automatasActuales.keySet().contains(nombreAFN)) {
 
-                System.out.println("El nombre ingresado no es valido.");
+                System.out.println("No hay ningun AFN con ese nombre.");
                 System.out.println("Por favor intentelo nuevamente.");
                 System.out.println();
 
@@ -2251,6 +2261,617 @@ public class ClasePrueba {
 
         System.out.println();
     }
+
+    // ** Probar AF2P
+    private static void probarAF2P(HashMap<String, AF2P> automatasActuales, Scanner input) {
+
+        // Setup menu probar AF2P
+        Boolean probandoAF2P = true;
+
+        // Menu que muestra las opciones para af2p
+        while (probandoAF2P) {
+
+            // Limpiar consola para que se vea mas fancy
+            System.out.print("\033c");
+
+            // Espacio al inicio para no saturar e indicar menu
+            System.out.println();
+            System.out.println("Prueba de AF2P");
+            System.out.println();
+
+            if (automatasActuales.size() != 0) {
+
+                // Listar AF2PS
+                imprimirListaNombresAF2P(automatasActuales);
+
+            }
+
+            // Mostrar las opciones para probar AF2P
+            System.out.println("Presionando el entero seguido de la tecla enter, por favor");
+            System.out.println("seleccione una opción:");
+            System.out.println();
+            System.out.println("1. Editar AF2P ");
+            System.out.println("2. Procesar cadenas");
+            System.out.println("3. Exportar AF2P");
+            System.out.println("0. Volver");
+            System.out.println();
+            System.out.print("Ingrese su opción: ");
+            Integer opcion = input.nextInt();
+            System.out.println();
+
+            // Redirigir a la opcion deseada
+            switch (opcion) {
+
+                case 1:
+                    editarAF2P(automatasActuales, input);
+                    break;
+
+                case 2:
+                    procesarCadenasAF2P(automatasActuales, input);
+                    break;
+
+                case 3:
+                    exportarAF2P(automatasActuales, input);
+                    break;
+
+                case 0:
+                    probandoAF2P = false;
+                    break;
+
+                default:
+
+                    System.out.println("Opción inválida.");
+
+                    try {
+
+                        // Espera que lea el mensaje
+                        TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+                    } catch (InterruptedException e) {
+
+                        e.printStackTrace();
+
+                    }
+
+                    break;
+
+            }
+
+        }
+
+    }
+
+    // * Editar AF2P
+    private static void editarAF2P(HashMap<String, AF2P> automatasActuales, Scanner input) {
+
+        // Setup menu editar AF2P
+        Boolean editandoAF2P = true;
+
+        // Menu que muestra las opciones para editar AF2P
+        while (editandoAF2P) {
+
+            // Limpiar consola para que se vea mas fancy
+            System.out.print("\033c");
+
+            // Espacio al inicio para no saturar e indicar menu
+            System.out.println();
+            System.out.println("Edición de AF2Ps");
+            System.out.println();
+
+            if (automatasActuales.size() != 0) {
+
+                // Listar AF2PS
+                imprimirListaNombresAF2P(automatasActuales);
+
+            }
+
+            // Mostrar las opciones para editar AF2P
+            System.out.println("Presionando el entero seguido de la tecla enter, por favor");
+            System.out.println("seleccione una opción:");
+            System.out.println();
+            System.out.println("1. Crear AF2P ");
+            System.out.println("2. Eliminar AF2P");
+            System.out.println("0. Volver");
+            System.out.println();
+            System.out.print("Ingrese su opción: ");
+            Integer opcion = input.nextInt();
+            System.out.println();
+
+            // Redirigir a la opcion deseada
+            switch (opcion) {
+
+                case 1:
+                    crearAF2P(automatasActuales, input);
+                    break;
+
+                case 2:
+                    eliminarAF2P(automatasActuales, input);
+                    break;
+
+                case 0:
+                    editandoAF2P = false;
+                    break;
+
+                default:
+
+                    System.out.println("Opción inválida.");
+
+                    try {
+
+                        // Espera que lea el mensaje
+                        TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+                    } catch (InterruptedException e) {
+
+                        e.printStackTrace();
+
+                    }
+
+                    break;
+
+            }
+
+        }
+
+    }
+
+    // Crear AFN
+    private static void crearAF2P(HashMap<String, AF2P> automatasActuales, Scanner input) {
+
+        // Limpiar consola para que se vea mas fancy
+        System.out.print("\033c");
+
+        // Espacio al inicio para no saturar e indicar menu
+        System.out.println();
+        System.out.println("Creación de AF2P desde archivo");
+        System.out.println();
+
+        // Pedir informacion necesaria para crear el AF2P
+        // Pedir ruta al archivo
+        System.out.println("Por favor ingrese la ruta al archivo que contiene el AF2P");
+        while (!input.hasNext()) {
+
+            // Esperar a que haya un input y luego sí avanzas
+
+        }
+        String rutaArchivo = input.next();
+        System.out.println();
+
+        // Pedir nombre del AF2P
+        Boolean ingresandoNombre = true;
+        String nombreAF2P = "";
+        while (ingresandoNombre) {
+            System.out.println(
+                    "Por favor ingrese un nombre de menos de " + Integer.toString(maxCharLenName)
+                            + " caracteres sin espacios para el AF2P");
+            nombreAF2P = input.next().trim();
+            System.out.println();
+
+            // Verificar condición
+            if (nombreAF2P.length() <= maxCharLenName && nombreAF2P.split(" ").length == 1) {
+
+                ingresandoNombre = false;
+
+            } else {
+
+                System.out.println("El nombre ingresado no es valido.");
+                System.out.println("Por favor intentelo de nuevo.");
+                System.out.println();
+
+            }
+
+        }
+
+        // Crear el AF2P
+        try {
+
+            AF2P nuevoAF2P = new AF2P(rutaArchivo);
+            automatasActuales.put(nombreAF2P, nuevoAF2P);
+
+        } catch (Exception e) {
+
+            if (devMode) {
+
+                e.printStackTrace();
+
+            }
+
+            System.out.println();
+            System.out.println("Ocurrió un error al buscar el archivo.");
+            System.out.println();
+
+            // Esperar hasta que presione enter
+            System.out.println("Presione enter para continuar");
+            try {
+                System.in.read(); // Waits for user to press Enter
+            } catch (IOException er) {
+                er.printStackTrace();
+            }
+
+        }
+
+    }
+
+    // Eliminar AFN
+    static void eliminarAF2P(HashMap<String, AF2P> automatasActuales, Scanner input) {
+
+        // Limpiar consola para que se vea mas fancy
+        System.out.print("\033c");
+
+        // Verificar que sí existan
+        if (automatasActuales.size() == 0) {
+
+            System.out.println();
+            System.out.println("Todavía no se ha creado ningún AF2P.");
+            System.out.println();
+
+            try {
+
+                // Espera que lea el mensaje
+                TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+            } catch (InterruptedException e) {
+
+                e.printStackTrace();
+
+            }
+
+            return;
+
+        }
+
+        // Espacio al inicio para no saturar e indicar menu
+        System.out.println();
+        System.out.println("Eliminación de AF2P");
+        System.out.println();
+
+        // Mostrar automatas creados
+        if (automatasActuales.size() != 0) {
+
+            // Listar AF2PS
+            imprimirListaNombresAF2P(automatasActuales);
+
+        }
+
+        Boolean ingresandoAF2P = true;
+        String nombreAF2P = "";
+
+        while (ingresandoAF2P) {
+
+            // Pedir info necesaria
+            System.out.println("Indique el nombre del AF2P que desea eliminar");
+            nombreAF2P = input.next();
+            System.out.println();
+
+            if (!automatasActuales.keySet().contains(nombreAF2P)) {
+
+                System.out.println("No hay ningun AF2P con ese nombre.");
+                System.out.println("Por favor intentelo nuevamente.");
+                System.out.println();
+
+            } else {
+
+                ingresandoAF2P = false;
+                automatasActuales.remove(nombreAF2P);
+
+            }
+
+        }
+
+    }
+
+    // * Exportar AFN
+    private static void exportarAF2P(HashMap<String, AF2P> automatasActuales, Scanner input) {
+
+        // Limpiar consola para que se vea mas fancy
+        System.out.print("\033c");
+
+        // Verificar que sí existan
+        if (automatasActuales.size() == 0) {
+
+            System.out.println();
+            System.out.println("Todavía no se ha creado ningún AF2P.");
+            System.out.println();
+
+            try {
+
+                // Espera que lea el mensaje
+                TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+            } catch (InterruptedException e) {
+
+                e.printStackTrace();
+
+            }
+
+            return;
+
+        }
+
+        // Espacio al inicio para no saturar e indicar menu
+        System.out.println();
+        System.out.println("Exportar AF2P");
+        System.out.println();
+
+        // Mostrar automatas existentes
+        if (automatasActuales.size() != 0) {
+
+            // Listar AF2PS
+            imprimirListaNombresAF2P(automatasActuales);
+
+        }
+
+        // Ingresar el AF2P a exportar
+        Boolean ingresandoAF2P = true;
+        String nombreAF2P = "";
+
+        while (ingresandoAF2P) {
+
+            // Pedir info necesaria
+            System.out.println("Indique el nombre del AF2P a exportar");
+            nombreAF2P = input.next();
+            System.out.println();
+
+            if (!automatasActuales.keySet().contains(nombreAF2P)) {
+
+                System.out.println("No hay ningun AF2P con ese nombre.");
+                System.out.println("Por favor intentelo nuevamente.");
+                System.out.println();
+
+            } else {
+
+                ingresandoAF2P = false;
+
+            }
+
+        }
+
+        // Ingresar nombre del archivo de salida
+        // Pedir info necesaria
+        System.out.println("Por favor ingrese el nombre del archivo de salida");
+        String nombreArchivoSalida = input.next();
+        System.out.println();
+
+        // Exportar el AFN
+        try {
+
+            automatasActuales.get(nombreAF2P).exportar(nombreArchivoSalida);
+
+        } catch (IOException e) {
+
+            e.printStackTrace();
+
+        }
+
+    }
+
+    // * Procesar cadenas AF2P
+    private static void procesarCadenasAF2P(HashMap<String, AF2P> automatasActuales, Scanner input) {
+
+        // Verificar que sí existan automatas
+        if (automatasActuales.size() == 0) {
+
+            // Limpiar consola para que se vea mas fancy
+            System.out.print("\033c");
+
+            System.out.println();
+            System.out.println("Todavía no se ha creado ningún AF2P.");
+            System.out.println();
+
+            try {
+
+                // Espera que lea el mensaje
+                TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+            } catch (InterruptedException e) {
+
+                e.printStackTrace();
+
+            }
+
+            return;
+
+        }
+
+        // Limpiar consola para que se vea mas fancy
+        System.out.print("\033c");
+
+        // Espacio al inicio para no saturar e indicar menu
+        System.out.println();
+        System.out.println("Procesamiento de una cadena por AF2P");
+        System.out.println();
+
+        if (automatasActuales.size() != 0) {
+
+            // Listar AF2PS
+            imprimirListaNombresAF2P(automatasActuales);
+
+        }
+
+        // Ingresar el AF2P con el que se desea trabajar
+        Boolean ingresandoAF2P = true;
+        String nombreAF2P = "";
+
+        while (ingresandoAF2P) {
+
+            // Pedir info necesaria
+            System.out.println("Indique el nombre del AF2P que desea utilizar");
+            nombreAF2P = input.next();
+            System.out.println();
+
+            if (!automatasActuales.keySet().contains(nombreAF2P)) {
+
+                System.out.println("No hay ningun AF2P con ese nombre.");
+                System.out.println("Por favor intentelo nuevamente.");
+                System.out.println();
+
+            } else {
+
+                ingresandoAF2P = false;
+
+            }
+        }
+        AF2P af2p = automatasActuales.get(nombreAF2P);
+
+        // Ingresar la cadena a procesar
+        Boolean ingresandoCadena = true;
+        String cadena = "";
+
+        while (ingresandoCadena) {
+
+            // Imprimir alfabeto de cinta
+            StringBuilder alfabeto = new StringBuilder();
+            alfabeto.append("{");
+            Boolean masDeUnCaracter = false;
+            for (Character simbolo : af2p.getSigma()) {
+                if (masDeUnCaracter) {
+                    alfabeto.append("," + simbolo);
+                } else {
+                    alfabeto.append(simbolo);
+                    masDeUnCaracter = true;
+                }
+            }
+            alfabeto.append("}");
+            System.out.println("Alfabeto: " + alfabeto.toString());
+            System.out.println("lambda: $");
+            System.out.println();
+
+            // Pedir info necesaria
+            System.out.println("Ingrese la cadena a procesar");
+            cadena = input.next();
+            System.out.println();
+            Boolean cadenaValida = true;
+            for (int i = 0; i < cadena.length(); i++) {
+                if (!af2p.getSigma().contains(cadena.charAt(i))) {
+                    cadenaValida = false;
+                    break;
+                }
+            }
+            if (!cadenaValida && !cadena.equals("$")) {
+                System.out.println("La cadena ingresada no es valida.");
+                System.out.println("Por favor intentelo nuevamente.");
+                System.out.println();
+
+            } else {
+                if (cadena.equals("$")) {
+                    cadena = "";
+                }
+                ingresandoCadena = false;
+
+            }
+        }
+
+        // Procesar la cadena
+        af2p.preprocesarCadena(cadena);
+
+        // Setup menu seleccion de tipo de procesamiento
+        Boolean procesandoCadenas = true;
+
+        // Seleccion de procesamiento que se repite hasta volver
+        while (procesandoCadenas) {
+
+            // Limpiar consola para que se vea mas fancy
+            System.out.print("\033c");
+
+            // Espacio al inicio para no saturar e indicar menu
+            System.out.println();
+            System.out.println("Selección tipo de procesamiento");
+            System.out.println();
+
+            // Mostrar las opciones de selección de automata
+            System.out.println("Presionando el entero seguido de la tecla enter, por favor");
+            System.out.println("seleccione una opción:");
+            System.out.println();
+            System.out.println("1. Procesar cadena: \"" + cadena + "\"");
+            System.out.println("2. Consultar todos los procesamiento posibles de la cadena: \"" + cadena + "\"");
+            System.out.println("3. Consultar los procesamientos de aceptacion de la cadena: \"" + cadena + "\"");
+            System.out.println("4. Consultar los procesamientos de rechazo de la cadena: \"" + cadena + "\"");
+            System.out.println("0. Volver");
+            System.out.println();
+            System.out.print("Ingrese su opción: ");
+            Integer opcion = input.nextInt();
+            System.out.println();
+
+            // Redirigir a la opcion deseada
+            switch (opcion) {
+
+                case 1:
+                    if (af2p.getEsAceptada()) {
+                        System.out.println("La cadena: \"" + cadena + "\" es aceptada.");
+                        System.out.println("Un procesamiento aceptado es: ");
+                        System.out.println(af2p.getProcesamientoAceptacion());
+                    } else {
+                        System.out.println("La cadena: \"" + cadena + "\" es rechazada.");
+                        System.out.println("Uno de los procesamientos mas cortos es: ");
+                        System.out.println(af2p.getProcesamientoRechazo());
+                    }
+                    
+                    break;
+
+                case 2:
+                    System.out.println(af2p.getStringListaProcesamientos());
+                    break;
+
+                case 3:
+                    System.out.println(af2p.getStringProcesamientosAceptacion());
+                    break;
+
+                case 4:
+                    System.out.println(af2p.getStringProcesamientosRechazo());
+                    break;
+
+                case 0:
+                    procesandoCadenas = false;
+                    break;
+
+                default:
+
+                    System.out.println("Opción inválida");
+
+                    try {
+
+                        // Espera que lea el mensaje
+                        TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+                    } catch (InterruptedException e) {
+
+                        e.printStackTrace();
+
+                    }
+
+                    break;
+
+            }
+            // Esperar hasta que se presione enter
+            if (procesandoCadenas) {
+                System.out.println("Presione enter para continuar");
+                try {
+                    System.in.read();
+                } catch (IOException er) {
+                    er.printStackTrace();
+                }
+            }
+        }
+
+    }
+
+    private static void imprimirListaNombresAF2P(HashMap<String, AF2P> automatas) {
+        Integer numActual = 1;
+
+        System.out.println("Sus AF2P actuales son:");
+        System.out.println();
+
+        // Imprimir los AF2P contenidos en automatasActuales
+        for (String strActual : automatas.keySet()) {
+
+            System.out.println(Integer.toString(numActual) + ". " + strActual + "\n");
+            numActual++;
+
+        }
+
+        System.out.println();
+    }
+
 
     // ** Probar AFN Lambda
     private static void probarAFNLambda(Scanner input) throws IOException {
