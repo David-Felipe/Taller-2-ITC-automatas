@@ -16,6 +16,10 @@ public class AF2P {
     private HashSet<String> F;
     private HashSet<String> estadosInaccesibles;
     private HashMap<String, HashMap<Character, HashMap<Character, HashMap<Character, HashSet<String[]>>>>> delta;
+    private Stack<Character> pila1 = new Stack<Character>();
+    private Stack<Character> pila2 = new Stack<Character>();
+    
+    // Registro procesamientos
     private String procesamientoAceptacion = null;
     private String procesamientoRechazo = null;
     private HashSet<String> procesamientos = null;
@@ -24,8 +28,6 @@ public class AF2P {
     private int numPasosProcesamientoAceptacion;
     private int numPasosProcesamientoRechazo;
     private Boolean esAceptado = false;
-    private Stack<Character> pila1 = new Stack<Character>();
-    private Stack<Character> pila2 = new Stack<Character>();
     private int numProcesamientos = 0;
 
 
@@ -65,7 +67,7 @@ public class AF2P {
 
                 // Cerrar el buffer
                 br.close();
-                throw new IllegalArgumentException("El archivo no corresponde a un AFN");
+                throw new IllegalArgumentException("El archivo no corresponde a un AF2P");
 
             }
             while ((linea = br.readLine()) != null) {
@@ -152,7 +154,7 @@ public class AF2P {
 
         return this.esAceptado;
     }
-
+    
     public String getProcesamientoAceptacion() {
 
         return this.procesamientoAceptacion;
@@ -195,6 +197,11 @@ public class AF2P {
         return this.sigma.getAlfabeto();
     }
     
+    public Alfabeto getAlfabeto() {
+
+        return this.sigma;
+    }
+
     private void leerEstados(Iterator<String> iterator) {
         while (iterator.hasNext()) {
             String linea = iterator.next();
@@ -665,7 +672,12 @@ public class AF2P {
         this.procesamientosRechazo = new HashSet<String>();
         this.esAceptado = false;
         this.numProcesamientos = 0;
-        String str = "(" + this.q0 + "," + cadena + ",$,$)";
+        String str = "(" + this.q0 + ",";
+        if (cadena.isEmpty()) {
+            str += "$,$,$)";
+        } else {
+            str += cadena + ",$,$)";
+        }
         preprocesarCadena(this.q0, cadena, this.pila1, this.pila2, str, 0);
 
     }
