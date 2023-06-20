@@ -218,8 +218,62 @@ public class ClasePrueba {
     // Menu para elegir que conversion probar
     private static void probarConversiones(Scanner input) {
 
-        // TODO
+        // Setup menu seleccion de prueba de conversiones
+        Boolean seleccionandoConversion = true;
 
+        // Seleccion de conversion que se repite hasta volver
+        while (seleccionandoConversion) {
+
+            // Limpiar consola para que se vea mas fancy
+            System.out.print("\033c");
+
+            // Espacio al inicio para no saturar e indicar menu
+            System.out.println();
+            System.out.println("Selección tipo de conversion");
+            System.out.println();
+
+            // Mostrar las opciones de selección de conversion
+            System.out.println("Presionando el entero seguido de la tecla enter, por favor");
+            System.out.println("seleccione una opción:");
+            System.out.println();
+            System.out.println("1. AFN a AFD");
+            System.out.println("2. Validar AFN a AFD con lista de automatas");
+            System.out.println("0. Volver");
+            System.out.println();
+            System.out.print("Ingrese su opción: ");
+            Integer opcion = input.nextInt();
+            System.out.println();
+
+            // Redirigir a la opcion deseada
+            switch (opcion) {
+
+                case 1:
+                    probarAFNtoAFD(input);
+                    break;
+                case 2:
+                    validarAFNtoAFD(input);
+                    break;
+                case 0:
+                    seleccionandoConversion = false;
+                    break;
+
+                default:
+
+                    System.out.println("Opción inválida");
+
+                    try {
+
+                        // Espera que lea el mensaje
+                        TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+                    } catch (InterruptedException e) {
+
+                        e.printStackTrace();
+
+                    }
+                    break;
+            }
+        }
     }
 
     // ** Probar automatas
@@ -4265,11 +4319,529 @@ public class ClasePrueba {
     }
 
     // Probar conversiones
-    private static void probarAFNtoAFD() {
+    private static void probarAFNtoAFD(Scanner input) {
 
-        // TODO
+        // Verificar que sí existan
+        if (automatasAFNActuales.size() == 0) {
+
+            System.out.println();
+            System.out.println("Todavía no se ha creado ningún AFN.");
+            System.out.println();
+
+            try {
+
+                // Espera que lea el mensaje
+                TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+            } catch (InterruptedException e) {
+
+                e.printStackTrace();
+
+            }
+
+            return;
+
+        }
+
+        // Ingresar el AFN a exportar
+        
+
+        // Setup menu probar AFN to AFD
+        Boolean probandoAFNtoAFD = true;
+
+        // Menu que muestra las opciones para pruebas de conversion AFN a AFD
+        while (probandoAFNtoAFD) {
+
+            // Limpiar consola para que se vea mas fancy
+            System.out.print("\033c");
+
+            // Espacio al inicio para no saturar e indicar menu
+            System.out.println();
+            System.out.println("Prueba de Conversion: AFN a AFD");
+            System.out.println();
+
+            if (automatasAFNActuales.size() != 0) {
+
+                // Listar AFNs
+                System.out.println("AFNs guardados:\n");
+                imprimirListaNombresAFN();
+
+            }
+
+            // Seleccionar AFN
+            Boolean ingresandoAFN = true;
+            String nombreAFN = "";
+
+            while (ingresandoAFN) {
+
+                // Pedir info necesaria
+                System.out.println("Indique el nombre del AFN con el que desea trabajar");
+                nombreAFN = input.next();
+                System.out.println();
+
+                if (!automatasAFNActuales.keySet().contains(nombreAFN)) {
+
+                    System.out.println("No hay ningun AFN con ese nombre.");
+                    System.out.println("Por favor intentelo nuevamente.");
+                    System.out.println();
+
+                } else {
+
+                    ingresandoAFN = false;
+
+                }
+
+            }
+
+            Boolean trabajandoConAFD = true;
+            AFN afn = automatasAFNActuales.get(nombreAFN);
+            AFD afd = AFN.AFNtoAFD(afn);
+
+            while (trabajandoConAFD) {
+                // Limpiar consola para que se vea mas fancy
+                System.out.print("\033c");
+
+                // Espacio al inicio para no saturar e indicar menu
+                System.out.println();
+                System.out.println("Prueba de Conversion: AFN a AFD");
+                System.out.println();
+                System.out.println("AFN seleccionado:" + nombreAFN + "\n");
+
+                // Mostrar las opciones para probar AFN to AFD
+                System.out.println("Presionando el entero seguido de la tecla enter, por favor");
+                System.out.println("seleccione una opción:");
+                System.out.println();
+                System.out.println("1. Comparar procesamiento de una cadena");
+                System.out.println("2. Procesar cadena con AFD equivalente");
+                System.out.println("3. Procesar lista de cadenas con AFD equivalente");
+                System.out.println("4. Exportar AFD equivalente");
+                System.out.println("5. Seleccionar otro AFN");
+                System.out.println("0. Volver");
+                System.out.println();
+                System.out.print("Ingrese su opción: ");
+                Integer opcion = input.nextInt();
+                System.out.println();
+
+                // Redirigir a la opcion deseada
+                switch (opcion) {
+
+                    case 1:
+                        compararAFNtoAFD(afn, afd, input);
+                        break;
+
+                    case 2:
+                        procesarCadenasAFNtoAFD(afn, afd, input);
+                        break;
+
+                    case 3:
+                        procesarListaDeCadenasAFNtoAFD(afn, afd, input, nombreAFN);
+                        break;
+
+                    case 4:
+                        exportarAFNtoAFD(afd, input);
+                        break;
+
+                    case 5:
+                        trabajandoConAFD = false;
+                        break;
+
+                    case 0:
+                        trabajandoConAFD = false;
+                        probandoAFNtoAFD = false;
+                        break;
+
+                    default:
+
+                        System.out.println("Opción inválida");
+
+                        try {
+
+                            // Espera que lea el mensaje
+                            TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+                        } catch (InterruptedException e) {
+
+                            e.printStackTrace();
+
+                        }
+
+                        break;
+
+                }
+            }
+        }
+    }
+
+    
+    // * Procesar cadenas AFN to AFD
+    private static void compararAFNtoAFD(AFN afn, AFD afd, Scanner input) {
+
+        // Ingresar la cadena a procesar
+        Boolean ingresandoCadena = true;
+        String cadena = "";
+
+        while (ingresandoCadena) {
+
+            // Imprimir alfabeto
+            StringBuilder alfabeto = new StringBuilder();
+            alfabeto.append("{");
+            Boolean masDeUnCaracter = false;
+            for (Character simbolo : afn.getSigma()) {
+                if (masDeUnCaracter) {
+                    alfabeto.append("," + simbolo);
+                } else {
+                    alfabeto.append(simbolo);
+                    masDeUnCaracter = true;
+                }
+            }
+            alfabeto.append("}");
+            System.out.println("Alfabeto: " + alfabeto.toString());
+            System.out.println("lambda: $");
+            System.out.println();
+
+            // Pedir info necesaria
+            System.out.println("Ingrese la cadena a procesar");
+            cadena = input.next().replaceAll("\\s+","");
+            System.out.println();
+            Boolean cadenaValida = true;
+            for (int i = 0; i < cadena.length(); i++) {
+                if (!afn.getSigma().contains(cadena.charAt(i))) {
+                    cadenaValida = false;
+                    break;
+                }
+            }
+            if (!cadenaValida && !cadena.equals("$")) {
+                System.out.println("La cadena ingresada no es valida.");
+                System.out.println("Por favor intentelo nuevamente.");
+                System.out.println();
+
+            } else {
+                if (cadena.equals("$")) {
+                    cadena = "";
+                }
+                ingresandoCadena = false;
+
+            }
+        }
+        System.out.println("Pocesamiento via AFN:");
+        Boolean esAceptadaPorAFN = afn.procesarCadenaConDetalles(cadena);
+        System.out.println();
+        System.out.println("Pocesamiento via AFD:");
+        Boolean esAceptadaPorAFD = afd.procesarCadena(cadena, true);
+        if (esAceptadaPorAFN && esAceptadaPorAFD) {
+            System.out.println("\nLa cadena \"" + cadena + "\" es aceptada por ambos automatas.");
+        } else if (!esAceptadaPorAFN && !esAceptadaPorAFD) {
+            System.out.println("\nLa cadena \"" + cadena + "\" es rechazada por ambos automatas.");
+        } else {
+            System.out.println("\nLos automatas difieren en el procesamiento de la cadena \"" + cadena + "\".");
+        }
+
+        // Esperar hasta que se presione enter
+        System.out.println("\nPresione enter para continuar");
+        try {
+            System.in.read();
+        } catch (IOException er) {
+            er.printStackTrace();
+        }
+    }
+
+    // * Procesar cadenas AFN to AFD
+    private static void procesarCadenasAFNtoAFD(AFN afn, AFD afd, Scanner input) {
+
+        // Ingresar la cadena a procesar
+        Boolean ingresandoCadena = true;
+        String cadena = "";
+
+        while (ingresandoCadena) {
+
+            // Imprimir alfabeto
+            StringBuilder alfabeto = new StringBuilder();
+            alfabeto.append("{");
+            Boolean masDeUnCaracter = false;
+            for (Character simbolo : afn.getSigma()) {
+                if (masDeUnCaracter) {
+                    alfabeto.append("," + simbolo);
+                } else {
+                    alfabeto.append(simbolo);
+                    masDeUnCaracter = true;
+                }
+            }
+            alfabeto.append("}");
+            System.out.println("Alfabeto: " + alfabeto.toString());
+            System.out.println("lambda: $");
+            System.out.println();
+
+            // Pedir info necesaria
+            System.out.println("Ingrese la cadena a procesar");
+            cadena = input.next().replaceAll("\\s+","");
+            System.out.println();
+            Boolean cadenaValida = true;
+            for (int i = 0; i < cadena.length(); i++) {
+                if (!afn.getSigma().contains(cadena.charAt(i))) {
+                    cadenaValida = false;
+                    break;
+                }
+            }
+            if (!cadenaValida && !cadena.equals("$")) {
+                System.out.println("La cadena ingresada no es valida.");
+                System.out.println("Por favor intentelo nuevamente.");
+                System.out.println();
+
+            } else {
+                if (cadena.equals("$")) {
+                    cadena = "";
+                }
+                ingresandoCadena = false;
+
+            }
+        }
+        Boolean esAceptada = afd.procesarCadena(cadena, true);
+
+        // Esperar hasta que se presione enter
+        System.out.println("\nPresione enter para continuar");
+        try {
+            System.in.read();
+        } catch (IOException er) {
+            er.printStackTrace();
+        }
+    }
+
+    // * Procesar lista de cadenas AFN
+    private static void procesarListaDeCadenasAFNtoAFD(AFN afn, AFD afd, Scanner input, String nombreAFN) {
+
+        // Setup menu probar AFN
+        Boolean escogiendoLista = true;
+
+        // Menu que muestra las opciones para afn
+        while (escogiendoLista) {
+
+            // Limpiar consola para que se vea mas fancy
+            System.out.print("\033c");
+
+            // Espacio al inicio para no saturar e indicar menu
+            System.out.println();
+            System.out.println("Procesamiento de listas de cadenas AFN");
+            System.out.println();
+            System.out.println("Automata: " + nombreAFN);
+
+            // Mostrar las opciones para probar AFN
+            System.out.println("Presionando el entero seguido de la tecla enter, por favor");
+            System.out.println("seleccione una opción:");
+            System.out.println();
+            System.out.println("1. Procesar lista de cadenas aleatorias con AFD equivalente");
+            System.out.println("2. Importar y procesar lista de cadenas con AFD equivalente");
+            System.out.println("0. Volver");
+            System.out.println();
+            System.out.print("Ingrese su opción: ");
+            Integer opcion = input.nextInt();
+            System.out.println();
+
+            Iterable<String> listaCadenas;
+            String nombreArchivo;
+            String imprimirPantallaStr;
+            boolean imprimirPantalla;
+
+            // Redirigir a la opcion deseada
+            switch (opcion) {
+
+                case 1:
+                    // Pedir informacion necesaria para crear la lista
+                    // Pedir cantidad de cadenas
+                    int numCadenas = 0;
+                    while (numCadenas < 1) {
+                        System.out.println("Por favor ingrese el numero de cadenas a generar");
+                        while (!input.hasNext()) {
+                            // Esperar a que haya un input y luego sí avanzas
+                        }
+                        numCadenas = input.nextInt();
+                    }
+                    listaCadenas = afn.getAlfabeto().generarCadenas(numCadenas);
+
+                    // Pedir info necesaria
+                    System.out.println("Indique el nombre del archivo de salida");
+                    nombreArchivo = input.next();
+                    System.out.println();
+
+                    System.out.println("ingrese \"p\" si desea imprimir los resultados en pantalla.");
+                    while (!input.hasNext()) {
+                        // Esperar a que haya un input y luego sí avanzas
+                    }
+                    imprimirPantallaStr = input.next();
+                    System.out.println();
+                    imprimirPantalla = imprimirPantallaStr.equalsIgnoreCase("p");
+
+                    //procesar lista
+                    afn.procesarListaCadenasConversion(listaCadenas, nombreArchivo, imprimirPantalla, afd);
+                    // Esperar hasta que presione enter
+                    System.out.println("Presione enter para continuar");
+                    try {
+                        System.in.read();
+                    } catch (IOException er) {
+                        er.printStackTrace();
+                    }
+                    break;
+
+                case 2:
+                    // Pedir informacion necesaria para crear la lista
+                    // Pedir ruta al archivo
+                    System.out.println("Por favor ingrese la ruta al archivo que contiene la lista");
+                    while (!input.hasNext()) {
+                        // Esperar a que haya un input y luego sí avanzas
+                    }
+                    String rutaArchivo = input.next();
+                    System.out.println();
+
+                    // Pedir info necesaria
+                    System.out.println("Indique el nombre del archivo de salida");
+                    nombreArchivo = input.next();
+                    System.out.println();
+
+                    System.out.println("ingrese \"p\" si desea imprimir los resultados en pantalla.");
+                    while (!input.hasNext()) {
+                        // Esperar a que haya un input y luego sí avanzas
+                    }
+                    imprimirPantallaStr = input.next();
+                    System.out.println();
+                    imprimirPantalla = imprimirPantallaStr.equalsIgnoreCase("p");
+
+                    // Crear lista
+                    try {
+                        listaCadenas = leerListaCadenasDesdeArchivo(rutaArchivo);
+
+                        //procesar lista
+                        afn.procesarListaCadenasConversion(listaCadenas, nombreArchivo, imprimirPantalla, afd);
+                        // Esperar hasta que presione enter
+                        System.out.println("Presione enter para continuar");
+                        try {
+                            System.in.read();
+                        } catch (IOException er) {
+                            er.printStackTrace();
+                        }
+                    } catch (Exception e) {
+                        if (devMode) {
+                            e.printStackTrace();
+                        }
+                        System.out.println("\nOcurrió un error al buscar el archivo.\n");
+                        escogiendoLista = false;
+
+                        // Esperar hasta que presione enter
+                        System.out.println("Presione enter para continuar");
+                        try {
+                            System.in.read();
+                        } catch (IOException er) {
+                            er.printStackTrace();
+                        }
+                    }
+                    break;
+
+                case 0:
+                    escogiendoLista = false;
+                    break;
+
+                default:
+
+                    System.out.println("Opción inválida");
+
+                    try {
+
+                        // Espera que lea el mensaje
+                        TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+                    } catch (InterruptedException e) {
+
+                        e.printStackTrace();
+
+                    }
+
+                    break;
+
+            }
+
+        }
+    }
+
+    // * Exportar AFN to AFD
+    private static void exportarAFNtoAFD(AFD afd, Scanner input) {
+
+        // Ingresar nombre del archivo de salida
+        // Pedir info necesaria
+        System.out.println("Por favor ingrese el nombre del archivo de salida");
+        String nombreArchivoSalida = input.next();
+        System.out.println();
+
+        // Exportar el AFD
+        afd.exportar(nombreArchivoSalida);
 
     }
+
+    private static void validarAFNtoAFD(Scanner input){
+
+        // Limpiar consola para que se vea mas fancy
+        System.out.print("\033c");
+
+        // Espacio al inicio para no saturar e indicar menu
+        System.out.println();
+        System.out.println("Validar convercion de AFN a AFD");
+        System.out.println();
+
+        // Pedir informacion necesaria para crear el AFN
+        // Pedir ruta al archivo
+        System.out.println("Por favor ingrese la ruta a un archivo que liste rutas a archivos .nfa");
+        while (!input.hasNext()) {
+
+            // Esperar a que haya un input y luego sí avanzas
+
+        }
+        String rutaArchivo = input.next();
+        System.out.println();
+
+
+        // Crear lista de AFNs
+
+        try {
+
+            Collection<AFN> listaAFNs = new ArrayDeque<AFN>();
+            FileReader fileReader = new FileReader(rutaArchivo);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            String linea;
+            while ((linea = bufferedReader.readLine()) != null) {
+                listaAFNs.add(new AFN(linea));
+            }
+            bufferedReader.close();
+            ClaseValidacion.validarAFNtoAFD(listaAFNs);
+
+            // Esperar hasta que presione enter
+            System.out.println("Presione enter para continuar");
+            try {
+                System.in.read(); // Waits for user to press Enter
+            } catch (IOException er) {
+                er.printStackTrace();
+            }
+
+
+
+        } catch (Exception e) {
+
+            if (devMode) {
+
+                e.printStackTrace();
+
+            }
+
+            System.out.println();
+            System.out.println("Ocurrió un error al buscar un archivo.");
+            System.out.println();
+
+            // Esperar hasta que presione enter
+            System.out.println("Presione enter para continuar");
+            try {
+                System.in.read(); // Waits for user to press Enter
+            } catch (IOException er) {
+                er.printStackTrace();
+            }
+        }
+    }
+
 
     private static void probarAFNLambdaToAFN() {
 
@@ -4418,8 +4990,8 @@ public class ClasePrueba {
                     }
                     break;
             }
+            }
         }
-    } 
 
     private static void crearAFPN(TreeSet<AFPN> automatasActuales, Scanner input) {
         // Limpiar consola
@@ -4435,7 +5007,7 @@ public class ClasePrueba {
         System.out.println("Por favor ingrese la ruta al archivo que contiene el AFPN");
         while (!input.hasNext()) {
             // Esperar a que haya un input y luego avanzar
-        }
+    }
         String rutaArchivo = input.next();
         System.out.println();
 
@@ -4609,7 +5181,7 @@ public class ClasePrueba {
                         e.printStackTrace();
                     }
                     break;
-            }
+                    }
         }
     }
 
@@ -4672,11 +5244,11 @@ public class ClasePrueba {
         }
 
         System.out.println("Presione enter para continuar");
-        try {
+                    try {
             System.in.read();
         } catch (IOException e) {
             e.printStackTrace();
-        }
+                    }
     }
 
     private static void procesarListaCadenasAFPN(TreeSet<AFPN> automatasActuales, Scanner input) {
@@ -4720,20 +5292,20 @@ public class ClasePrueba {
         System.out.println();
 
         ArrayList<String> listaCadenas = new ArrayList<>();
-        try {
+                    try {
             File archivo = new File(rutaArchivo);
             Scanner lector = new Scanner(archivo);
 
             while (lector.hasNextLine()) {
                 String lineaActual = lector.nextLine().trim();
                 listaCadenas.add(lineaActual);
-            }
+                        }
 
             lector.close();
-        } catch (FileNotFoundException e) {
+                    } catch (FileNotFoundException e) {
             if (devMode) {
                 e.printStackTrace();
-            }
+                    }
             System.out.println();
             System.out.println("Ocurrió un error al buscar el archivo");
             System.out.println();
@@ -4761,11 +5333,11 @@ public class ClasePrueba {
         System.out.println();
         if (detalles == 1) {
             System.out.println("Presione enter para continuar");
-            try {
+                    try {
                 System.in.read();
             } catch (IOException e) {
                 e.printStackTrace();
-            }
+                    }
         }
     }
 

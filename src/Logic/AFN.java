@@ -317,9 +317,7 @@ public class AFN {
 
     public Boolean procesarCadenaConDetalles(String cadena) {
         ProcesamientoCadenaAFN pAFN = new ProcesamientoCadenaAFN(cadena, this);
-        if (pAFN.esAceptada()) {
-            System.out.println(pAFN.procesamientoMasCorto() + " " + "Aceptacion");
-        }
+        System.out.println(pAFN.procesamientoMasCorto() + " " + "Aceptacion");
         return pAFN.esAceptada();
     }
 
@@ -368,6 +366,9 @@ public class AFN {
         // Insertar transiciones
         sb.append("#transitions\n");
         for (String preEstado : this.delta.keySet()) {
+            if (!mostrarInaccesibles && this.estadosInaccesibles.contains(preEstado)) {
+                continue;
+            }
             for (Character simbolo : this.delta.get(preEstado).keySet()) {
                 Boolean masDeUnPostEstado = false;
                 sb.append(preEstado + ":" + simbolo + ">");
@@ -418,7 +419,7 @@ public class AFN {
 
             // Escribir el AFD en el archivo
             FileWriter escritor = new FileWriter(archivoAFN);
-            escritor.write(this.preToString(true, false));
+            escritor.write(this.preToString(false, false));
             escritor.close();
 
             System.out.println("Archivo del AFN creado exitosamente");
@@ -755,6 +756,38 @@ public class AFN {
         }
 
         AFD afd = AFNtoAFD(this);
+        afd.procesarListaCadenas(listaCadenas, nombreArchivo, imprimirPantalla);
+    }
+
+    public void procesarListaCadenasConversion(Iterable<String> listaCadenas, String nombreArchivo,
+            Boolean imprimirPantalla, AFD afd) {
+        // Comprobar que el nombre del archivo es valido
+        for (int i = 0; i < nombreArchivo.length(); i++) {
+            Character simbolo = nombreArchivo.charAt(i);
+            if (!Character.isDigit(simbolo) && !Character.isLetter(simbolo) && !(simbolo >= ',' && simbolo <= '.')
+                    && !(simbolo == '_')) {
+                nombreArchivo = "procesamiento-cadenas_"
+                        + LocalDateTime.now().getYear() + "-"
+                        + LocalDateTime.now().getMonthValue() + "-"
+                        + LocalDateTime.now().getDayOfMonth() + "-"
+                        + LocalDateTime.now().getHour() + "-"
+                        + LocalDateTime.now().getMinute() + "-"
+                        + LocalDateTime.now().getSecond() + "_"
+                        + Integer.toString(this.hashCode());
+                break;
+            }
+        }
+        if (nombreArchivo.isBlank()){
+            nombreArchivo = "procesamiento-cadenas_"
+                        + LocalDateTime.now().getYear() + "-"
+                        + LocalDateTime.now().getMonthValue() + "-"
+                        + LocalDateTime.now().getDayOfMonth() + "-"
+                        + LocalDateTime.now().getHour() + "-"
+                        + LocalDateTime.now().getMinute() + "-"
+                        + LocalDateTime.now().getSecond() + "_"
+                        + Integer.toString(this.hashCode());
+        }
+
         afd.procesarListaCadenas(listaCadenas, nombreArchivo, imprimirPantalla);
     }
 

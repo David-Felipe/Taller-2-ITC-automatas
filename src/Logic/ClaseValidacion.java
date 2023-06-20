@@ -29,14 +29,21 @@ public class ClaseValidacion {
 
             }
             System.out.println("Automata " + contadorAutomatas + ": \n");
-            System.out.println("Numero de casos con el mismo resultado: " + contadorIguales);
-            System.out.println("Numero de casos con resultados distintos: " + contadorDistintos);
+            System.out.println("Numero de casos con el mismo resultado: " + contadorIguales + "\n");
+            System.out.println("Numero de casos con resultados distintos: " + contadorDistintos + "\n");
             if (contadorDistintos > 0){
                 System.out.println("Cadenas que generan resultados distintos:");
-                System.out.println(cadenasDiferencia);
+                if (cadenasDiferencia.isEmpty()){
+                    System.out.println("Ninguna.\n");
+                } else {
+                    for (String cadena : cadenasDiferencia) {
+                        System.out.println(cadena);
+                    }
+                    System.out.println();
+                }
             }
             System.out.println("\n\n");
-
+            contadorAutomatas++;
 
         }
         
