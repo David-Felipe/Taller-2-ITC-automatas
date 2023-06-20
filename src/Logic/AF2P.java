@@ -154,7 +154,7 @@ public class AF2P {
 
         return this.esAceptado;
     }
-
+    
     public String getProcesamientoAceptacion() {
 
         return this.procesamientoAceptacion;
@@ -197,6 +197,11 @@ public class AF2P {
         return this.sigma.getAlfabeto();
     }
     
+    public Alfabeto getAlfabeto() {
+
+        return this.sigma;
+    }
+
     private void leerEstados(Iterator<String> iterator) {
         while (iterator.hasNext()) {
             String linea = iterator.next();
@@ -668,7 +673,7 @@ public class AF2P {
         this.esAceptado = false;
         this.numProcesamientos = 0;
         String str = "(" + this.q0 + ",";
-        if (cadena.equals("$")) {
+        if (cadena.isEmpty()) {
             str += "$,$,$)";
         } else {
             str += cadena + ",$,$)";

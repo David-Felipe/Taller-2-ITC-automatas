@@ -397,6 +397,7 @@ public class MT {
                 this.sufijo.push('!');
             }
             readOnTape = this.sufijo.peek();
+            readOnTape = (readOnTape.equals('$')) ? ('!'):(readOnTape);
 
             String[] image = this.delta(currentState, readOnTape);
             if (image != null){

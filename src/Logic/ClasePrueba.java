@@ -1685,8 +1685,9 @@ public class ClasePrueba {
             System.out.println("seleccione una opción:");
             System.out.println();
             System.out.println("1. Editar AFN ");
-            System.out.println("2. Procesar cadenas");
-            System.out.println("3. Exportar AFN");
+            System.out.println("2. Procesar cadena");
+            System.out.println("3. Procesar lista de cadenas");
+            System.out.println("4. Exportar AFN");
             System.out.println("0. Volver");
             System.out.println();
             System.out.print("Ingrese su opción: ");
@@ -1705,6 +1706,10 @@ public class ClasePrueba {
                     break;
 
                 case 3:
+                    procesarListaDeCadenasAFN(input);
+                    break;
+
+                case 4:
                     exportarAFN(input);
                     break;
 
@@ -1754,7 +1759,7 @@ public class ClasePrueba {
 
             if (automatasAFNActuales.size() != 0) {
 
-                // Listar AFNS
+                // Listar AFNs
                 imprimirListaNombresAFN();
 
             }
@@ -1881,9 +1886,7 @@ public class ClasePrueba {
             } catch (IOException er) {
                 er.printStackTrace();
             }
-
         }
-
     }
 
     // Eliminar AFN
@@ -2141,7 +2144,7 @@ public class ClasePrueba {
 
                 // Pedir info necesaria
                 System.out.println("Ingrese la cadena a procesar");
-                cadena = input.next();
+                cadena = input.next().replaceAll("\\s+","");
                 System.out.println();
                 Boolean cadenaValida = true;
                 for (int i = 0; i < cadena.length(); i++) {
@@ -2266,6 +2269,232 @@ public class ClasePrueba {
         }
     }
 
+
+    // * Procesar lista de cadenas AFN
+    private static void procesarListaDeCadenasAFN(Scanner input) {
+
+        // Verificar que sí existan
+        if (automatasAFNActuales.size() == 0) {
+
+            // Limpiar consola para que se vea mas fancy
+            System.out.print("\033c");
+
+            System.out.println();
+            System.out.println("Todavía no se ha creado ningún AFN.");
+            System.out.println();
+
+            try {
+
+                // Espera que lea el mensaje
+                TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+            } catch (InterruptedException e) {
+
+                e.printStackTrace();
+
+            }
+
+            return;
+
+        }
+
+        // Limpiar consola para que se vea mas fancy
+        System.out.print("\033c");
+
+        // Espacio al inicio para no saturar e indicar menu
+        System.out.println();
+        System.out.println("Procesamiento de cadenas por AFN");
+        System.out.println();
+
+        if (automatasAFNActuales.size() != 0) {
+
+            // Listar AFNS
+            imprimirListaNombresAFN();
+
+        }
+
+        // Ingresar el AFN con el que se desea trabajar
+        Boolean ingresandoAFN = true;
+        String nombreAFN = "";
+
+        while (ingresandoAFN) {
+
+            // Pedir info necesaria
+            System.out.println("Indique el nombre del AFN que desea utilizar");
+            nombreAFN = input.next();
+            System.out.println();
+
+            if (!automatasAFNActuales.keySet().contains(nombreAFN)) {
+
+                System.out.println("No hay ningun AFN con ese nombre.");
+                System.out.println("Por favor intentelo nuevamente.");
+                System.out.println();
+
+            } else {
+
+                ingresandoAFN = false;
+
+            }
+        }
+        AFN afn = automatasAFNActuales.get(nombreAFN);
+
+        procesarListaDeCadenasAFNConEsteAFN(afn, input, nombreAFN);
+
+    }
+    
+    private static void procesarListaDeCadenasAFNConEsteAFN(AFN afn, Scanner input, String nombreAFN) {
+
+        // Setup menu probar AFN
+        Boolean escogiendoLista = true;
+
+        // Menu que muestra las opciones para afn
+        while (escogiendoLista) {
+
+            // Limpiar consola para que se vea mas fancy
+            System.out.print("\033c");
+
+            // Espacio al inicio para no saturar e indicar menu
+            System.out.println();
+            System.out.println("Procesamiento de listas de cadenas AFN");
+            System.out.println();
+            System.out.println("Automata: " + nombreAFN);
+
+            // Mostrar las opciones para probar AFN
+            System.out.println("Presionando el entero seguido de la tecla enter, por favor");
+            System.out.println("seleccione una opción:");
+            System.out.println();
+            System.out.println("1. Procesar lista de cadenas aleatorias");
+            System.out.println("2. Importar y procesar lista de cadenas");
+            System.out.println("0. Volver");
+            System.out.println();
+            System.out.print("Ingrese su opción: ");
+            Integer opcion = input.nextInt();
+            System.out.println();
+
+            Iterable<String> listaCadenas;
+            String nombreArchivo;
+            String imprimirPantallaStr;
+            boolean imprimirPantalla;
+
+            // Redirigir a la opcion deseada
+            switch (opcion) {
+
+                case 1:
+                    // Pedir informacion necesaria para crear la lista
+                    // Pedir cantidad de cadenas
+                    int numCadenas = 0;
+                    while (numCadenas < 1) {
+                        System.out.println("Por favor ingrese el numero de cadenas a generar");
+                        while (!input.hasNext()) {
+                            // Esperar a que haya un input y luego sí avanzas
+                        }
+                        numCadenas = input.nextInt();
+                    }
+                    listaCadenas = afn.getAlfabeto().generarCadenas(numCadenas);
+
+                    // Pedir info necesaria
+                    System.out.println("Indique el nombre del archivo de salida");
+                    nombreArchivo = input.next();
+                    System.out.println();
+
+                    System.out.println("ingrese \"p\" si desea imprimir los resultados en pantalla.");
+                    while (!input.hasNext()) {
+                        // Esperar a que haya un input y luego sí avanzas
+                    }
+                    imprimirPantallaStr = input.next();
+                    System.out.println();
+                    imprimirPantalla = imprimirPantallaStr.equalsIgnoreCase("p");
+
+                    //procesar lista
+                    afn.procesarListaCadenas(listaCadenas, nombreArchivo, imprimirPantalla);
+                    // Esperar hasta que presione enter
+                    System.out.println("Presione enter para continuar");
+                    try {
+                        System.in.read();
+                    } catch (IOException er) {
+                        er.printStackTrace();
+                    }
+                    break;
+
+                case 2:
+                    // Pedir informacion necesaria para crear la lista
+                    // Pedir ruta al archivo
+                    System.out.println("Por favor ingrese la ruta al archivo que contiene la lista");
+                    while (!input.hasNext()) {
+                        // Esperar a que haya un input y luego sí avanzas
+                    }
+                    String rutaArchivo = input.next();
+                    System.out.println();
+
+                    // Pedir info necesaria
+                    System.out.println("Indique el nombre del archivo de salida");
+                    nombreArchivo = input.next();
+                    System.out.println();
+
+                    System.out.println("ingrese \"p\" si desea imprimir los resultados en pantalla.");
+                    while (!input.hasNext()) {
+                        // Esperar a que haya un input y luego sí avanzas
+                    }
+                    imprimirPantallaStr = input.next();
+                    System.out.println();
+                    imprimirPantalla = imprimirPantallaStr.equalsIgnoreCase("p");
+
+                    // Crear lista
+                    try {
+                        listaCadenas = leerListaCadenasDesdeArchivo(rutaArchivo);
+
+                        //procesar lista
+                        afn.procesarListaCadenas(listaCadenas, nombreArchivo, imprimirPantalla);
+                        // Esperar hasta que presione enter
+                        System.out.println("Presione enter para continuar");
+                        try {
+                            System.in.read();
+                        } catch (IOException er) {
+                            er.printStackTrace();
+                        }
+                    } catch (Exception e) {
+                        if (devMode) {
+                            e.printStackTrace();
+                        }
+                        System.out.println("\nOcurrió un error al buscar el archivo.\n");
+                        escogiendoLista = false;
+
+                        // Esperar hasta que presione enter
+                        System.out.println("Presione enter para continuar");
+                        try {
+                            System.in.read();
+                        } catch (IOException er) {
+                            er.printStackTrace();
+                        }
+                    }
+                    break;
+
+                case 0:
+                    escogiendoLista = false;
+                    break;
+
+                default:
+
+                    System.out.println("Opción inválida");
+
+                    try {
+
+                        // Espera que lea el mensaje
+                        TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+                    } catch (InterruptedException e) {
+
+                        e.printStackTrace();
+
+                    }
+
+                    break;
+
+            }
+
+        }
+    }
+
     private static void imprimirListaNombresAFN() {
         Integer numActual = 1;
 
@@ -2313,7 +2542,8 @@ public class ClasePrueba {
             System.out.println();
             System.out.println("1. Editar AF2P ");
             System.out.println("2. Procesar cadenas");
-            System.out.println("3. Exportar AF2P");
+            System.out.println("3. Procesar lista de cadenas");
+            System.out.println("4. Exportar AF2P");
             System.out.println("0. Volver");
             System.out.println();
             System.out.print("Ingrese su opción: ");
@@ -2332,6 +2562,10 @@ public class ClasePrueba {
                     break;
 
                 case 3:
+                    procesarListaDeCadenasAF2P(input);
+                    break;
+
+                case 4:
                     exportarAF2P(input);
                     break;
 
@@ -2436,7 +2670,7 @@ public class ClasePrueba {
 
     }
 
-    // Crear AFN
+    // Crear AF2P
     private static void crearAF2P(Scanner input) {
 
         // Limpiar consola para que se vea mas fancy
@@ -2513,7 +2747,7 @@ public class ClasePrueba {
 
     }
 
-    // Eliminar AFN
+    // Eliminar AF2P
     static void eliminarAF2P(Scanner input) {
 
         // Limpiar consola para que se vea mas fancy
@@ -2581,7 +2815,7 @@ public class ClasePrueba {
 
     }
 
-    // * Exportar AFN
+    // * Exportar AF2P
     private static void exportarAF2P(Scanner input) {
 
         // Limpiar consola para que se vea mas fancy
@@ -2653,7 +2887,7 @@ public class ClasePrueba {
         String nombreArchivoSalida = input.next();
         System.out.println();
 
-        // Exportar el AFN
+        // Exportar el AF2P
         try {
 
             automatasAF2PActuales.get(nombreAF2P).exportar(nombreArchivoSalida);
@@ -2769,7 +3003,7 @@ public class ClasePrueba {
 
                 // Pedir info necesaria
                 System.out.println("Ingrese la cadena a procesar");
-                cadena = input.next();
+                cadena = input.next().replaceAll("\\s+","");
                 System.out.println();
                 Boolean cadenaValida = true;
                 for (int i = 0; i < cadena.length(); i++) {
@@ -2892,6 +3126,231 @@ public class ClasePrueba {
         }
     }
 
+    // * Procesar lista de cadenas AF2P
+    private static void procesarListaDeCadenasAF2P(Scanner input) {
+
+        // Verificar que sí existan
+        if (automatasAF2PActuales.size() == 0) {
+
+            // Limpiar consola para que se vea mas fancy
+            System.out.print("\033c");
+
+            System.out.println();
+            System.out.println("Todavía no se ha creado ningún AF2P.");
+            System.out.println();
+
+            try {
+
+                // Espera que lea el mensaje
+                TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+            } catch (InterruptedException e) {
+
+                e.printStackTrace();
+
+            }
+
+            return;
+
+        }
+
+        // Limpiar consola para que se vea mas fancy
+        System.out.print("\033c");
+
+        // Espacio al inicio para no saturar e indicar menu
+        System.out.println();
+        System.out.println("Procesamiento de cadenas por AF2P");
+        System.out.println();
+
+        if (automatasAF2PActuales.size() != 0) {
+
+            // Listar AF2Ps
+            imprimirListaNombresAF2P();
+
+        }
+
+        // Ingresar el AF2P con el que se desea trabajar
+        Boolean ingresandoAF2P = true;
+        String nombreAF2P = "";
+
+        while (ingresandoAF2P) {
+
+            // Pedir info necesaria
+            System.out.println("Indique el nombre del AF2P que desea utilizar");
+            nombreAF2P = input.next();
+            System.out.println();
+
+            if (!automatasAF2PActuales.keySet().contains(nombreAF2P)) {
+
+                System.out.println("No hay ningun AF2P con ese nombre.");
+                System.out.println("Por favor intentelo nuevamente.");
+                System.out.println();
+
+            } else {
+
+                ingresandoAF2P = false;
+
+            }
+        }
+        AF2P af2p = automatasAF2PActuales.get(nombreAF2P);
+
+        procesarListaDeCadenasAF2PConEsteAF2P(af2p, input, nombreAF2P);
+
+    }
+    
+    private static void procesarListaDeCadenasAF2PConEsteAF2P(AF2P af2p, Scanner input, String nombreAF2P) {
+
+        // Setup menu probar AF2P
+        Boolean escogiendoLista = true;
+
+        // Menu que muestra las opciones para af2p
+        while (escogiendoLista) {
+
+            // Limpiar consola para que se vea mas fancy
+            System.out.print("\033c");
+
+            // Espacio al inicio para no saturar e indicar menu
+            System.out.println();
+            System.out.println("Procesamiento de listas de cadenas AF2P");
+            System.out.println();
+            System.out.println("Automata: " + nombreAF2P);
+
+            // Mostrar las opciones para probar AF2P
+            System.out.println("Presionando el entero seguido de la tecla enter, por favor");
+            System.out.println("seleccione una opción:");
+            System.out.println();
+            System.out.println("1. Procesar lista de cadenas aleatorias");
+            System.out.println("2. Importar y procesar lista de cadenas");
+            System.out.println("0. Volver");
+            System.out.println();
+            System.out.print("Ingrese su opción: ");
+            Integer opcion = input.nextInt();
+            System.out.println();
+
+            Iterable<String> listaCadenas;
+            String nombreArchivo;
+            String imprimirPantallaStr;
+            boolean imprimirPantalla;
+
+            // Redirigir a la opcion deseada
+            switch (opcion) {
+
+                case 1:
+                    // Pedir informacion necesaria para crear la lista
+                    // Pedir cantidad de cadenas
+                    int numCadenas = 0;
+                    while (numCadenas < 1) {
+                        System.out.println("Por favor ingrese el numero de cadenas a generar");
+                        while (!input.hasNext()) {
+                            // Esperar a que haya un input y luego sí avanzas
+                        }
+                        numCadenas = input.nextInt();
+                    }
+                    listaCadenas = af2p.getAlfabeto().generarCadenas(numCadenas);
+
+                    // Pedir info necesaria
+                    System.out.println("Indique el nombre del archivo de salida");
+                    nombreArchivo = input.next();
+                    System.out.println();
+
+                    System.out.println("Ingrese \"p\" si desea imprimir los resultados en pantalla.");
+                    while (!input.hasNext()) {
+                        // Esperar a que haya un input y luego sí avanzas
+                    }
+                    imprimirPantallaStr = input.next();
+                    System.out.println();
+                    imprimirPantalla = imprimirPantallaStr.equalsIgnoreCase("p");
+
+                    //procesar lista
+                    af2p.procesarListaCadenas(listaCadenas, nombreArchivo, imprimirPantalla);
+                    // Esperar hasta que presione enter
+                    System.out.println("\nPresione enter para continuar");
+                    try {
+                        System.in.read();
+                    } catch (IOException er) {
+                        er.printStackTrace();
+                    }
+                    break;
+
+                case 2:
+                    // Pedir informacion necesaria para crear la lista
+                    // Pedir ruta al archivo
+                    System.out.println("Por favor ingrese la ruta al archivo que contiene la lista");
+                    while (!input.hasNext()) {
+                        // Esperar a que haya un input y luego sí avanzas
+                    }
+                    String rutaArchivo = input.next();
+                    System.out.println();
+
+                    // Pedir info necesaria
+                    System.out.println("Indique el nombre del archivo de salida");
+                    nombreArchivo = input.next();
+                    System.out.println();
+
+                    System.out.println("ingrese \"p\" si desea imprimir los resultados en pantalla.");
+                    while (!input.hasNext()) {
+                        // Esperar a que haya un input y luego sí avanzas
+                    }
+                    imprimirPantallaStr = input.next();
+                    System.out.println();
+                    imprimirPantalla = imprimirPantallaStr.equalsIgnoreCase("p");
+
+                    // Crear lista
+                    try {
+                        listaCadenas = leerListaCadenasDesdeArchivo(rutaArchivo);
+
+                        //procesar lista
+                        af2p.procesarListaCadenas(listaCadenas, nombreArchivo, imprimirPantalla);
+                        // Esperar hasta que presione enter
+                        System.out.println("\nPresione enter para continuar");
+                        try {
+                            System.in.read();
+                        } catch (IOException er) {
+                            er.printStackTrace();
+                        }
+                    } catch (Exception e) {
+                        if (devMode) {
+                            e.printStackTrace();
+                        }
+                        System.out.println("\nOcurrió un error al buscar el archivo.\n");
+                        escogiendoLista = false;
+
+                        // Esperar hasta que presione enter
+                        System.out.println("Presione enter para continuar");
+                        try {
+                            System.in.read();
+                        } catch (IOException er) {
+                            er.printStackTrace();
+                        }
+                    }
+                    break;
+
+                case 0:
+                    escogiendoLista = false;
+                    break;
+
+                default:
+
+                    System.out.println("Opción inválida");
+
+                    try {
+
+                        // Espera que lea el mensaje
+                        TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+                    } catch (InterruptedException e) {
+
+                        e.printStackTrace();
+
+                    }
+
+                    break;
+
+            }
+
+        }
+    }
+
     private static void imprimirListaNombresAF2P() {
         Integer numActual = 1;
 
@@ -2908,7 +3367,6 @@ public class ClasePrueba {
 
         System.out.println();
     }
-
 
     // ** Probar MT
     private static void probarMT(Scanner input) {
@@ -2940,7 +3398,8 @@ public class ClasePrueba {
             System.out.println();
             System.out.println("1. Editar MT");
             System.out.println("2. Procesar cadenas");
-            System.out.println("3. Exportar MT");
+            System.out.println("3. Procesar listas de cadenas");
+            System.out.println("4. Exportar MT");
             System.out.println("0. Volver");
             System.out.println();
             System.out.print("Ingrese su opción: ");
@@ -2959,6 +3418,10 @@ public class ClasePrueba {
                     break;
 
                 case 3:
+                    procesarListaDeCadenasMT(input);
+                    break;
+                
+                case 4:
                     exportarMT(input);
                     break;
 
@@ -3242,7 +3705,7 @@ public class ClasePrueba {
         System.out.println();
 
         // Mostrar automatas existentes
-        if (automatasAF2PActuales.size() != 0) {
+        if (MTActuales.size() != 0) {
 
             // Listar MTs
             imprimirListaNombresMT();
@@ -3349,7 +3812,7 @@ public class ClasePrueba {
 
             if (!MTActuales.keySet().contains(nombreMT)) {
 
-                System.out.println("No hay ningun AF2P con ese nombre.");
+                System.out.println("No hay ninguna MT con ese nombre.");
                 System.out.println("Por favor intentelo nuevamente.");
                 System.out.println();
 
@@ -3396,7 +3859,7 @@ public class ClasePrueba {
 
                 // Pedir info necesaria
                 System.out.println("Ingrese la cadena a procesar");
-                cadena = input.next();
+                cadena = input.next().replaceAll("\\s+","");
                 System.out.println();
                 Boolean cadenaValida = true;
                 for (int i = 0; i < cadena.length(); i++) {
@@ -3509,6 +3972,192 @@ public class ClasePrueba {
         }
     }
 
+    // * Procesar lista de cadenas MT
+    private static void procesarListaDeCadenasMT(Scanner input) {
+
+        // Verificar que sí existan
+        if (MTActuales.size() == 0) {
+
+            // Limpiar consola para que se vea mas fancy
+            System.out.print("\033c");
+
+            System.out.println();
+            System.out.println("Todavía no se ha creado ninguna MT.");
+            System.out.println();
+
+            try {
+
+                // Espera que lea el mensaje
+                TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+            } catch (InterruptedException e) {
+
+                e.printStackTrace();
+
+            }
+
+            return;
+
+        }
+
+        // Limpiar consola para que se vea mas fancy
+        System.out.print("\033c");
+
+        // Espacio al inicio para no saturar e indicar menu
+        System.out.println();
+        System.out.println("Procesamiento de cadenas por MT");
+        System.out.println();
+
+        if (MTActuales.size() != 0) {
+
+            // Listar MTa
+            imprimirListaNombresMT();
+
+        }
+
+        // Ingresar la MT con la que se desea trabajar
+        Boolean ingresandoMT = true;
+        String nombreMT = "";
+
+        while (ingresandoMT) {
+
+            // Pedir info necesaria
+            System.out.println("Indique el nombre de la MT que desea utilizar");
+            nombreMT = input.next();
+            System.out.println();
+
+            if (!MTActuales.keySet().contains(nombreMT)) {
+
+                System.out.println("No hay ninguna MT con ese nombre.");
+                System.out.println("Por favor intentelo nuevamente.");
+                System.out.println();
+
+            } else {
+
+                ingresandoMT = false;
+
+            }
+        }
+        MT mt = MTActuales.get(nombreMT);
+
+        procesarListaDeCadenasMTConEstaMT(mt, input, nombreMT);
+
+    }
+    
+    private static void procesarListaDeCadenasMTConEstaMT(MT mt, Scanner input, String nombreMT) {
+
+        Boolean escogiendoLista = true;
+
+        // Menu que muestra las opciones de listas
+        while (escogiendoLista) {
+
+            // Limpiar consola para que se vea mas fancy
+            System.out.print("\033c");
+
+            // Espacio al inicio para no saturar e indicar menu
+            System.out.println();
+            System.out.println("Procesamiento de listas de cadenas con MT");
+            System.out.println();
+            System.out.println("Automata: " + nombreMT);
+
+            // Mostrar las opciones para probar MT
+            System.out.println("Presionando el entero seguido de la tecla enter, por favor");
+            System.out.println("seleccione una opción:");
+            System.out.println();
+            System.out.println("1. Importar y procesar lista de cadenas");
+            System.out.println("0. Volver");
+            System.out.println();
+            System.out.print("Ingrese su opción: ");
+            Integer opcion = input.nextInt();
+            System.out.println();
+
+            Iterable<String> listaCadenas;
+            String nombreArchivo;
+            String imprimirPantallaStr;
+            boolean imprimirPantalla;
+
+            // Redirigir a la opcion deseada
+            switch (opcion) {
+
+                case 1:
+                    // Pedir informacion necesaria para crear la lista
+                    // Pedir ruta al archivo
+                    System.out.println("Por favor ingrese la ruta al archivo que contiene la lista");
+                    while (!input.hasNext()) {
+                        // Esperar a que haya un input y luego sí avanzas
+                    }
+                    String rutaArchivo = input.next();
+                    System.out.println();
+
+                    // Pedir info necesaria
+                    System.out.println("Indique el nombre del archivo de salida");
+                    nombreArchivo = input.next();
+                    System.out.println();
+
+                    System.out.println("ingrese \"p\" si desea imprimir los resultados en pantalla.");
+                    while (!input.hasNext()) {
+                        // Esperar a que haya un input y luego sí avanzas
+                    }
+                    imprimirPantallaStr = input.next();
+                    System.out.println();
+                    imprimirPantalla = imprimirPantallaStr.equalsIgnoreCase("p");
+
+                    // Crear lista
+                    try {
+                        listaCadenas = leerListaCadenasDesdeArchivo(rutaArchivo);
+
+                        //procesar lista
+                        mt.procesarListaCadenas(listaCadenas, nombreArchivo, imprimirPantalla);
+                        // Esperar hasta que presione enter
+                        System.out.println("\nPresione enter para continuar");
+                        try {
+                            System.in.read();
+                        } catch (IOException er) {
+                            er.printStackTrace();
+                        }
+                    } catch (Exception e) {
+                        if (devMode) {
+                            e.printStackTrace();
+                        }
+                        System.out.println("\nOcurrió un error al buscar el archivo.\n");
+                        escogiendoLista = false;
+
+                        // Esperar hasta que presione enter
+                        System.out.println("Presione enter para continuar");
+                        try {
+                            System.in.read();
+                        } catch (IOException er) {
+                            er.printStackTrace();
+                        }
+                    }
+                    break;
+
+                case 0:
+                    escogiendoLista = false;
+                    break;
+
+                default:
+
+                    System.out.println("Opción inválida");
+
+                    try {
+
+                        // Espera que lea el mensaje
+                        TimeUnit.SECONDS.sleep(segundosEsperaLector);
+
+                    } catch (InterruptedException e) {
+
+                        e.printStackTrace();
+
+                    }
+
+                    break;
+
+            }
+
+        }
+    }
+
     private static void imprimirListaNombresMT() {
         Integer numActual = 1;
 
@@ -3525,7 +4174,6 @@ public class ClasePrueba {
 
         System.out.println();
     }
-
 
     // ** Probar AFN Lambda
     private static void probarAFNLambda(Scanner input) throws IOException {
