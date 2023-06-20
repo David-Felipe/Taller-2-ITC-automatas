@@ -2,7 +2,6 @@ package Logic;
 
 import java.util.*;
 import java.io.*;
-import org.jgrapht.alg.util.*;
 
 public class AFPD implements Comparable<AFPD> {
 
@@ -102,16 +101,8 @@ public class AFPD implements Comparable<AFPD> {
             return estadoDes;
         }
 
-        public void setEstadoDes(String estadoDes) {
-            this.estadoDes = estadoDes;
-        }
-
         public Character getTopeDestino() {
             return topeDestino;
-        }
-
-        public void setTopeDestino(Character topeDestino) {
-            this.topeDestino = topeDestino;
         }
 
     }
@@ -149,16 +140,8 @@ public class AFPD implements Comparable<AFPD> {
             return estadoAFPD;
         }
 
-        public void setEstado1(String estadoAFPD) {
-            this.estadoAFPD = estadoAFPD;
-        }
-
         public String getEstado2() {
             return estadoAFD;
-        }
-
-        public void setEstado2(String estadoAFD) {
-            this.estadoAFD = estadoAFD;
         }
 
     }

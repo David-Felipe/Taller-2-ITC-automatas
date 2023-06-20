@@ -1649,7 +1649,6 @@ public class ClasePrueba {
 
     }
 
-
     // ** Probar AFN
     private static void probarAFN(Scanner input) {
 
@@ -2108,7 +2107,7 @@ public class ClasePrueba {
     private static void procesarCadenasAFNConEsteAFN(AFN afn, Scanner input) {
 
         Boolean procesandoVariasCadenas = true;
-        while (procesandoVariasCadenas){
+        while (procesandoVariasCadenas) {
 
             // Ingresar la cadena a procesar
             Boolean ingresandoCadena = true;
@@ -2735,7 +2734,7 @@ public class ClasePrueba {
     private static void procesarCadenasAF2PConEsteAF2P(AF2P af2p, Scanner input) {
 
         Boolean procesandoVariasCadenas = true;
-        while (procesandoVariasCadenas){
+        while (procesandoVariasCadenas) {
 
             // Ingresar la cadena a procesar
             Boolean ingresandoCadena = true;
@@ -2830,7 +2829,7 @@ public class ClasePrueba {
                             System.out.println("Uno de los procesamientos mas cortos es: ");
                             System.out.println(af2p.getProcesamientoRechazo());
                         }
-                        
+
                         break;
 
                     case 2:
@@ -2902,7 +2901,6 @@ public class ClasePrueba {
         System.out.println();
     }
 
-
     // ** Probar AFN Lambda
     private static void probarAFNLambda(Scanner input) throws IOException {
         System.out.print("Ingrese el nombre del archivo AFNLambda: ");
@@ -2919,7 +2917,6 @@ public class ClasePrueba {
         }
 
         Boolean probandoAFNLambda = true;
-        TreeSet<AFD> automatasActuales = new TreeSet<>();
 
         while (probandoAFNLambda) {
 

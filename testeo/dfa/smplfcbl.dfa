@@ -28,4 +28,4 @@ q5: 1 > q2
 q6: 0 > q5
 q6: 1 > q3
 #comentario
-AFD que acepta el lenguaje binario de cadenas que contienen un número par de ceros
+AFD que acepta el lenguaje binario de cadenas 1*0[ ((0U1)0)* U ((0U1)1(0U1))*]
