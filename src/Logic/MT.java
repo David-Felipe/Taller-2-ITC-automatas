@@ -292,7 +292,6 @@ public class MT {
     }
 
     // Hallar los estados inasequibles del automata y guardarlos en
-    // "this.estadosInasequibles"
     public void hallarEstadosInaccesibles() {
         this.estadosInaccesibles = new HashSet<>();
         HashSet<String> estados = new HashSet<String>();
@@ -345,7 +344,7 @@ public class MT {
     public void addTransition(String fromState, Character symbol, String toState,  Character replacementSymbol, Character movement) {
         if (this.Q.contains(fromState) && 
         this.Q.contains(toState) && 
-        (this.sigma.contains(symbol) || symbol == '!') &&
+        (this.gama.contains(symbol) || this.sigma.contains(symbol) || symbol == '!') &&
         (this.gama.contains(replacementSymbol) || replacementSymbol == '!') &&
         (movement.equals('-') || movement.equals('<') || movement.equals('>'))) {
 
