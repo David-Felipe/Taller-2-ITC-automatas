@@ -317,7 +317,11 @@ public class AFN {
 
     public Boolean procesarCadenaConDetalles(String cadena) {
         ProcesamientoCadenaAFN pAFN = new ProcesamientoCadenaAFN(cadena, this);
-        System.out.println(pAFN.procesamientoMasCorto() + " " + "Aceptacion");
+        String aceptacion = "No Aceptacion";
+        if (pAFN.esAceptada()) {
+            aceptacion = "Aceptacion";
+        }
+        System.out.println(pAFN.procesamientoMasCorto() + " " + aceptacion);
         return pAFN.esAceptada();
     }
 
