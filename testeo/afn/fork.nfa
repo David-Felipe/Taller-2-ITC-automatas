@@ -39,5 +39,5 @@ q8:a>q13
 q9:a>q14
 q10:a>q15
 q11:a>q16
-inac1ible_1:a>q0;inaccesible_2
+inaccesible_1:a>q0;inaccesible_2
 inaccesible_2:b>inaccesible_1;inaccesible_2

@@ -234,12 +234,16 @@ public class AFN {
     }
 
     // Hallar los estados inasequibles del automata y guardarlos en
-    // "this.estadosInasequibles"
+    // "this.estadosInaccesibles"
     private void hallarEstadosInaccesibles() {
         HashSet<String> estados = new HashSet<String>();
+
+        // A~adir q0 al conjunto estados
         estados.add(this.q0);
         int oldSizeEstados = 0;
 
+        // Evaluar delta en el conjunto estados
+        // a~adir los nuevos estados al conjunto estados
         NavigableSet<Character> alfabeto = this.sigma.getAlfabeto();
         while (oldSizeEstados != estados.size()) {
             oldSizeEstados = estados.size();
@@ -258,6 +262,8 @@ public class AFN {
             estados = copyEstados;
         }
 
+        // Construir el conjunto de estados inaccesibles
+        // (complemento de estados)
         Iterator<String> iterator = this.Q.iterator();
         while (iterator.hasNext()) {
             String estado = iterator.next();
