@@ -6,14 +6,11 @@ q0
 q3
 q4
 q5
-q6
-q8
-q9
+qa
 #initial
 q0
 #accepting
-q6
-q8
+qa
 #inputAlphabet
 a 
 b 
@@ -21,7 +18,7 @@ b
 a 
 b 
 #transitions
-q0:!?q6:!:-
+q0:!?qa:!:-
 q0:a?q1:!:>
 q0:b?q3:!:>
 q1:a?q1:a:>
@@ -35,5 +32,3 @@ q4:b?q5:!:<
 q5:a?q5:a:<
 q5:b?q5:b:<
 q5:!?q0:!:>
-q8:b?q9:!:<
-q9:a?q8:a:<
