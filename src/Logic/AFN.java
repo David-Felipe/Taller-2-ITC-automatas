@@ -645,6 +645,9 @@ public class AFN {
 
         for (String cadena : listaCadenas) {
 
+            if (cadena.equals("$")){
+                cadena = "";
+            }
             ProcesamientoCadenaAFN pAFN = new ProcesamientoCadenaAFN(cadena, this);
 
             String fueAceptada = "no";

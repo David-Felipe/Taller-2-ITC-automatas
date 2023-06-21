@@ -1,0 +1,6 @@
+Taller-2-ITC-automatas/testeo/afn/fork.nfa
+Taller-2-ITC-automatas/testeo/afn/regex01_1.nfa
+Taller-2-ITC-automatas/testeo/afn/regex01_2.nfa
+Taller-2-ITC-automatas/testeo/afn/regexab_1.nfa
+Taller-2-ITC-automatas/testeo/afn/regexab_2.nfa
+Taller-2-ITC-automatas/testeo/afn/terminadas_en_b.nfa

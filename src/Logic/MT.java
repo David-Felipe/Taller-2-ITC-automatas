@@ -385,7 +385,10 @@ public class MT {
         this.sufijo = new Stack<Character>();
 
         for (int i = cadena.length()-1; i >= 0; i--) {
-            this.sufijo.push(cadena.charAt(i));
+            Character symbol = cadena.charAt(i);
+            if (!symbol.equals('$')){
+                this.sufijo.push(symbol);
+            }
         }
 
         Character readOnTape;

@@ -1,0 +1,13 @@
+Clasificacion:
+
+Taller-2-ITC-automatas/testeo/tm/num_a_igual_num_b.tm
+Taller-2-ITC-automatas/testeo/tm/palindromos_par.tm
+Taller-2-ITC-automatas/testeo/tm/potencias_de_dos.tm
+Taller-2-ITC-automatas/testeo/tm/ww.tm
+
+
+Funciones:
+
+Taller-2-ITC-automatas/testeo/tm/n_mas_m.tm
+Taller-2-ITC-automatas/testeo/tm/n_mod_3.tm
+Taller-2-ITC-automatas/testeo/tm/next_lex_ord_a-z.tm

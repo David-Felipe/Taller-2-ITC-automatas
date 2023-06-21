@@ -1,0 +1,3 @@
+Taller-2-ITC-automatas/testeo/af2p/anbncn.msm
+Taller-2-ITC-automatas/testeo/af2p/anbncndn.msm
+Taller-2-ITC-automatas/testeo/af2p/ww.msm

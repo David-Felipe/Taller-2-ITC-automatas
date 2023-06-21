@@ -422,7 +422,7 @@ public class AF2P {
     }
 
     public void preprocesarCadena(String estado, String cadena, Stack<Character> pila1, Stack<Character> pila2, String str, int numPasos) {
-        if (cadena.isEmpty()) {
+        if (cadena.isEmpty() || cadena.equals("$")) {
             
             this.numProcesamientos++;
 
